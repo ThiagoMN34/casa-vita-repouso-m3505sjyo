@@ -2,8 +2,8 @@ import { Hero } from '@/components/sections/Hero'
 import { About } from '@/components/sections/About'
 import { Services } from '@/components/sections/Services'
 import { Team } from '@/components/sections/Team'
-import { FAQ } from '@/components/sections/FAQ'
 import { Gallery } from '@/components/sections/Gallery'
+import { FAQ } from '@/components/sections/FAQ'
 import { CTA } from '@/components/sections/CTA'
 
 export default function Index() {

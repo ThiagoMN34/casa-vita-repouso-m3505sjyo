@@ -1,61 +1,53 @@
 import { Button } from '@/components/ui/button'
-import { ArrowRight, Heart } from 'lucide-react'
-import posterImg from '@/assets/poster-b2fef.jpg'
 import { trackWhatsAppClick } from '@/lib/tracking'
 
 export function Hero() {
-  const handleWhatsAppClick = () => {
-    trackWhatsAppClick()
-    window.open('https://wa.me/5511981182882', '_blank')
-  }
-
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-primary/5 pt-20">
-      <div className="absolute inset-0 z-0">
-        <img
-          src={posterImg}
-          alt="Cuidados com carinho na Casa Vita"
-          className="w-full h-full object-cover object-center opacity-30 md:opacity-100"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-transparent md:w-3/4 lg:w-2/3 xl:w-1/2"></div>
-      </div>
-
-      <div className="container relative z-10 mx-auto px-4 md:px-6">
-        <div className="max-w-2xl animate-fade-in-up">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
-            <Heart className="h-4 w-4 fill-primary" />
-            <span className="text-sm font-semibold">Cuidado e Acolhimento</span>
+    <section className="relative overflow-hidden bg-white pt-24 pb-16 md:pt-32 md:pb-24">
+      <div className="absolute inset-0 bg-gradient-to-b from-[#B4D330]/5 to-transparent -z-10" />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+          <div className="max-w-2xl">
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl leading-tight">
+              Alegria, carinho e <span className="text-[#B4D330]">qualidade de vida</span>
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-gray-600">
+              Na Casa Vita, oferecemos uma moradia assistida com foco no bem-estar e na segurança de
+              quem você ama. Nossa equipe especializada proporciona cuidados diários em um ambiente
+              acolhedor e cheio de vida.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-4 sm:gap-6">
+              <a
+                href="https://wa.me/5511999999999"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={trackWhatsAppClick}
+              >
+                <Button
+                  size="lg"
+                  className="rounded-full bg-[#B4D330] hover:bg-[#a0bc2a] text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
+                >
+                  Fale pelo WhatsApp
+                </Button>
+              </a>
+              <a
+                href="#about"
+                className="text-base font-semibold leading-6 text-gray-900 hover:text-[#B4D330] transition-colors px-4 py-2"
+              >
+                Conheça a Casa Vita <span aria-hidden="true">→</span>
+              </a>
+            </div>
           </div>
-
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6">
-            O lar perfeito para quem você <span className="text-primary">mais ama.</span>
-          </h1>
-
-          <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
-            Na Casa Vita, oferecemos um ambiente moderno, seguro e cheio de vida. Nossa equipe
-            especializada proporciona cuidados 24h com muito respeito, carinho e dedicação
-            profissional.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button
-              size="lg"
-              className="rounded-2xl text-base px-8 h-14 bg-primary hover:bg-primary/90"
-              onClick={handleWhatsAppClick}
-            >
-              Falar com um Especialista
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="rounded-2xl text-base px-8 h-14 border-primary text-primary hover:bg-primary/5 bg-white/50 backdrop-blur-sm"
-              onClick={() =>
-                document.getElementById('servicos')?.scrollIntoView({ behavior: 'smooth' })
-              }
-            >
-              Conhecer Nossos Serviços
-            </Button>
+          <div className="relative mx-auto w-full max-w-lg lg:max-w-none group">
+            <div className="absolute -top-4 -right-4 w-72 h-72 bg-[#B4D330]/20 rounded-full blur-3xl -z-10 transition-all duration-500 group-hover:bg-[#B4D330]/30" />
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl transition-transform duration-500 hover:scale-[1.02]">
+              <img
+                src="https://img.usecurling.com/p/800/600?q=happy%20seniors%20smiling"
+                alt="Idosos felizes e sorridentes na Casa Vita"
+                className="w-full h-[500px] object-cover"
+              />
+              <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-gray-900/10" />
+            </div>
           </div>
         </div>
       </div>

@@ -1,40 +1,36 @@
 export function Gallery() {
   const images = [
-    'https://img.usecurling.com/p/600/400?q=senior%20activities&color=orange',
-    'https://img.usecurling.com/p/600/400?q=nursing%20home%20garden',
-    'https://img.usecurling.com/p/600/400?q=elderly%20care%20room',
-    'https://img.usecurling.com/p/600/400?q=senior%20dining&color=green',
-    'https://img.usecurling.com/p/600/400?q=physical%20therapy%20elderly',
-    'https://img.usecurling.com/p/600/400?q=happy%20senior%20people&color=blue',
+    'https://img.usecurling.com/p/600/400?q=living%20room%20cozy',
+    'https://img.usecurling.com/p/600/400?q=healthy%20food',
+    'https://img.usecurling.com/p/600/400?q=elderly%20activities',
+    'https://img.usecurling.com/p/600/400?q=garden%20sunny',
+    'https://img.usecurling.com/p/600/400?q=bedroom%20comfortable',
+    'https://img.usecurling.com/p/600/400?q=senior%20care',
   ]
 
   return (
-    <section className="py-20 bg-primary/5">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nossos Ambientes</h2>
-          <p className="text-lg text-muted-foreground">
-            Conheça um pouco das nossas instalações, preparadas com carinho para oferecer o máximo
-            de conforto.
+    <section id="gallery" className="py-24 sm:py-32 bg-gray-50/50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center mb-16">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Conheça Nosso Espaço
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Ambientes amplos, modernos e planejados para oferecer máximo conforto e segurança.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {images.map((src, index) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {images.map((src, idx) => (
             <div
-              key={index}
-              className="group relative rounded-2xl overflow-hidden aspect-[4/3] bg-white shadow-sm hover:shadow-xl transition-all duration-300"
+              key={idx}
+              className="relative group overflow-hidden rounded-3xl aspect-[4/3] shadow-md hover:shadow-xl transition-all duration-300"
             >
               <img
                 src={src}
-                alt={`Galeria Casa Vita ${index + 1}`}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                alt={`Galeria Casa Vita ${idx + 1}`}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                <span className="text-white font-medium px-4 py-2 border-2 border-white rounded-full">
-                  Ver Ampliado
-                </span>
-              </div>
+              <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
           ))}
         </div>

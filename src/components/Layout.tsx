@@ -5,9 +5,9 @@ import { FloatingWhatsApp } from '@/components/FloatingWhatsApp'
 
 export function Layout() {
   return (
-    <div className="min-h-screen font-sans antialiased text-slate-900 bg-slate-50 flex flex-col">
+    <div className="min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-[#B4D330] selection:text-white">
       <Header />
-      <main className="flex-grow">
+      <main className="pt-[72px]">
         <Outlet />
       </main>
       <Footer />

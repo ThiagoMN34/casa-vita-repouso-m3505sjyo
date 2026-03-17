@@ -15437,6 +15437,22 @@ var __vitePreload = function preload(baseModule, deps, importerUrl) {
 //#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/react-router@7.13.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/react-router/dist/development/chunk-LFPYN7LY.mjs
 var import_react = /* @__PURE__ */ __toESM(require_react(), 1);
+/**
+* react-router v7.13.1
+*
+* Copyright (c) Remix Software Inc.
+*
+* This source code is licensed under the MIT license found in the
+* LICENSE.md file in the root directory of this source tree.
+*
+* @license MIT
+*/
+var __typeError = (msg) => {
+	throw TypeError(msg);
+};
+var __accessCheck = (obj, member, msg) => member.has(obj) || __typeError("Cannot " + msg);
+var __privateGet = (obj, member, getter) => (__accessCheck(obj, member, "read from private field"), getter ? getter.call(obj) : member.get(obj));
+var __privateAdd = (obj, member, value) => member.has(obj) ? __typeError("Cannot add the same private member more than once") : member instanceof WeakSet ? member.add(obj) : member.set(obj, value);
 var PopStateEventType = "popstate";
 function isLocation(obj) {
 	return typeof obj === "object" && obj != null && "pathname" in obj && "search" in obj && "hash" in obj && "state" in obj && "key" in obj;
@@ -15627,6 +15643,105 @@ function createBrowserURLImpl(to, isAbsolute = false) {
 	if (!isAbsolute && href.startsWith("//")) href = base + href;
 	return new URL(href, base);
 }
+function createContext(defaultValue) {
+	return { defaultValue };
+}
+var _map;
+var RouterContextProvider = class {
+	/**
+	* Create a new `RouterContextProvider` instance
+	* @param init An optional initial context map to populate the provider with
+	*/
+	constructor(init) {
+		__privateAdd(this, _map, /* @__PURE__ */ new Map());
+		if (init) for (let [context, value] of init) this.set(context, value);
+	}
+	/**
+	* Access a value from the context. If no value has been set for the context,
+	* it will return the context's `defaultValue` if provided, or throw an error
+	* if no `defaultValue` was set.
+	* @param context The context to get the value for
+	* @returns The value for the context, or the context's `defaultValue` if no
+	* value was set
+	*/
+	get(context) {
+		if (__privateGet(this, _map).has(context)) return __privateGet(this, _map).get(context);
+		if (context.defaultValue !== void 0) return context.defaultValue;
+		throw new Error("No value found for context");
+	}
+	/**
+	* Set a value for the context. If the context already has a value set, this
+	* will overwrite it.
+	*
+	* @param context The context to set the value for
+	* @param value The value to set for the context
+	* @returns {void}
+	*/
+	set(context, value) {
+		__privateGet(this, _map).set(context, value);
+	}
+};
+_map = /* @__PURE__ */ new WeakMap();
+var unsupportedLazyRouteObjectKeys = /* @__PURE__ */ new Set([
+	"lazy",
+	"caseSensitive",
+	"path",
+	"id",
+	"index",
+	"children"
+]);
+function isUnsupportedLazyRouteObjectKey(key) {
+	return unsupportedLazyRouteObjectKeys.has(key);
+}
+var unsupportedLazyRouteFunctionKeys = /* @__PURE__ */ new Set([
+	"lazy",
+	"caseSensitive",
+	"path",
+	"id",
+	"index",
+	"middleware",
+	"children"
+]);
+function isUnsupportedLazyRouteFunctionKey(key) {
+	return unsupportedLazyRouteFunctionKeys.has(key);
+}
+function isIndexRoute(route) {
+	return route.index === true;
+}
+function convertRoutesToDataRoutes(routes, mapRouteProperties2, parentPath = [], manifest = {}, allowInPlaceMutations = false) {
+	return routes.map((route, index) => {
+		let treePath = [...parentPath, String(index)];
+		let id = typeof route.id === "string" ? route.id : treePath.join("-");
+		invariant(route.index !== true || !route.children, `Cannot specify children on an index route`);
+		invariant(allowInPlaceMutations || !manifest[id], `Found a route id collision on id "${id}".  Route id's must be globally unique within Data Router usages`);
+		if (isIndexRoute(route)) {
+			let indexRoute = {
+				...route,
+				id
+			};
+			manifest[id] = mergeRouteUpdates(indexRoute, mapRouteProperties2(indexRoute));
+			return indexRoute;
+		} else {
+			let pathOrLayoutRoute = {
+				...route,
+				id,
+				children: void 0
+			};
+			manifest[id] = mergeRouteUpdates(pathOrLayoutRoute, mapRouteProperties2(pathOrLayoutRoute));
+			if (route.children) pathOrLayoutRoute.children = convertRoutesToDataRoutes(route.children, mapRouteProperties2, treePath, manifest, allowInPlaceMutations);
+			return pathOrLayoutRoute;
+		}
+	});
+}
+function mergeRouteUpdates(route, updates) {
+	return Object.assign(route, {
+		...updates,
+		...typeof updates.lazy === "object" && updates.lazy != null ? { lazy: {
+			...route.lazy,
+			...updates.lazy
+		} } : {}
+	});
+}
 function matchRoutes(routes, locationArg, basename = "/") {
 	return matchRoutesImpl(routes, locationArg, basename, false);
 }
@@ -15816,7 +15931,11 @@ function stripBasename(pathname, basename) {
 	if (nextChar && nextChar !== "/") return null;
 	return pathname.slice(startIndex) || "/";
 }
+function prependBasename({ basename, pathname }) {
+	return pathname === "/" ? basename : joinPaths([basename, pathname]);
+}
 var ABSOLUTE_URL_REGEX = /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i;
+var isAbsoluteUrl = (url) => ABSOLUTE_URL_REGEX.test(url);
 function resolvePath(to, fromPathname = "/") {
 	let { pathname: toPathname, search = "", hash = "" } = typeof to === "string" ? parsePath(to) : to;
 	let pathname;
@@ -15927,12 +16046,2587 @@ function parseToInfo(_to, basename) {
 		to
 	};
 }
-Object.getOwnPropertyNames(Object.prototype).sort().join("\0");
+var UninstrumentedSymbol = Symbol("Uninstrumented");
+function getRouteInstrumentationUpdates(fns, route) {
+	let aggregated = {
+		lazy: [],
+		"lazy.loader": [],
+		"lazy.action": [],
+		"lazy.middleware": [],
+		middleware: [],
+		loader: [],
+		action: []
+	};
+	fns.forEach((fn) => fn({
+		id: route.id,
+		index: route.index,
+		path: route.path,
+		instrument(i) {
+			let keys = Object.keys(aggregated);
+			for (let key of keys) if (i[key]) aggregated[key].push(i[key]);
+		}
+	}));
+	let updates = {};
+	if (typeof route.lazy === "function" && aggregated.lazy.length > 0) {
+		let instrumented = wrapImpl(aggregated.lazy, route.lazy, () => void 0);
+		if (instrumented) updates.lazy = instrumented;
+	}
+	if (typeof route.lazy === "object") {
+		let lazyObject = route.lazy;
+		[
+			"middleware",
+			"loader",
+			"action"
+		].forEach((key) => {
+			let lazyFn = lazyObject[key];
+			let instrumentations = aggregated[`lazy.${key}`];
+			if (typeof lazyFn === "function" && instrumentations.length > 0) {
+				let instrumented = wrapImpl(instrumentations, lazyFn, () => void 0);
+				if (instrumented) updates.lazy = Object.assign(updates.lazy || {}, { [key]: instrumented });
+			}
+		});
+	}
+	["loader", "action"].forEach((key) => {
+		let handler = route[key];
+		if (typeof handler === "function" && aggregated[key].length > 0) {
+			let original = handler[UninstrumentedSymbol] ?? handler;
+			let instrumented = wrapImpl(aggregated[key], original, (...args) => getHandlerInfo(args[0]));
+			if (instrumented) {
+				if (key === "loader" && original.hydrate === true) instrumented.hydrate = true;
+				instrumented[UninstrumentedSymbol] = original;
+				updates[key] = instrumented;
+			}
+		}
+	});
+	if (route.middleware && route.middleware.length > 0 && aggregated.middleware.length > 0) updates.middleware = route.middleware.map((middleware) => {
+		let original = middleware[UninstrumentedSymbol] ?? middleware;
+		let instrumented = wrapImpl(aggregated.middleware, original, (...args) => getHandlerInfo(args[0]));
+		if (instrumented) {
+			instrumented[UninstrumentedSymbol] = original;
+			return instrumented;
+		}
+		return middleware;
+	});
+	return updates;
+}
+function instrumentClientSideRouter(router, fns) {
+	let aggregated = {
+		navigate: [],
+		fetch: []
+	};
+	fns.forEach((fn) => fn({ instrument(i) {
+		let keys = Object.keys(i);
+		for (let key of keys) if (i[key]) aggregated[key].push(i[key]);
+	} }));
+	if (aggregated.navigate.length > 0) {
+		let navigate = router.navigate[UninstrumentedSymbol] ?? router.navigate;
+		let instrumentedNavigate = wrapImpl(aggregated.navigate, navigate, (...args) => {
+			let [to, opts] = args;
+			return {
+				to: typeof to === "number" || typeof to === "string" ? to : to ? createPath(to) : ".",
+				...getRouterInfo(router, opts ?? {})
+			};
+		});
+		if (instrumentedNavigate) {
+			instrumentedNavigate[UninstrumentedSymbol] = navigate;
+			router.navigate = instrumentedNavigate;
+		}
+	}
+	if (aggregated.fetch.length > 0) {
+		let fetch2 = router.fetch[UninstrumentedSymbol] ?? router.fetch;
+		let instrumentedFetch = wrapImpl(aggregated.fetch, fetch2, (...args) => {
+			let [key, , href, opts] = args;
+			return {
+				href: href ?? ".",
+				fetcherKey: key,
+				...getRouterInfo(router, opts ?? {})
+			};
+		});
+		if (instrumentedFetch) {
+			instrumentedFetch[UninstrumentedSymbol] = fetch2;
+			router.fetch = instrumentedFetch;
+		}
+	}
+	return router;
+}
+function wrapImpl(impls, handler, getInfo) {
+	if (impls.length === 0) return null;
+	return async (...args) => {
+		let result = await recurseRight(impls, getInfo(...args), () => handler(...args), impls.length - 1);
+		if (result.type === "error") throw result.value;
+		return result.value;
+	};
+}
+async function recurseRight(impls, info, handler, index) {
+	let impl = impls[index];
+	let result;
+	if (!impl) try {
+		result = {
+			type: "success",
+			value: await handler()
+		};
+	} catch (e) {
+		result = {
+			type: "error",
+			value: e
+		};
+	}
+	else {
+		let handlerPromise = void 0;
+		let callHandler = async () => {
+			if (handlerPromise) console.error("You cannot call instrumented handlers more than once");
+			else handlerPromise = recurseRight(impls, info, handler, index - 1);
+			result = await handlerPromise;
+			invariant(result, "Expected a result");
+			if (result.type === "error" && result.value instanceof Error) return {
+				status: "error",
+				error: result.value
+			};
+			return {
+				status: "success",
+				error: void 0
+			};
+		};
+		try {
+			await impl(callHandler, info);
+		} catch (e) {
+			console.error("An instrumentation function threw an error:", e);
+		}
+		if (!handlerPromise) await callHandler();
+		await handlerPromise;
+	}
+	if (result) return result;
+	return {
+		type: "error",
+		value: /* @__PURE__ */ new Error("No result assigned in instrumentation chain.")
+	};
+}
+function getHandlerInfo(args) {
+	let { request, context, params, unstable_pattern } = args;
+	return {
+		request: getReadonlyRequest(request),
+		params: { ...params },
+		unstable_pattern,
+		context: getReadonlyContext(context)
+	};
+}
+function getRouterInfo(router, opts) {
+	return {
+		currentUrl: createPath(router.state.location),
+		..."formMethod" in opts ? { formMethod: opts.formMethod } : {},
+		..."formEncType" in opts ? { formEncType: opts.formEncType } : {},
+		..."formData" in opts ? { formData: opts.formData } : {},
+		..."body" in opts ? { body: opts.body } : {}
+	};
+}
+function getReadonlyRequest(request) {
+	return {
+		method: request.method,
+		url: request.url,
+		headers: { get: (...args) => request.headers.get(...args) }
+	};
+}
+function getReadonlyContext(context) {
+	if (isPlainObject(context)) {
+		let frozen = { ...context };
+		Object.freeze(frozen);
+		return frozen;
+	} else return { get: (ctx) => context.get(ctx) };
+}
+var objectProtoNames = Object.getOwnPropertyNames(Object.prototype).sort().join("\0");
+function isPlainObject(thing) {
+	if (thing === null || typeof thing !== "object") return false;
+	const proto = Object.getPrototypeOf(thing);
+	return proto === Object.prototype || proto === null || Object.getOwnPropertyNames(proto).sort().join("\0") === objectProtoNames;
+}
+var validMutationMethodsArr = [
+	"POST",
+	"PUT",
+	"PATCH",
+	"DELETE"
+];
+var validMutationMethods = new Set(validMutationMethodsArr);
+var validRequestMethodsArr = ["GET", ...validMutationMethodsArr];
+var validRequestMethods = new Set(validRequestMethodsArr);
+var redirectStatusCodes = /* @__PURE__ */ new Set([
+	301,
+	302,
+	303,
+	307,
+	308
+]);
+var redirectPreserveMethodStatusCodes = /* @__PURE__ */ new Set([307, 308]);
+var IDLE_NAVIGATION = {
+	state: "idle",
+	location: void 0,
+	formMethod: void 0,
+	formAction: void 0,
+	formEncType: void 0,
+	formData: void 0,
+	json: void 0,
+	text: void 0
+};
+var IDLE_FETCHER = {
+	state: "idle",
+	data: void 0,
+	formMethod: void 0,
+	formAction: void 0,
+	formEncType: void 0,
+	formData: void 0,
+	json: void 0,
+	text: void 0
+};
+var IDLE_BLOCKER = {
+	state: "unblocked",
+	proceed: void 0,
+	reset: void 0,
+	location: void 0
+};
+var defaultMapRouteProperties = (route) => ({ hasErrorBoundary: Boolean(route.hasErrorBoundary) });
+var TRANSITIONS_STORAGE_KEY = "remix-router-transitions";
+var ResetLoaderDataSymbol = Symbol("ResetLoaderData");
+function createRouter(init) {
+	const routerWindow = init.window ? init.window : typeof window !== "undefined" ? window : void 0;
+	const isBrowser3 = typeof routerWindow !== "undefined" && typeof routerWindow.document !== "undefined" && typeof routerWindow.document.createElement !== "undefined";
+	invariant(init.routes.length > 0, "You must provide a non-empty routes array to createRouter");
+	let hydrationRouteProperties2 = init.hydrationRouteProperties || [];
+	let _mapRouteProperties = init.mapRouteProperties || defaultMapRouteProperties;
+	let mapRouteProperties2 = _mapRouteProperties;
+	if (init.unstable_instrumentations) {
+		let instrumentations = init.unstable_instrumentations;
+		mapRouteProperties2 = (route) => {
+			return {
+				..._mapRouteProperties(route),
+				...getRouteInstrumentationUpdates(instrumentations.map((i) => i.route).filter(Boolean), route)
+			};
+		};
+	}
+	let manifest = {};
+	let dataRoutes = convertRoutesToDataRoutes(init.routes, mapRouteProperties2, void 0, manifest);
+	let inFlightDataRoutes;
+	let basename = init.basename || "/";
+	if (!basename.startsWith("/")) basename = `/${basename}`;
+	let dataStrategyImpl = init.dataStrategy || defaultDataStrategyWithMiddleware;
+	let future = { ...init.future };
+	let unlistenHistory = null;
+	let subscribers = /* @__PURE__ */ new Set();
+	let savedScrollPositions2 = null;
+	let getScrollRestorationKey2 = null;
+	let getScrollPosition = null;
+	let initialScrollRestored = init.hydrationData != null;
+	let initialMatches = matchRoutes(dataRoutes, init.history.location, basename);
+	let initialMatchesIsFOW = false;
+	let initialErrors = null;
+	let initialized;
+	let renderFallback;
+	if (initialMatches == null && !init.patchRoutesOnNavigation) {
+		let error = getInternalRouterError(404, { pathname: init.history.location.pathname });
+		let { matches, route } = getShortCircuitMatches(dataRoutes);
+		initialized = true;
+		renderFallback = !initialized;
+		initialMatches = matches;
+		initialErrors = { [route.id]: error };
+	} else {
+		if (initialMatches && !init.hydrationData) {
+			if (checkFogOfWar(initialMatches, dataRoutes, init.history.location.pathname).active) initialMatches = null;
+		}
+		if (!initialMatches) {
+			initialized = false;
+			renderFallback = !initialized;
+			initialMatches = [];
+			let fogOfWar = checkFogOfWar(null, dataRoutes, init.history.location.pathname);
+			if (fogOfWar.active && fogOfWar.matches) {
+				initialMatchesIsFOW = true;
+				initialMatches = fogOfWar.matches;
+			}
+		} else if (initialMatches.some((m) => m.route.lazy)) {
+			initialized = false;
+			renderFallback = !initialized;
+		} else if (!initialMatches.some((m) => routeHasLoaderOrMiddleware(m.route))) {
+			initialized = true;
+			renderFallback = !initialized;
+		} else {
+			let loaderData = init.hydrationData ? init.hydrationData.loaderData : null;
+			let errors = init.hydrationData ? init.hydrationData.errors : null;
+			let relevantMatches = initialMatches;
+			if (errors) {
+				let idx = initialMatches.findIndex((m) => errors[m.route.id] !== void 0);
+				relevantMatches = relevantMatches.slice(0, idx + 1);
+			}
+			renderFallback = false;
+			initialized = relevantMatches.every((m) => {
+				let status = getRouteHydrationStatus(m.route, loaderData, errors);
+				renderFallback = renderFallback || status.renderFallback;
+				return !status.shouldLoad;
+			});
+		}
+	}
+	let router;
+	let state = {
+		historyAction: init.history.action,
+		location: init.history.location,
+		matches: initialMatches,
+		initialized,
+		renderFallback,
+		navigation: IDLE_NAVIGATION,
+		restoreScrollPosition: init.hydrationData != null ? false : null,
+		preventScrollReset: false,
+		revalidation: "idle",
+		loaderData: init.hydrationData && init.hydrationData.loaderData || {},
+		actionData: init.hydrationData && init.hydrationData.actionData || null,
+		errors: init.hydrationData && init.hydrationData.errors || initialErrors,
+		fetchers: /* @__PURE__ */ new Map(),
+		blockers: /* @__PURE__ */ new Map()
+	};
+	let pendingAction = "POP";
+	let pendingPopstateNavigationDfd = null;
+	let pendingPreventScrollReset = false;
+	let pendingNavigationController;
+	let pendingViewTransitionEnabled = false;
+	let appliedViewTransitions = /* @__PURE__ */ new Map();
+	let removePageHideEventListener = null;
+	let isUninterruptedRevalidation = false;
+	let isRevalidationRequired = false;
+	let cancelledFetcherLoads = /* @__PURE__ */ new Set();
+	let fetchControllers = /* @__PURE__ */ new Map();
+	let incrementingLoadId = 0;
+	let pendingNavigationLoadId = -1;
+	let fetchReloadIds = /* @__PURE__ */ new Map();
+	let fetchRedirectIds = /* @__PURE__ */ new Set();
+	let fetchLoadMatches = /* @__PURE__ */ new Map();
+	let activeFetchers = /* @__PURE__ */ new Map();
+	let fetchersQueuedForDeletion = /* @__PURE__ */ new Set();
+	let blockerFunctions = /* @__PURE__ */ new Map();
+	let unblockBlockerHistoryUpdate = void 0;
+	let pendingRevalidationDfd = null;
+	function initialize() {
+		unlistenHistory = init.history.listen(({ action: historyAction, location, delta }) => {
+			if (unblockBlockerHistoryUpdate) {
+				unblockBlockerHistoryUpdate();
+				unblockBlockerHistoryUpdate = void 0;
+				return;
+			}
+			warning(blockerFunctions.size === 0 || delta != null, "You are trying to use a blocker on a POP navigation to a location that was not created by @remix-run/router. This will fail silently in production. This can happen if you are navigating outside the router via `window.history.pushState`/`window.location.hash` instead of using router navigation APIs.  This can also happen if you are using createHashRouter and the user manually changes the URL.");
+			let blockerKey = shouldBlockNavigation({
+				currentLocation: state.location,
+				nextLocation: location,
+				historyAction
+			});
+			if (blockerKey && delta != null) {
+				let nextHistoryUpdatePromise = new Promise((resolve) => {
+					unblockBlockerHistoryUpdate = resolve;
+				});
+				init.history.go(delta * -1);
+				updateBlocker(blockerKey, {
+					state: "blocked",
+					location,
+					proceed() {
+						updateBlocker(blockerKey, {
+							state: "proceeding",
+							proceed: void 0,
+							reset: void 0,
+							location
+						});
+						nextHistoryUpdatePromise.then(() => init.history.go(delta));
+					},
+					reset() {
+						let blockers = new Map(state.blockers);
+						blockers.set(blockerKey, IDLE_BLOCKER);
+						updateState({ blockers });
+					}
+				});
+				pendingPopstateNavigationDfd?.resolve();
+				pendingPopstateNavigationDfd = null;
+				return;
+			}
+			return startNavigation(historyAction, location);
+		});
+		if (isBrowser3) {
+			restoreAppliedTransitions(routerWindow, appliedViewTransitions);
+			let _saveAppliedTransitions = () => persistAppliedTransitions(routerWindow, appliedViewTransitions);
+			routerWindow.addEventListener("pagehide", _saveAppliedTransitions);
+			removePageHideEventListener = () => routerWindow.removeEventListener("pagehide", _saveAppliedTransitions);
+		}
+		if (!state.initialized) startNavigation("POP", state.location, { initialHydration: true });
+		return router;
+	}
+	function dispose() {
+		if (unlistenHistory) unlistenHistory();
+		if (removePageHideEventListener) removePageHideEventListener();
+		subscribers.clear();
+		pendingNavigationController && pendingNavigationController.abort();
+		state.fetchers.forEach((_, key) => deleteFetcher(key));
+		state.blockers.forEach((_, key) => deleteBlocker(key));
+	}
+	function subscribe(fn) {
+		subscribers.add(fn);
+		return () => subscribers.delete(fn);
+	}
+	function updateState(newState, opts = {}) {
+		if (newState.matches) newState.matches = newState.matches.map((m) => {
+			let route = manifest[m.route.id];
+			let matchRoute = m.route;
+			if (matchRoute.element !== route.element || matchRoute.errorElement !== route.errorElement || matchRoute.hydrateFallbackElement !== route.hydrateFallbackElement) return {
+				...m,
+				route
+			};
+			return m;
+		});
+		state = {
+			...state,
+			...newState
+		};
+		let unmountedFetchers = [];
+		let mountedFetchers = [];
+		state.fetchers.forEach((fetcher, key) => {
+			if (fetcher.state === "idle") if (fetchersQueuedForDeletion.has(key)) unmountedFetchers.push(key);
+			else mountedFetchers.push(key);
+		});
+		fetchersQueuedForDeletion.forEach((key) => {
+			if (!state.fetchers.has(key) && !fetchControllers.has(key)) unmountedFetchers.push(key);
+		});
+		[...subscribers].forEach((subscriber) => subscriber(state, {
+			deletedFetchers: unmountedFetchers,
+			newErrors: newState.errors ?? null,
+			viewTransitionOpts: opts.viewTransitionOpts,
+			flushSync: opts.flushSync === true
+		}));
+		unmountedFetchers.forEach((key) => deleteFetcher(key));
+		mountedFetchers.forEach((key) => state.fetchers.delete(key));
+	}
+	function completeNavigation(location, newState, { flushSync } = {}) {
+		let isActionReload = state.actionData != null && state.navigation.formMethod != null && isMutationMethod(state.navigation.formMethod) && state.navigation.state === "loading" && location.state?._isRedirect !== true;
+		let actionData;
+		if (newState.actionData) if (Object.keys(newState.actionData).length > 0) actionData = newState.actionData;
+		else actionData = null;
+		else if (isActionReload) actionData = state.actionData;
+		else actionData = null;
+		let loaderData = newState.loaderData ? mergeLoaderData(state.loaderData, newState.loaderData, newState.matches || [], newState.errors) : state.loaderData;
+		let blockers = state.blockers;
+		if (blockers.size > 0) {
+			blockers = new Map(blockers);
+			blockers.forEach((_, k) => blockers.set(k, IDLE_BLOCKER));
+		}
+		let restoreScrollPosition = isUninterruptedRevalidation ? false : getSavedScrollPosition(location, newState.matches || state.matches);
+		let preventScrollReset = pendingPreventScrollReset === true || state.navigation.formMethod != null && isMutationMethod(state.navigation.formMethod) && location.state?._isRedirect !== true;
+		if (inFlightDataRoutes) {
+			dataRoutes = inFlightDataRoutes;
+			inFlightDataRoutes = void 0;
+		}
+		if (isUninterruptedRevalidation) {} else if (pendingAction === "POP") {} else if (pendingAction === "PUSH") init.history.push(location, location.state);
+		else if (pendingAction === "REPLACE") init.history.replace(location, location.state);
+		let viewTransitionOpts;
+		if (pendingAction === "POP") {
+			let priorPaths = appliedViewTransitions.get(state.location.pathname);
+			if (priorPaths && priorPaths.has(location.pathname)) viewTransitionOpts = {
+				currentLocation: state.location,
+				nextLocation: location
+			};
+			else if (appliedViewTransitions.has(location.pathname)) viewTransitionOpts = {
+				currentLocation: location,
+				nextLocation: state.location
+			};
+		} else if (pendingViewTransitionEnabled) {
+			let toPaths = appliedViewTransitions.get(state.location.pathname);
+			if (toPaths) toPaths.add(location.pathname);
+			else {
+				toPaths = /* @__PURE__ */ new Set([location.pathname]);
+				appliedViewTransitions.set(state.location.pathname, toPaths);
+			}
+			viewTransitionOpts = {
+				currentLocation: state.location,
+				nextLocation: location
+			};
+		}
+		updateState({
+			...newState,
+			actionData,
+			loaderData,
+			historyAction: pendingAction,
+			location,
+			initialized: true,
+			renderFallback: false,
+			navigation: IDLE_NAVIGATION,
+			revalidation: "idle",
+			restoreScrollPosition,
+			preventScrollReset,
+			blockers
+		}, {
+			viewTransitionOpts,
+			flushSync: flushSync === true
+		});
+		pendingAction = "POP";
+		pendingPreventScrollReset = false;
+		pendingViewTransitionEnabled = false;
+		isUninterruptedRevalidation = false;
+		isRevalidationRequired = false;
+		pendingPopstateNavigationDfd?.resolve();
+		pendingPopstateNavigationDfd = null;
+		pendingRevalidationDfd?.resolve();
+		pendingRevalidationDfd = null;
+	}
+	async function navigate(to, opts) {
+		pendingPopstateNavigationDfd?.resolve();
+		pendingPopstateNavigationDfd = null;
+		if (typeof to === "number") {
+			if (!pendingPopstateNavigationDfd) pendingPopstateNavigationDfd = createDeferred();
+			let promise = pendingPopstateNavigationDfd.promise;
+			init.history.go(to);
+			return promise;
+		}
+		let { path, submission, error } = normalizeNavigateOptions(false, normalizeTo(state.location, state.matches, basename, to, opts?.fromRouteId, opts?.relative), opts);
+		let maskPath;
+		if (opts?.unstable_mask) maskPath = {
+			pathname: "",
+			search: "",
+			hash: "",
+			...typeof opts.unstable_mask === "string" ? parsePath(opts.unstable_mask) : {
+				...state.location.unstable_mask,
+				...opts.unstable_mask
+			}
+		};
+		let currentLocation = state.location;
+		let nextLocation = createLocation(currentLocation, path, opts && opts.state, void 0, maskPath);
+		nextLocation = {
+			...nextLocation,
+			...init.history.encodeLocation(nextLocation)
+		};
+		let userReplace = opts && opts.replace != null ? opts.replace : void 0;
+		let historyAction = "PUSH";
+		if (userReplace === true) historyAction = "REPLACE";
+		else if (userReplace === false) {} else if (submission != null && isMutationMethod(submission.formMethod) && submission.formAction === state.location.pathname + state.location.search) historyAction = "REPLACE";
+		let preventScrollReset = opts && "preventScrollReset" in opts ? opts.preventScrollReset === true : void 0;
+		let flushSync = (opts && opts.flushSync) === true;
+		let blockerKey = shouldBlockNavigation({
+			currentLocation,
+			nextLocation,
+			historyAction
+		});
+		if (blockerKey) {
+			updateBlocker(blockerKey, {
+				state: "blocked",
+				location: nextLocation,
+				proceed() {
+					updateBlocker(blockerKey, {
+						state: "proceeding",
+						proceed: void 0,
+						reset: void 0,
+						location: nextLocation
+					});
+					navigate(to, opts);
+				},
+				reset() {
+					let blockers = new Map(state.blockers);
+					blockers.set(blockerKey, IDLE_BLOCKER);
+					updateState({ blockers });
+				}
+			});
+			return;
+		}
+		await startNavigation(historyAction, nextLocation, {
+			submission,
+			pendingError: error,
+			preventScrollReset,
+			replace: opts && opts.replace,
+			enableViewTransition: opts && opts.viewTransition,
+			flushSync,
+			callSiteDefaultShouldRevalidate: opts && opts.unstable_defaultShouldRevalidate
+		});
+	}
+	function revalidate() {
+		if (!pendingRevalidationDfd) pendingRevalidationDfd = createDeferred();
+		interruptActiveLoads();
+		updateState({ revalidation: "loading" });
+		let promise = pendingRevalidationDfd.promise;
+		if (state.navigation.state === "submitting") return promise;
+		if (state.navigation.state === "idle") {
+			startNavigation(state.historyAction, state.location, { startUninterruptedRevalidation: true });
+			return promise;
+		}
+		startNavigation(pendingAction || state.historyAction, state.navigation.location, {
+			overrideNavigation: state.navigation,
+			enableViewTransition: pendingViewTransitionEnabled === true
+		});
+		return promise;
+	}
+	async function startNavigation(historyAction, location, opts) {
+		pendingNavigationController && pendingNavigationController.abort();
+		pendingNavigationController = null;
+		pendingAction = historyAction;
+		isUninterruptedRevalidation = (opts && opts.startUninterruptedRevalidation) === true;
+		saveScrollPosition(state.location, state.matches);
+		pendingPreventScrollReset = (opts && opts.preventScrollReset) === true;
+		pendingViewTransitionEnabled = (opts && opts.enableViewTransition) === true;
+		let routesToUse = inFlightDataRoutes || dataRoutes;
+		let loadingNavigation = opts && opts.overrideNavigation;
+		let matches = opts?.initialHydration && state.matches && state.matches.length > 0 && !initialMatchesIsFOW ? state.matches : matchRoutes(routesToUse, location, basename);
+		let flushSync = (opts && opts.flushSync) === true;
+		if (matches && state.initialized && !isRevalidationRequired && isHashChangeOnly(state.location, location) && !(opts && opts.submission && isMutationMethod(opts.submission.formMethod))) {
+			completeNavigation(location, { matches }, { flushSync });
+			return;
+		}
+		let fogOfWar = checkFogOfWar(matches, routesToUse, location.pathname);
+		if (fogOfWar.active && fogOfWar.matches) matches = fogOfWar.matches;
+		if (!matches) {
+			let { error, notFoundMatches, route } = handleNavigational404(location.pathname);
+			completeNavigation(location, {
+				matches: notFoundMatches,
+				loaderData: {},
+				errors: { [route.id]: error }
+			}, { flushSync });
+			return;
+		}
+		pendingNavigationController = new AbortController();
+		let request = createClientSideRequest(init.history, location, pendingNavigationController.signal, opts && opts.submission);
+		let scopedContext = init.getContext ? await init.getContext() : new RouterContextProvider();
+		let pendingActionResult;
+		if (opts && opts.pendingError) pendingActionResult = [findNearestBoundary(matches).route.id, {
+			type: "error",
+			error: opts.pendingError
+		}];
+		else if (opts && opts.submission && isMutationMethod(opts.submission.formMethod)) {
+			let actionResult = await handleAction(request, location, opts.submission, matches, scopedContext, fogOfWar.active, opts && opts.initialHydration === true, {
+				replace: opts.replace,
+				flushSync
+			});
+			if (actionResult.shortCircuited) return;
+			if (actionResult.pendingActionResult) {
+				let [routeId, result] = actionResult.pendingActionResult;
+				if (isErrorResult(result) && isRouteErrorResponse(result.error) && result.error.status === 404) {
+					pendingNavigationController = null;
+					completeNavigation(location, {
+						matches: actionResult.matches,
+						loaderData: {},
+						errors: { [routeId]: result.error }
+					});
+					return;
+				}
+			}
+			matches = actionResult.matches || matches;
+			pendingActionResult = actionResult.pendingActionResult;
+			loadingNavigation = getLoadingNavigation(location, opts.submission);
+			flushSync = false;
+			fogOfWar.active = false;
+			request = createClientSideRequest(init.history, request.url, request.signal);
+		}
+		let { shortCircuited, matches: updatedMatches, loaderData, errors } = await handleLoaders(request, location, matches, scopedContext, fogOfWar.active, loadingNavigation, opts && opts.submission, opts && opts.fetcherSubmission, opts && opts.replace, opts && opts.initialHydration === true, flushSync, pendingActionResult, opts && opts.callSiteDefaultShouldRevalidate);
+		if (shortCircuited) return;
+		pendingNavigationController = null;
+		completeNavigation(location, {
+			matches: updatedMatches || matches,
+			...getActionDataForCommit(pendingActionResult),
+			loaderData,
+			errors
+		});
+	}
+	async function handleAction(request, location, submission, matches, scopedContext, isFogOfWar, initialHydration, opts = {}) {
+		interruptActiveLoads();
+		updateState({ navigation: getSubmittingNavigation(location, submission) }, { flushSync: opts.flushSync === true });
+		if (isFogOfWar) {
+			let discoverResult = await discoverRoutes(matches, location.pathname, request.signal);
+			if (discoverResult.type === "aborted") return { shortCircuited: true };
+			else if (discoverResult.type === "error") {
+				if (discoverResult.partialMatches.length === 0) {
+					let { matches: matches2, route } = getShortCircuitMatches(dataRoutes);
+					return {
+						matches: matches2,
+						pendingActionResult: [route.id, {
+							type: "error",
+							error: discoverResult.error
+						}]
+					};
+				}
+				let boundaryId = findNearestBoundary(discoverResult.partialMatches).route.id;
+				return {
+					matches: discoverResult.partialMatches,
+					pendingActionResult: [boundaryId, {
+						type: "error",
+						error: discoverResult.error
+					}]
+				};
+			} else if (!discoverResult.matches) {
+				let { notFoundMatches, error, route } = handleNavigational404(location.pathname);
+				return {
+					matches: notFoundMatches,
+					pendingActionResult: [route.id, {
+						type: "error",
+						error
+					}]
+				};
+			} else matches = discoverResult.matches;
+		}
+		let result;
+		let actionMatch = getTargetMatch(matches, location);
+		if (!actionMatch.route.action && !actionMatch.route.lazy) result = {
+			type: "error",
+			error: getInternalRouterError(405, {
+				method: request.method,
+				pathname: location.pathname,
+				routeId: actionMatch.route.id
+			})
+		};
+		else {
+			let results = await callDataStrategy(request, getTargetedDataStrategyMatches(mapRouteProperties2, manifest, request, matches, actionMatch, initialHydration ? [] : hydrationRouteProperties2, scopedContext), scopedContext, null);
+			result = results[actionMatch.route.id];
+			if (!result) {
+				for (let match of matches) if (results[match.route.id]) {
+					result = results[match.route.id];
+					break;
+				}
+			}
+			if (request.signal.aborted) return { shortCircuited: true };
+		}
+		if (isRedirectResult(result)) {
+			let replace2;
+			if (opts && opts.replace != null) replace2 = opts.replace;
+			else replace2 = normalizeRedirectLocation(result.response.headers.get("Location"), new URL(request.url), basename, init.history) === state.location.pathname + state.location.search;
+			await startRedirectNavigation(request, result, true, {
+				submission,
+				replace: replace2
+			});
+			return { shortCircuited: true };
+		}
+		if (isErrorResult(result)) {
+			let boundaryMatch = findNearestBoundary(matches, actionMatch.route.id);
+			if ((opts && opts.replace) !== true) pendingAction = "PUSH";
+			return {
+				matches,
+				pendingActionResult: [
+					boundaryMatch.route.id,
+					result,
+					actionMatch.route.id
+				]
+			};
+		}
+		return {
+			matches,
+			pendingActionResult: [actionMatch.route.id, result]
+		};
+	}
+	async function handleLoaders(request, location, matches, scopedContext, isFogOfWar, overrideNavigation, submission, fetcherSubmission, replace2, initialHydration, flushSync, pendingActionResult, callSiteDefaultShouldRevalidate) {
+		let loadingNavigation = overrideNavigation || getLoadingNavigation(location, submission);
+		let activeSubmission = submission || fetcherSubmission || getSubmissionFromNavigation(loadingNavigation);
+		let shouldUpdateNavigationState = !isUninterruptedRevalidation && !initialHydration;
+		if (isFogOfWar) {
+			if (shouldUpdateNavigationState) {
+				let actionData = getUpdatedActionData(pendingActionResult);
+				updateState({
+					navigation: loadingNavigation,
+					...actionData !== void 0 ? { actionData } : {}
+				}, { flushSync });
+			}
+			let discoverResult = await discoverRoutes(matches, location.pathname, request.signal);
+			if (discoverResult.type === "aborted") return { shortCircuited: true };
+			else if (discoverResult.type === "error") {
+				if (discoverResult.partialMatches.length === 0) {
+					let { matches: matches2, route } = getShortCircuitMatches(dataRoutes);
+					return {
+						matches: matches2,
+						loaderData: {},
+						errors: { [route.id]: discoverResult.error }
+					};
+				}
+				let boundaryId = findNearestBoundary(discoverResult.partialMatches).route.id;
+				return {
+					matches: discoverResult.partialMatches,
+					loaderData: {},
+					errors: { [boundaryId]: discoverResult.error }
+				};
+			} else if (!discoverResult.matches) {
+				let { error, notFoundMatches, route } = handleNavigational404(location.pathname);
+				return {
+					matches: notFoundMatches,
+					loaderData: {},
+					errors: { [route.id]: error }
+				};
+			} else matches = discoverResult.matches;
+		}
+		let routesToUse = inFlightDataRoutes || dataRoutes;
+		let { dsMatches, revalidatingFetchers } = getMatchesToLoad(request, scopedContext, mapRouteProperties2, manifest, init.history, state, matches, activeSubmission, location, initialHydration ? [] : hydrationRouteProperties2, initialHydration === true, isRevalidationRequired, cancelledFetcherLoads, fetchersQueuedForDeletion, fetchLoadMatches, fetchRedirectIds, routesToUse, basename, init.patchRoutesOnNavigation != null, pendingActionResult, callSiteDefaultShouldRevalidate);
+		pendingNavigationLoadId = ++incrementingLoadId;
+		if (!init.dataStrategy && !dsMatches.some((m) => m.shouldLoad) && !dsMatches.some((m) => m.route.middleware && m.route.middleware.length > 0) && revalidatingFetchers.length === 0) {
+			let updatedFetchers2 = markFetchRedirectsDone();
+			completeNavigation(location, {
+				matches,
+				loaderData: {},
+				errors: pendingActionResult && isErrorResult(pendingActionResult[1]) ? { [pendingActionResult[0]]: pendingActionResult[1].error } : null,
+				...getActionDataForCommit(pendingActionResult),
+				...updatedFetchers2 ? { fetchers: new Map(state.fetchers) } : {}
+			}, { flushSync });
+			return { shortCircuited: true };
+		}
+		if (shouldUpdateNavigationState) {
+			let updates = {};
+			if (!isFogOfWar) {
+				updates.navigation = loadingNavigation;
+				let actionData = getUpdatedActionData(pendingActionResult);
+				if (actionData !== void 0) updates.actionData = actionData;
+			}
+			if (revalidatingFetchers.length > 0) updates.fetchers = getUpdatedRevalidatingFetchers(revalidatingFetchers);
+			updateState(updates, { flushSync });
+		}
+		revalidatingFetchers.forEach((rf) => {
+			abortFetcher(rf.key);
+			if (rf.controller) fetchControllers.set(rf.key, rf.controller);
+		});
+		let abortPendingFetchRevalidations = () => revalidatingFetchers.forEach((f) => abortFetcher(f.key));
+		if (pendingNavigationController) pendingNavigationController.signal.addEventListener("abort", abortPendingFetchRevalidations);
+		let { loaderResults, fetcherResults } = await callLoadersAndMaybeResolveData(dsMatches, revalidatingFetchers, request, scopedContext);
+		if (request.signal.aborted) return { shortCircuited: true };
+		if (pendingNavigationController) pendingNavigationController.signal.removeEventListener("abort", abortPendingFetchRevalidations);
+		revalidatingFetchers.forEach((rf) => fetchControllers.delete(rf.key));
+		let redirect2 = findRedirect(loaderResults);
+		if (redirect2) {
+			await startRedirectNavigation(request, redirect2.result, true, { replace: replace2 });
+			return { shortCircuited: true };
+		}
+		redirect2 = findRedirect(fetcherResults);
+		if (redirect2) {
+			fetchRedirectIds.add(redirect2.key);
+			await startRedirectNavigation(request, redirect2.result, true, { replace: replace2 });
+			return { shortCircuited: true };
+		}
+		let { loaderData, errors } = processLoaderData(state, matches, loaderResults, pendingActionResult, revalidatingFetchers, fetcherResults);
+		if (initialHydration && state.errors) errors = {
+			...state.errors,
+			...errors
+		};
+		let updatedFetchers = markFetchRedirectsDone();
+		let didAbortFetchLoads = abortStaleFetchLoads(pendingNavigationLoadId);
+		let shouldUpdateFetchers = updatedFetchers || didAbortFetchLoads || revalidatingFetchers.length > 0;
+		return {
+			matches,
+			loaderData,
+			errors,
+			...shouldUpdateFetchers ? { fetchers: new Map(state.fetchers) } : {}
+		};
+	}
+	function getUpdatedActionData(pendingActionResult) {
+		if (pendingActionResult && !isErrorResult(pendingActionResult[1])) return { [pendingActionResult[0]]: pendingActionResult[1].data };
+		else if (state.actionData) if (Object.keys(state.actionData).length === 0) return null;
+		else return state.actionData;
+	}
+	function getUpdatedRevalidatingFetchers(revalidatingFetchers) {
+		revalidatingFetchers.forEach((rf) => {
+			let fetcher = state.fetchers.get(rf.key);
+			let revalidatingFetcher = getLoadingFetcher(void 0, fetcher ? fetcher.data : void 0);
+			state.fetchers.set(rf.key, revalidatingFetcher);
+		});
+		return new Map(state.fetchers);
+	}
+	async function fetch2(key, routeId, href, opts) {
+		abortFetcher(key);
+		let flushSync = (opts && opts.flushSync) === true;
+		let routesToUse = inFlightDataRoutes || dataRoutes;
+		let normalizedPath = normalizeTo(state.location, state.matches, basename, href, routeId, opts?.relative);
+		let matches = matchRoutes(routesToUse, normalizedPath, basename);
+		let fogOfWar = checkFogOfWar(matches, routesToUse, normalizedPath);
+		if (fogOfWar.active && fogOfWar.matches) matches = fogOfWar.matches;
+		if (!matches) {
+			setFetcherError(key, routeId, getInternalRouterError(404, { pathname: normalizedPath }), { flushSync });
+			return;
+		}
+		let { path, submission, error } = normalizeNavigateOptions(true, normalizedPath, opts);
+		if (error) {
+			setFetcherError(key, routeId, error, { flushSync });
+			return;
+		}
+		let scopedContext = init.getContext ? await init.getContext() : new RouterContextProvider();
+		let preventScrollReset = (opts && opts.preventScrollReset) === true;
+		if (submission && isMutationMethod(submission.formMethod)) {
+			await handleFetcherAction(key, routeId, path, matches, scopedContext, fogOfWar.active, flushSync, preventScrollReset, submission, opts && opts.unstable_defaultShouldRevalidate);
+			return;
+		}
+		fetchLoadMatches.set(key, {
+			routeId,
+			path
+		});
+		await handleFetcherLoader(key, routeId, path, matches, scopedContext, fogOfWar.active, flushSync, preventScrollReset, submission);
+	}
+	async function handleFetcherAction(key, routeId, path, requestMatches, scopedContext, isFogOfWar, flushSync, preventScrollReset, submission, callSiteDefaultShouldRevalidate) {
+		interruptActiveLoads();
+		fetchLoadMatches.delete(key);
+		updateFetcherState(key, getSubmittingFetcher(submission, state.fetchers.get(key)), { flushSync });
+		let abortController = new AbortController();
+		let fetchRequest = createClientSideRequest(init.history, path, abortController.signal, submission);
+		if (isFogOfWar) {
+			let discoverResult = await discoverRoutes(requestMatches, new URL(fetchRequest.url).pathname, fetchRequest.signal, key);
+			if (discoverResult.type === "aborted") return;
+			else if (discoverResult.type === "error") {
+				setFetcherError(key, routeId, discoverResult.error, { flushSync });
+				return;
+			} else if (!discoverResult.matches) {
+				setFetcherError(key, routeId, getInternalRouterError(404, { pathname: path }), { flushSync });
+				return;
+			} else requestMatches = discoverResult.matches;
+		}
+		let match = getTargetMatch(requestMatches, path);
+		if (!match.route.action && !match.route.lazy) {
+			setFetcherError(key, routeId, getInternalRouterError(405, {
+				method: submission.formMethod,
+				pathname: path,
+				routeId
+			}), { flushSync });
+			return;
+		}
+		fetchControllers.set(key, abortController);
+		let originatingLoadId = incrementingLoadId;
+		let fetchMatches = getTargetedDataStrategyMatches(mapRouteProperties2, manifest, fetchRequest, requestMatches, match, hydrationRouteProperties2, scopedContext);
+		let actionResults = await callDataStrategy(fetchRequest, fetchMatches, scopedContext, key);
+		let actionResult = actionResults[match.route.id];
+		if (!actionResult) {
+			for (let match2 of fetchMatches) if (actionResults[match2.route.id]) {
+				actionResult = actionResults[match2.route.id];
+				break;
+			}
+		}
+		if (fetchRequest.signal.aborted) {
+			if (fetchControllers.get(key) === abortController) fetchControllers.delete(key);
+			return;
+		}
+		if (fetchersQueuedForDeletion.has(key)) {
+			if (isRedirectResult(actionResult) || isErrorResult(actionResult)) {
+				updateFetcherState(key, getDoneFetcher(void 0));
+				return;
+			}
+		} else {
+			if (isRedirectResult(actionResult)) {
+				fetchControllers.delete(key);
+				if (pendingNavigationLoadId > originatingLoadId) {
+					updateFetcherState(key, getDoneFetcher(void 0));
+					return;
+				} else {
+					fetchRedirectIds.add(key);
+					updateFetcherState(key, getLoadingFetcher(submission));
+					return startRedirectNavigation(fetchRequest, actionResult, false, {
+						fetcherSubmission: submission,
+						preventScrollReset
+					});
+				}
+			}
+			if (isErrorResult(actionResult)) {
+				setFetcherError(key, routeId, actionResult.error);
+				return;
+			}
+		}
+		let nextLocation = state.navigation.location || state.location;
+		let revalidationRequest = createClientSideRequest(init.history, nextLocation, abortController.signal);
+		let routesToUse = inFlightDataRoutes || dataRoutes;
+		let matches = state.navigation.state !== "idle" ? matchRoutes(routesToUse, state.navigation.location, basename) : state.matches;
+		invariant(matches, "Didn't find any matches after fetcher action");
+		let loadId = ++incrementingLoadId;
+		fetchReloadIds.set(key, loadId);
+		let loadFetcher = getLoadingFetcher(submission, actionResult.data);
+		state.fetchers.set(key, loadFetcher);
+		let { dsMatches, revalidatingFetchers } = getMatchesToLoad(revalidationRequest, scopedContext, mapRouteProperties2, manifest, init.history, state, matches, submission, nextLocation, hydrationRouteProperties2, false, isRevalidationRequired, cancelledFetcherLoads, fetchersQueuedForDeletion, fetchLoadMatches, fetchRedirectIds, routesToUse, basename, init.patchRoutesOnNavigation != null, [match.route.id, actionResult], callSiteDefaultShouldRevalidate);
+		revalidatingFetchers.filter((rf) => rf.key !== key).forEach((rf) => {
+			let staleKey = rf.key;
+			let existingFetcher2 = state.fetchers.get(staleKey);
+			let revalidatingFetcher = getLoadingFetcher(void 0, existingFetcher2 ? existingFetcher2.data : void 0);
+			state.fetchers.set(staleKey, revalidatingFetcher);
+			abortFetcher(staleKey);
+			if (rf.controller) fetchControllers.set(staleKey, rf.controller);
+		});
+		updateState({ fetchers: new Map(state.fetchers) });
+		let abortPendingFetchRevalidations = () => revalidatingFetchers.forEach((rf) => abortFetcher(rf.key));
+		abortController.signal.addEventListener("abort", abortPendingFetchRevalidations);
+		let { loaderResults, fetcherResults } = await callLoadersAndMaybeResolveData(dsMatches, revalidatingFetchers, revalidationRequest, scopedContext);
+		if (abortController.signal.aborted) return;
+		abortController.signal.removeEventListener("abort", abortPendingFetchRevalidations);
+		fetchReloadIds.delete(key);
+		fetchControllers.delete(key);
+		revalidatingFetchers.forEach((r) => fetchControllers.delete(r.key));
+		if (state.fetchers.has(key)) {
+			let doneFetcher = getDoneFetcher(actionResult.data);
+			state.fetchers.set(key, doneFetcher);
+		}
+		let redirect2 = findRedirect(loaderResults);
+		if (redirect2) return startRedirectNavigation(revalidationRequest, redirect2.result, false, { preventScrollReset });
+		redirect2 = findRedirect(fetcherResults);
+		if (redirect2) {
+			fetchRedirectIds.add(redirect2.key);
+			return startRedirectNavigation(revalidationRequest, redirect2.result, false, { preventScrollReset });
+		}
+		let { loaderData, errors } = processLoaderData(state, matches, loaderResults, void 0, revalidatingFetchers, fetcherResults);
+		abortStaleFetchLoads(loadId);
+		if (state.navigation.state === "loading" && loadId > pendingNavigationLoadId) {
+			invariant(pendingAction, "Expected pending action");
+			pendingNavigationController && pendingNavigationController.abort();
+			completeNavigation(state.navigation.location, {
+				matches,
+				loaderData,
+				errors,
+				fetchers: new Map(state.fetchers)
+			});
+		} else {
+			updateState({
+				errors,
+				loaderData: mergeLoaderData(state.loaderData, loaderData, matches, errors),
+				fetchers: new Map(state.fetchers)
+			});
+			isRevalidationRequired = false;
+		}
+	}
+	async function handleFetcherLoader(key, routeId, path, matches, scopedContext, isFogOfWar, flushSync, preventScrollReset, submission) {
+		let existingFetcher = state.fetchers.get(key);
+		updateFetcherState(key, getLoadingFetcher(submission, existingFetcher ? existingFetcher.data : void 0), { flushSync });
+		let abortController = new AbortController();
+		let fetchRequest = createClientSideRequest(init.history, path, abortController.signal);
+		if (isFogOfWar) {
+			let discoverResult = await discoverRoutes(matches, new URL(fetchRequest.url).pathname, fetchRequest.signal, key);
+			if (discoverResult.type === "aborted") return;
+			else if (discoverResult.type === "error") {
+				setFetcherError(key, routeId, discoverResult.error, { flushSync });
+				return;
+			} else if (!discoverResult.matches) {
+				setFetcherError(key, routeId, getInternalRouterError(404, { pathname: path }), { flushSync });
+				return;
+			} else matches = discoverResult.matches;
+		}
+		let match = getTargetMatch(matches, path);
+		fetchControllers.set(key, abortController);
+		let originatingLoadId = incrementingLoadId;
+		let result = (await callDataStrategy(fetchRequest, getTargetedDataStrategyMatches(mapRouteProperties2, manifest, fetchRequest, matches, match, hydrationRouteProperties2, scopedContext), scopedContext, key))[match.route.id];
+		if (fetchControllers.get(key) === abortController) fetchControllers.delete(key);
+		if (fetchRequest.signal.aborted) return;
+		if (fetchersQueuedForDeletion.has(key)) {
+			updateFetcherState(key, getDoneFetcher(void 0));
+			return;
+		}
+		if (isRedirectResult(result)) if (pendingNavigationLoadId > originatingLoadId) {
+			updateFetcherState(key, getDoneFetcher(void 0));
+			return;
+		} else {
+			fetchRedirectIds.add(key);
+			await startRedirectNavigation(fetchRequest, result, false, { preventScrollReset });
+			return;
+		}
+		if (isErrorResult(result)) {
+			setFetcherError(key, routeId, result.error);
+			return;
+		}
+		updateFetcherState(key, getDoneFetcher(result.data));
+	}
+	async function startRedirectNavigation(request, redirect2, isNavigation, { submission, fetcherSubmission, preventScrollReset, replace: replace2 } = {}) {
+		if (!isNavigation) {
+			pendingPopstateNavigationDfd?.resolve();
+			pendingPopstateNavigationDfd = null;
+		}
+		if (redirect2.response.headers.has("X-Remix-Revalidate")) isRevalidationRequired = true;
+		let location = redirect2.response.headers.get("Location");
+		invariant(location, "Expected a Location header on the redirect Response");
+		location = normalizeRedirectLocation(location, new URL(request.url), basename, init.history);
+		let redirectLocation = createLocation(state.location, location, { _isRedirect: true });
+		if (isBrowser3) {
+			let isDocumentReload = false;
+			if (redirect2.response.headers.has("X-Remix-Reload-Document")) isDocumentReload = true;
+			else if (isAbsoluteUrl(location)) {
+				const url = createBrowserURLImpl(location, true);
+				isDocumentReload = url.origin !== routerWindow.location.origin || stripBasename(url.pathname, basename) == null;
+			}
+			if (isDocumentReload) {
+				if (replace2) routerWindow.location.replace(location);
+				else routerWindow.location.assign(location);
+				return;
+			}
+		}
+		pendingNavigationController = null;
+		let redirectNavigationType = replace2 === true || redirect2.response.headers.has("X-Remix-Replace") ? "REPLACE" : "PUSH";
+		let { formMethod, formAction, formEncType } = state.navigation;
+		if (!submission && !fetcherSubmission && formMethod && formAction && formEncType) submission = getSubmissionFromNavigation(state.navigation);
+		let activeSubmission = submission || fetcherSubmission;
+		if (redirectPreserveMethodStatusCodes.has(redirect2.response.status) && activeSubmission && isMutationMethod(activeSubmission.formMethod)) await startNavigation(redirectNavigationType, redirectLocation, {
+			submission: {
+				...activeSubmission,
+				formAction: location
+			},
+			preventScrollReset: preventScrollReset || pendingPreventScrollReset,
+			enableViewTransition: isNavigation ? pendingViewTransitionEnabled : void 0
+		});
+		else await startNavigation(redirectNavigationType, redirectLocation, {
+			overrideNavigation: getLoadingNavigation(redirectLocation, submission),
+			fetcherSubmission,
+			preventScrollReset: preventScrollReset || pendingPreventScrollReset,
+			enableViewTransition: isNavigation ? pendingViewTransitionEnabled : void 0
+		});
+	}
+	async function callDataStrategy(request, matches, scopedContext, fetcherKey) {
+		let results;
+		let dataResults = {};
+		try {
+			results = await callDataStrategyImpl(dataStrategyImpl, request, matches, fetcherKey, scopedContext, false);
+		} catch (e) {
+			matches.filter((m) => m.shouldLoad).forEach((m) => {
+				dataResults[m.route.id] = {
+					type: "error",
+					error: e
+				};
+			});
+			return dataResults;
+		}
+		if (request.signal.aborted) return dataResults;
+		if (!isMutationMethod(request.method)) for (let match of matches) {
+			if (results[match.route.id]?.type === "error") break;
+			if (!results.hasOwnProperty(match.route.id) && !state.loaderData.hasOwnProperty(match.route.id) && (!state.errors || !state.errors.hasOwnProperty(match.route.id)) && match.shouldCallHandler()) results[match.route.id] = {
+				type: "error",
+				result: /* @__PURE__ */ new Error(`No result returned from dataStrategy for route ${match.route.id}`)
+			};
+		}
+		for (let [routeId, result] of Object.entries(results)) if (isRedirectDataStrategyResult(result)) {
+			let response = result.result;
+			dataResults[routeId] = {
+				type: "redirect",
+				response: normalizeRelativeRoutingRedirectResponse(response, request, routeId, matches, basename)
+			};
+		} else dataResults[routeId] = await convertDataStrategyResultToDataResult(result);
+		return dataResults;
+	}
+	async function callLoadersAndMaybeResolveData(matches, fetchersToLoad, request, scopedContext) {
+		let loaderResultsPromise = callDataStrategy(request, matches, scopedContext, null);
+		let fetcherResultsPromise = Promise.all(fetchersToLoad.map(async (f) => {
+			if (f.matches && f.match && f.request && f.controller) {
+				let result = (await callDataStrategy(f.request, f.matches, scopedContext, f.key))[f.match.route.id];
+				return { [f.key]: result };
+			} else return Promise.resolve({ [f.key]: {
+				type: "error",
+				error: getInternalRouterError(404, { pathname: f.path })
+			} });
+		}));
+		return {
+			loaderResults: await loaderResultsPromise,
+			fetcherResults: (await fetcherResultsPromise).reduce((acc, r) => Object.assign(acc, r), {})
+		};
+	}
+	function interruptActiveLoads() {
+		isRevalidationRequired = true;
+		fetchLoadMatches.forEach((_, key) => {
+			if (fetchControllers.has(key)) cancelledFetcherLoads.add(key);
+			abortFetcher(key);
+		});
+	}
+	function updateFetcherState(key, fetcher, opts = {}) {
+		state.fetchers.set(key, fetcher);
+		updateState({ fetchers: new Map(state.fetchers) }, { flushSync: (opts && opts.flushSync) === true });
+	}
+	function setFetcherError(key, routeId, error, opts = {}) {
+		let boundaryMatch = findNearestBoundary(state.matches, routeId);
+		deleteFetcher(key);
+		updateState({
+			errors: { [boundaryMatch.route.id]: error },
+			fetchers: new Map(state.fetchers)
+		}, { flushSync: (opts && opts.flushSync) === true });
+	}
+	function getFetcher(key) {
+		activeFetchers.set(key, (activeFetchers.get(key) || 0) + 1);
+		if (fetchersQueuedForDeletion.has(key)) fetchersQueuedForDeletion.delete(key);
+		return state.fetchers.get(key) || IDLE_FETCHER;
+	}
+	function resetFetcher(key, opts) {
+		abortFetcher(key, opts?.reason);
+		updateFetcherState(key, getDoneFetcher(null));
+	}
+	function deleteFetcher(key) {
+		let fetcher = state.fetchers.get(key);
+		if (fetchControllers.has(key) && !(fetcher && fetcher.state === "loading" && fetchReloadIds.has(key))) abortFetcher(key);
+		fetchLoadMatches.delete(key);
+		fetchReloadIds.delete(key);
+		fetchRedirectIds.delete(key);
+		fetchersQueuedForDeletion.delete(key);
+		cancelledFetcherLoads.delete(key);
+		state.fetchers.delete(key);
+	}
+	function queueFetcherForDeletion(key) {
+		let count = (activeFetchers.get(key) || 0) - 1;
+		if (count <= 0) {
+			activeFetchers.delete(key);
+			fetchersQueuedForDeletion.add(key);
+		} else activeFetchers.set(key, count);
+		updateState({ fetchers: new Map(state.fetchers) });
+	}
+	function abortFetcher(key, reason) {
+		let controller = fetchControllers.get(key);
+		if (controller) {
+			controller.abort(reason);
+			fetchControllers.delete(key);
+		}
+	}
+	function markFetchersDone(keys) {
+		for (let key of keys) {
+			let doneFetcher = getDoneFetcher(getFetcher(key).data);
+			state.fetchers.set(key, doneFetcher);
+		}
+	}
+	function markFetchRedirectsDone() {
+		let doneKeys = [];
+		let updatedFetchers = false;
+		for (let key of fetchRedirectIds) {
+			let fetcher = state.fetchers.get(key);
+			invariant(fetcher, `Expected fetcher: ${key}`);
+			if (fetcher.state === "loading") {
+				fetchRedirectIds.delete(key);
+				doneKeys.push(key);
+				updatedFetchers = true;
+			}
+		}
+		markFetchersDone(doneKeys);
+		return updatedFetchers;
+	}
+	function abortStaleFetchLoads(landedId) {
+		let yeetedKeys = [];
+		for (let [key, id] of fetchReloadIds) if (id < landedId) {
+			let fetcher = state.fetchers.get(key);
+			invariant(fetcher, `Expected fetcher: ${key}`);
+			if (fetcher.state === "loading") {
+				abortFetcher(key);
+				fetchReloadIds.delete(key);
+				yeetedKeys.push(key);
+			}
+		}
+		markFetchersDone(yeetedKeys);
+		return yeetedKeys.length > 0;
+	}
+	function getBlocker(key, fn) {
+		let blocker = state.blockers.get(key) || IDLE_BLOCKER;
+		if (blockerFunctions.get(key) !== fn) blockerFunctions.set(key, fn);
+		return blocker;
+	}
+	function deleteBlocker(key) {
+		state.blockers.delete(key);
+		blockerFunctions.delete(key);
+	}
+	function updateBlocker(key, newBlocker) {
+		let blocker = state.blockers.get(key) || IDLE_BLOCKER;
+		invariant(blocker.state === "unblocked" && newBlocker.state === "blocked" || blocker.state === "blocked" && newBlocker.state === "blocked" || blocker.state === "blocked" && newBlocker.state === "proceeding" || blocker.state === "blocked" && newBlocker.state === "unblocked" || blocker.state === "proceeding" && newBlocker.state === "unblocked", `Invalid blocker state transition: ${blocker.state} -> ${newBlocker.state}`);
+		let blockers = new Map(state.blockers);
+		blockers.set(key, newBlocker);
+		updateState({ blockers });
+	}
+	function shouldBlockNavigation({ currentLocation, nextLocation, historyAction }) {
+		if (blockerFunctions.size === 0) return;
+		if (blockerFunctions.size > 1) warning(false, "A router only supports one blocker at a time");
+		let entries = Array.from(blockerFunctions.entries());
+		let [blockerKey, blockerFunction] = entries[entries.length - 1];
+		let blocker = state.blockers.get(blockerKey);
+		if (blocker && blocker.state === "proceeding") return;
+		if (blockerFunction({
+			currentLocation,
+			nextLocation,
+			historyAction
+		})) return blockerKey;
+	}
+	function handleNavigational404(pathname) {
+		let error = getInternalRouterError(404, { pathname });
+		let { matches, route } = getShortCircuitMatches(inFlightDataRoutes || dataRoutes);
+		return {
+			notFoundMatches: matches,
+			route,
+			error
+		};
+	}
+	function enableScrollRestoration(positions, getPosition, getKey) {
+		savedScrollPositions2 = positions;
+		getScrollPosition = getPosition;
+		getScrollRestorationKey2 = getKey || null;
+		if (!initialScrollRestored && state.navigation === IDLE_NAVIGATION) {
+			initialScrollRestored = true;
+			let y = getSavedScrollPosition(state.location, state.matches);
+			if (y != null) updateState({ restoreScrollPosition: y });
+		}
+		return () => {
+			savedScrollPositions2 = null;
+			getScrollPosition = null;
+			getScrollRestorationKey2 = null;
+		};
+	}
+	function getScrollKey(location, matches) {
+		if (getScrollRestorationKey2) return getScrollRestorationKey2(location, matches.map((m) => convertRouteMatchToUiMatch(m, state.loaderData))) || location.key;
+		return location.key;
+	}
+	function saveScrollPosition(location, matches) {
+		if (savedScrollPositions2 && getScrollPosition) {
+			let key = getScrollKey(location, matches);
+			savedScrollPositions2[key] = getScrollPosition();
+		}
+	}
+	function getSavedScrollPosition(location, matches) {
+		if (savedScrollPositions2) {
+			let key = getScrollKey(location, matches);
+			let y = savedScrollPositions2[key];
+			if (typeof y === "number") return y;
+		}
+		return null;
+	}
+	function checkFogOfWar(matches, routesToUse, pathname) {
+		if (init.patchRoutesOnNavigation) {
+			if (!matches) return {
+				active: true,
+				matches: matchRoutesImpl(routesToUse, pathname, basename, true) || []
+			};
+			else if (Object.keys(matches[0].params).length > 0) return {
+				active: true,
+				matches: matchRoutesImpl(routesToUse, pathname, basename, true)
+			};
+		}
+		return {
+			active: false,
+			matches: null
+		};
+	}
+	async function discoverRoutes(matches, pathname, signal, fetcherKey) {
+		if (!init.patchRoutesOnNavigation) return {
+			type: "success",
+			matches
+		};
+		let partialMatches = matches;
+		while (true) {
+			let isNonHMR = inFlightDataRoutes == null;
+			let routesToUse = inFlightDataRoutes || dataRoutes;
+			let localManifest = manifest;
+			try {
+				await init.patchRoutesOnNavigation({
+					signal,
+					path: pathname,
+					matches: partialMatches,
+					fetcherKey,
+					patch: (routeId, children) => {
+						if (signal.aborted) return;
+						patchRoutesImpl(routeId, children, routesToUse, localManifest, mapRouteProperties2, false);
+					}
+				});
+			} catch (e) {
+				return {
+					type: "error",
+					error: e,
+					partialMatches
+				};
+			} finally {
+				if (isNonHMR && !signal.aborted) dataRoutes = [...dataRoutes];
+			}
+			if (signal.aborted) return { type: "aborted" };
+			let newMatches = matchRoutes(routesToUse, pathname, basename);
+			let newPartialMatches = null;
+			if (newMatches) if (Object.keys(newMatches[0].params).length === 0) return {
+				type: "success",
+				matches: newMatches
+			};
+			else {
+				newPartialMatches = matchRoutesImpl(routesToUse, pathname, basename, true);
+				if (!(newPartialMatches && partialMatches.length < newPartialMatches.length && compareMatches(partialMatches, newPartialMatches.slice(0, partialMatches.length)))) return {
+					type: "success",
+					matches: newMatches
+				};
+			}
+			if (!newPartialMatches) newPartialMatches = matchRoutesImpl(routesToUse, pathname, basename, true);
+			if (!newPartialMatches || compareMatches(partialMatches, newPartialMatches)) return {
+				type: "success",
+				matches: null
+			};
+			partialMatches = newPartialMatches;
+		}
+	}
+	function compareMatches(a, b) {
+		return a.length === b.length && a.every((m, i) => m.route.id === b[i].route.id);
+	}
+	function _internalSetRoutes(newRoutes) {
+		manifest = {};
+		inFlightDataRoutes = convertRoutesToDataRoutes(newRoutes, mapRouteProperties2, void 0, manifest);
+	}
+	function patchRoutes(routeId, children, unstable_allowElementMutations = false) {
+		let isNonHMR = inFlightDataRoutes == null;
+		patchRoutesImpl(routeId, children, inFlightDataRoutes || dataRoutes, manifest, mapRouteProperties2, unstable_allowElementMutations);
+		if (isNonHMR) {
+			dataRoutes = [...dataRoutes];
+			updateState({});
+		}
+	}
+	router = {
+		get basename() {
+			return basename;
+		},
+		get future() {
+			return future;
+		},
+		get state() {
+			return state;
+		},
+		get routes() {
+			return dataRoutes;
+		},
+		get window() {
+			return routerWindow;
+		},
+		initialize,
+		subscribe,
+		enableScrollRestoration,
+		navigate,
+		fetch: fetch2,
+		revalidate,
+		createHref: (to) => init.history.createHref(to),
+		encodeLocation: (to) => init.history.encodeLocation(to),
+		getFetcher,
+		resetFetcher,
+		deleteFetcher: queueFetcherForDeletion,
+		dispose,
+		getBlocker,
+		deleteBlocker,
+		patchRoutes,
+		_internalFetchControllers: fetchControllers,
+		_internalSetRoutes,
+		_internalSetStateDoNotUseOrYouWillBreakYourApp(newState) {
+			updateState(newState);
+		}
+	};
+	if (init.unstable_instrumentations) router = instrumentClientSideRouter(router, init.unstable_instrumentations.map((i) => i.router).filter(Boolean));
+	return router;
+}
+function isSubmissionNavigation(opts) {
+	return opts != null && ("formData" in opts && opts.formData != null || "body" in opts && opts.body !== void 0);
+}
+function normalizeTo(location, matches, basename, to, fromRouteId, relative) {
+	let contextualMatches;
+	let activeRouteMatch;
+	if (fromRouteId) {
+		contextualMatches = [];
+		for (let match of matches) {
+			contextualMatches.push(match);
+			if (match.route.id === fromRouteId) {
+				activeRouteMatch = match;
+				break;
+			}
+		}
+	} else {
+		contextualMatches = matches;
+		activeRouteMatch = matches[matches.length - 1];
+	}
+	let path = resolveTo(to ? to : ".", getResolveToMatches(contextualMatches), stripBasename(location.pathname, basename) || location.pathname, relative === "path");
+	if (to == null) {
+		path.search = location.search;
+		path.hash = location.hash;
+	}
+	if ((to == null || to === "" || to === ".") && activeRouteMatch) {
+		let nakedIndex = hasNakedIndexQuery(path.search);
+		if (activeRouteMatch.route.index && !nakedIndex) path.search = path.search ? path.search.replace(/^\?/, "?index&") : "?index";
+		else if (!activeRouteMatch.route.index && nakedIndex) {
+			let params = new URLSearchParams(path.search);
+			let indexValues = params.getAll("index");
+			params.delete("index");
+			indexValues.filter((v) => v).forEach((v) => params.append("index", v));
+			let qs = params.toString();
+			path.search = qs ? `?${qs}` : "";
+		}
+	}
+	if (basename !== "/") path.pathname = prependBasename({
+		basename,
+		pathname: path.pathname
+	});
+	return createPath(path);
+}
+function normalizeNavigateOptions(isFetcher, path, opts) {
+	if (!opts || !isSubmissionNavigation(opts)) return { path };
+	if (opts.formMethod && !isValidMethod(opts.formMethod)) return {
+		path,
+		error: getInternalRouterError(405, { method: opts.formMethod })
+	};
+	let getInvalidBodyError = () => ({
+		path,
+		error: getInternalRouterError(400, { type: "invalid-body" })
+	});
+	let formMethod = (opts.formMethod || "get").toUpperCase();
+	let formAction = stripHashFromPath(path);
+	if (opts.body !== void 0) {
+		if (opts.formEncType === "text/plain") {
+			if (!isMutationMethod(formMethod)) return getInvalidBodyError();
+			let text = typeof opts.body === "string" ? opts.body : opts.body instanceof FormData || opts.body instanceof URLSearchParams ? Array.from(opts.body.entries()).reduce((acc, [name, value]) => `${acc}${name}=${value}
+`, "") : String(opts.body);
+			return {
+				path,
+				submission: {
+					formMethod,
+					formAction,
+					formEncType: opts.formEncType,
+					formData: void 0,
+					json: void 0,
+					text
+				}
+			};
+		} else if (opts.formEncType === "application/json") {
+			if (!isMutationMethod(formMethod)) return getInvalidBodyError();
+			try {
+				let json = typeof opts.body === "string" ? JSON.parse(opts.body) : opts.body;
+				return {
+					path,
+					submission: {
+						formMethod,
+						formAction,
+						formEncType: opts.formEncType,
+						formData: void 0,
+						json,
+						text: void 0
+					}
+				};
+			} catch (e) {
+				return getInvalidBodyError();
+			}
+		}
+	}
+	invariant(typeof FormData === "function", "FormData is not available in this environment");
+	let searchParams;
+	let formData;
+	if (opts.formData) {
+		searchParams = convertFormDataToSearchParams(opts.formData);
+		formData = opts.formData;
+	} else if (opts.body instanceof FormData) {
+		searchParams = convertFormDataToSearchParams(opts.body);
+		formData = opts.body;
+	} else if (opts.body instanceof URLSearchParams) {
+		searchParams = opts.body;
+		formData = convertSearchParamsToFormData(searchParams);
+	} else if (opts.body == null) {
+		searchParams = new URLSearchParams();
+		formData = new FormData();
+	} else try {
+		searchParams = new URLSearchParams(opts.body);
+		formData = convertSearchParamsToFormData(searchParams);
+	} catch (e) {
+		return getInvalidBodyError();
+	}
+	let submission = {
+		formMethod,
+		formAction,
+		formEncType: opts && opts.formEncType || "application/x-www-form-urlencoded",
+		formData,
+		json: void 0,
+		text: void 0
+	};
+	if (isMutationMethod(submission.formMethod)) return {
+		path,
+		submission
+	};
+	let parsedPath = parsePath(path);
+	if (isFetcher && parsedPath.search && hasNakedIndexQuery(parsedPath.search)) searchParams.append("index", "");
+	parsedPath.search = `?${searchParams}`;
+	return {
+		path: createPath(parsedPath),
+		submission
+	};
+}
+function getMatchesToLoad(request, scopedContext, mapRouteProperties2, manifest, history, state, matches, submission, location, lazyRoutePropertiesToSkip, initialHydration, isRevalidationRequired, cancelledFetcherLoads, fetchersQueuedForDeletion, fetchLoadMatches, fetchRedirectIds, routesToUse, basename, hasPatchRoutesOnNavigation, pendingActionResult, callSiteDefaultShouldRevalidate) {
+	let actionResult = pendingActionResult ? isErrorResult(pendingActionResult[1]) ? pendingActionResult[1].error : pendingActionResult[1].data : void 0;
+	let currentUrl = history.createURL(state.location);
+	let nextUrl = history.createURL(location);
+	let maxIdx;
+	if (initialHydration && state.errors) {
+		let boundaryId = Object.keys(state.errors)[0];
+		maxIdx = matches.findIndex((m) => m.route.id === boundaryId);
+	} else if (pendingActionResult && isErrorResult(pendingActionResult[1])) {
+		let boundaryId = pendingActionResult[0];
+		maxIdx = matches.findIndex((m) => m.route.id === boundaryId) - 1;
+	}
+	let actionStatus = pendingActionResult ? pendingActionResult[1].statusCode : void 0;
+	let shouldSkipRevalidation = actionStatus && actionStatus >= 400;
+	let baseShouldRevalidateArgs = {
+		currentUrl,
+		currentParams: state.matches[0]?.params || {},
+		nextUrl,
+		nextParams: matches[0].params,
+		...submission,
+		actionResult,
+		actionStatus
+	};
+	let pattern = getRoutePattern(matches);
+	let dsMatches = matches.map((match, index) => {
+		let { route } = match;
+		let forceShouldLoad = null;
+		if (maxIdx != null && index > maxIdx) forceShouldLoad = false;
+		else if (route.lazy) forceShouldLoad = true;
+		else if (!routeHasLoaderOrMiddleware(route)) forceShouldLoad = false;
+		else if (initialHydration) {
+			let { shouldLoad: shouldLoad2 } = getRouteHydrationStatus(route, state.loaderData, state.errors);
+			forceShouldLoad = shouldLoad2;
+		} else if (isNewLoader(state.loaderData, state.matches[index], match)) forceShouldLoad = true;
+		if (forceShouldLoad !== null) return getDataStrategyMatch(mapRouteProperties2, manifest, request, pattern, match, lazyRoutePropertiesToSkip, scopedContext, forceShouldLoad);
+		let defaultShouldRevalidate = false;
+		if (typeof callSiteDefaultShouldRevalidate === "boolean") defaultShouldRevalidate = callSiteDefaultShouldRevalidate;
+		else if (shouldSkipRevalidation) defaultShouldRevalidate = false;
+		else if (isRevalidationRequired) defaultShouldRevalidate = true;
+		else if (currentUrl.pathname + currentUrl.search === nextUrl.pathname + nextUrl.search) defaultShouldRevalidate = true;
+		else if (currentUrl.search !== nextUrl.search) defaultShouldRevalidate = true;
+		else if (isNewRouteInstance(state.matches[index], match)) defaultShouldRevalidate = true;
+		let shouldRevalidateArgs = {
+			...baseShouldRevalidateArgs,
+			defaultShouldRevalidate
+		};
+		return getDataStrategyMatch(mapRouteProperties2, manifest, request, pattern, match, lazyRoutePropertiesToSkip, scopedContext, shouldRevalidateLoader(match, shouldRevalidateArgs), shouldRevalidateArgs, callSiteDefaultShouldRevalidate);
+	});
+	let revalidatingFetchers = [];
+	fetchLoadMatches.forEach((f, key) => {
+		if (initialHydration || !matches.some((m) => m.route.id === f.routeId) || fetchersQueuedForDeletion.has(key)) return;
+		let fetcher = state.fetchers.get(key);
+		let isMidInitialLoad = fetcher && fetcher.state !== "idle" && fetcher.data === void 0;
+		let fetcherMatches = matchRoutes(routesToUse, f.path, basename);
+		if (!fetcherMatches) {
+			if (hasPatchRoutesOnNavigation && isMidInitialLoad) return;
+			revalidatingFetchers.push({
+				key,
+				routeId: f.routeId,
+				path: f.path,
+				matches: null,
+				match: null,
+				request: null,
+				controller: null
+			});
+			return;
+		}
+		if (fetchRedirectIds.has(key)) return;
+		let fetcherMatch = getTargetMatch(fetcherMatches, f.path);
+		let fetchController = new AbortController();
+		let fetchRequest = createClientSideRequest(history, f.path, fetchController.signal);
+		let fetcherDsMatches = null;
+		if (cancelledFetcherLoads.has(key)) {
+			cancelledFetcherLoads.delete(key);
+			fetcherDsMatches = getTargetedDataStrategyMatches(mapRouteProperties2, manifest, fetchRequest, fetcherMatches, fetcherMatch, lazyRoutePropertiesToSkip, scopedContext);
+		} else if (isMidInitialLoad) {
+			if (isRevalidationRequired) fetcherDsMatches = getTargetedDataStrategyMatches(mapRouteProperties2, manifest, fetchRequest, fetcherMatches, fetcherMatch, lazyRoutePropertiesToSkip, scopedContext);
+		} else {
+			let defaultShouldRevalidate;
+			if (typeof callSiteDefaultShouldRevalidate === "boolean") defaultShouldRevalidate = callSiteDefaultShouldRevalidate;
+			else if (shouldSkipRevalidation) defaultShouldRevalidate = false;
+			else defaultShouldRevalidate = isRevalidationRequired;
+			let shouldRevalidateArgs = {
+				...baseShouldRevalidateArgs,
+				defaultShouldRevalidate
+			};
+			if (shouldRevalidateLoader(fetcherMatch, shouldRevalidateArgs)) fetcherDsMatches = getTargetedDataStrategyMatches(mapRouteProperties2, manifest, fetchRequest, fetcherMatches, fetcherMatch, lazyRoutePropertiesToSkip, scopedContext, shouldRevalidateArgs);
+		}
+		if (fetcherDsMatches) revalidatingFetchers.push({
+			key,
+			routeId: f.routeId,
+			path: f.path,
+			matches: fetcherDsMatches,
+			match: fetcherMatch,
+			request: fetchRequest,
+			controller: fetchController
+		});
+	});
+	return {
+		dsMatches,
+		revalidatingFetchers
+	};
+}
+function routeHasLoaderOrMiddleware(route) {
+	return route.loader != null || route.middleware != null && route.middleware.length > 0;
+}
+function getRouteHydrationStatus(route, loaderData, errors) {
+	if (route.lazy) return {
+		shouldLoad: true,
+		renderFallback: true
+	};
+	if (!routeHasLoaderOrMiddleware(route)) return {
+		shouldLoad: false,
+		renderFallback: false
+	};
+	let hasData = loaderData != null && route.id in loaderData;
+	let hasError = errors != null && errors[route.id] !== void 0;
+	if (!hasData && hasError) return {
+		shouldLoad: false,
+		renderFallback: false
+	};
+	if (typeof route.loader === "function" && route.loader.hydrate === true) return {
+		shouldLoad: true,
+		renderFallback: !hasData
+	};
+	let shouldLoad = !hasData && !hasError;
+	return {
+		shouldLoad,
+		renderFallback: shouldLoad
+	};
+}
+function isNewLoader(currentLoaderData, currentMatch, match) {
+	let isNew = !currentMatch || match.route.id !== currentMatch.route.id;
+	let isMissingData = !currentLoaderData.hasOwnProperty(match.route.id);
+	return isNew || isMissingData;
+}
+function isNewRouteInstance(currentMatch, match) {
+	let currentPath = currentMatch.route.path;
+	return currentMatch.pathname !== match.pathname || currentPath != null && currentPath.endsWith("*") && currentMatch.params["*"] !== match.params["*"];
+}
+function shouldRevalidateLoader(loaderMatch, arg) {
+	if (loaderMatch.route.shouldRevalidate) {
+		let routeChoice = loaderMatch.route.shouldRevalidate(arg);
+		if (typeof routeChoice === "boolean") return routeChoice;
+	}
+	return arg.defaultShouldRevalidate;
+}
+function patchRoutesImpl(routeId, children, routesToUse, manifest, mapRouteProperties2, allowElementMutations) {
+	let childrenToPatch;
+	if (routeId) {
+		let route = manifest[routeId];
+		invariant(route, `No route found to patch children into: routeId = ${routeId}`);
+		if (!route.children) route.children = [];
+		childrenToPatch = route.children;
+	} else childrenToPatch = routesToUse;
+	let uniqueChildren = [];
+	let existingChildren = [];
+	children.forEach((newRoute) => {
+		let existingRoute = childrenToPatch.find((existingRoute2) => isSameRoute(newRoute, existingRoute2));
+		if (existingRoute) existingChildren.push({
+			existingRoute,
+			newRoute
+		});
+		else uniqueChildren.push(newRoute);
+	});
+	if (uniqueChildren.length > 0) {
+		let newRoutes = convertRoutesToDataRoutes(uniqueChildren, mapRouteProperties2, [
+			routeId || "_",
+			"patch",
+			String(childrenToPatch?.length || "0")
+		], manifest);
+		childrenToPatch.push(...newRoutes);
+	}
+	if (allowElementMutations && existingChildren.length > 0) for (let i = 0; i < existingChildren.length; i++) {
+		let { existingRoute, newRoute } = existingChildren[i];
+		let existingRouteTyped = existingRoute;
+		let [newRouteTyped] = convertRoutesToDataRoutes([newRoute], mapRouteProperties2, [], {}, true);
+		Object.assign(existingRouteTyped, {
+			element: newRouteTyped.element ? newRouteTyped.element : existingRouteTyped.element,
+			errorElement: newRouteTyped.errorElement ? newRouteTyped.errorElement : existingRouteTyped.errorElement,
+			hydrateFallbackElement: newRouteTyped.hydrateFallbackElement ? newRouteTyped.hydrateFallbackElement : existingRouteTyped.hydrateFallbackElement
+		});
+	}
+}
+function isSameRoute(newRoute, existingRoute) {
+	if ("id" in newRoute && "id" in existingRoute && newRoute.id === existingRoute.id) return true;
+	if (!(newRoute.index === existingRoute.index && newRoute.path === existingRoute.path && newRoute.caseSensitive === existingRoute.caseSensitive)) return false;
+	if ((!newRoute.children || newRoute.children.length === 0) && (!existingRoute.children || existingRoute.children.length === 0)) return true;
+	return newRoute.children?.every((aChild, i) => existingRoute.children?.some((bChild) => isSameRoute(aChild, bChild))) ?? false;
+}
+var lazyRoutePropertyCache = /* @__PURE__ */ new WeakMap();
+var loadLazyRouteProperty = ({ key, route, manifest, mapRouteProperties: mapRouteProperties2 }) => {
+	let routeToUpdate = manifest[route.id];
+	invariant(routeToUpdate, "No route found in manifest");
+	if (!routeToUpdate.lazy || typeof routeToUpdate.lazy !== "object") return;
+	let lazyFn = routeToUpdate.lazy[key];
+	if (!lazyFn) return;
+	let cache = lazyRoutePropertyCache.get(routeToUpdate);
+	if (!cache) {
+		cache = {};
+		lazyRoutePropertyCache.set(routeToUpdate, cache);
+	}
+	let cachedPromise = cache[key];
+	if (cachedPromise) return cachedPromise;
+	let propertyPromise = (async () => {
+		let isUnsupported = isUnsupportedLazyRouteObjectKey(key);
+		let isStaticallyDefined = routeToUpdate[key] !== void 0 && key !== "hasErrorBoundary";
+		if (isUnsupported) {
+			warning(!isUnsupported, "Route property " + key + " is not a supported lazy route property. This property will be ignored.");
+			cache[key] = Promise.resolve();
+		} else if (isStaticallyDefined) warning(false, `Route "${routeToUpdate.id}" has a static property "${key}" defined. The lazy property will be ignored.`);
+		else {
+			let value = await lazyFn();
+			if (value != null) {
+				Object.assign(routeToUpdate, { [key]: value });
+				Object.assign(routeToUpdate, mapRouteProperties2(routeToUpdate));
+			}
+		}
+		if (typeof routeToUpdate.lazy === "object") {
+			routeToUpdate.lazy[key] = void 0;
+			if (Object.values(routeToUpdate.lazy).every((value) => value === void 0)) routeToUpdate.lazy = void 0;
+		}
+	})();
+	cache[key] = propertyPromise;
+	return propertyPromise;
+};
+var lazyRouteFunctionCache = /* @__PURE__ */ new WeakMap();
+function loadLazyRoute(route, type, manifest, mapRouteProperties2, lazyRoutePropertiesToSkip) {
+	let routeToUpdate = manifest[route.id];
+	invariant(routeToUpdate, "No route found in manifest");
+	if (!route.lazy) return {
+		lazyRoutePromise: void 0,
+		lazyHandlerPromise: void 0
+	};
+	if (typeof route.lazy === "function") {
+		let cachedPromise = lazyRouteFunctionCache.get(routeToUpdate);
+		if (cachedPromise) return {
+			lazyRoutePromise: cachedPromise,
+			lazyHandlerPromise: cachedPromise
+		};
+		let lazyRoutePromise2 = (async () => {
+			invariant(typeof route.lazy === "function", "No lazy route function found");
+			let lazyRoute = await route.lazy();
+			let routeUpdates = {};
+			for (let lazyRouteProperty in lazyRoute) {
+				let lazyValue = lazyRoute[lazyRouteProperty];
+				if (lazyValue === void 0) continue;
+				let isUnsupported = isUnsupportedLazyRouteFunctionKey(lazyRouteProperty);
+				let isStaticallyDefined = routeToUpdate[lazyRouteProperty] !== void 0 && lazyRouteProperty !== "hasErrorBoundary";
+				if (isUnsupported) warning(!isUnsupported, "Route property " + lazyRouteProperty + " is not a supported property to be returned from a lazy route function. This property will be ignored.");
+				else if (isStaticallyDefined) warning(!isStaticallyDefined, `Route "${routeToUpdate.id}" has a static property "${lazyRouteProperty}" defined but its lazy function is also returning a value for this property. The lazy route property "${lazyRouteProperty}" will be ignored.`);
+				else routeUpdates[lazyRouteProperty] = lazyValue;
+			}
+			Object.assign(routeToUpdate, routeUpdates);
+			Object.assign(routeToUpdate, {
+				...mapRouteProperties2(routeToUpdate),
+				lazy: void 0
+			});
+		})();
+		lazyRouteFunctionCache.set(routeToUpdate, lazyRoutePromise2);
+		lazyRoutePromise2.catch(() => {});
+		return {
+			lazyRoutePromise: lazyRoutePromise2,
+			lazyHandlerPromise: lazyRoutePromise2
+		};
+	}
+	let lazyKeys = Object.keys(route.lazy);
+	let lazyPropertyPromises = [];
+	let lazyHandlerPromise = void 0;
+	for (let key of lazyKeys) {
+		if (lazyRoutePropertiesToSkip && lazyRoutePropertiesToSkip.includes(key)) continue;
+		let promise = loadLazyRouteProperty({
+			key,
+			route,
+			manifest,
+			mapRouteProperties: mapRouteProperties2
+		});
+		if (promise) {
+			lazyPropertyPromises.push(promise);
+			if (key === type) lazyHandlerPromise = promise;
+		}
+	}
+	let lazyRoutePromise = lazyPropertyPromises.length > 0 ? Promise.all(lazyPropertyPromises).then(() => {}) : void 0;
+	lazyRoutePromise?.catch(() => {});
+	lazyHandlerPromise?.catch(() => {});
+	return {
+		lazyRoutePromise,
+		lazyHandlerPromise
+	};
+}
+async function defaultDataStrategy(args) {
+	let matchesToLoad = args.matches.filter((m) => m.shouldLoad);
+	let keyedResults = {};
+	(await Promise.all(matchesToLoad.map((m) => m.resolve()))).forEach((result, i) => {
+		keyedResults[matchesToLoad[i].route.id] = result;
+	});
+	return keyedResults;
+}
+async function defaultDataStrategyWithMiddleware(args) {
+	if (!args.matches.some((m) => m.route.middleware)) return defaultDataStrategy(args);
+	return runClientMiddlewarePipeline(args, () => defaultDataStrategy(args));
+}
+function runClientMiddlewarePipeline(args, handler) {
+	return runMiddlewarePipeline(args, handler, (r) => {
+		if (isRedirectResponse(r)) throw r;
+		return r;
+	}, isDataStrategyResults, errorHandler);
+	function errorHandler(error, routeId, nextResult) {
+		if (nextResult) return Promise.resolve(Object.assign(nextResult.value, { [routeId]: {
+			type: "error",
+			result: error
+		} }));
+		else {
+			let { matches } = args;
+			let boundaryRouteId = findNearestBoundary(matches, matches[Math.min(Math.max(matches.findIndex((m) => m.route.id === routeId), 0), Math.max(matches.findIndex((m) => m.shouldCallHandler()), 0))].route.id).route.id;
+			return Promise.resolve({ [boundaryRouteId]: {
+				type: "error",
+				result: error
+			} });
+		}
+	}
+}
+async function runMiddlewarePipeline(args, handler, processResult, isResult, errorHandler) {
+	let { matches, request, params, context, unstable_pattern } = args;
+	let tuples = matches.flatMap((m) => m.route.middleware ? m.route.middleware.map((fn) => [m.route.id, fn]) : []);
+	return await callRouteMiddleware({
+		request,
+		params,
+		context,
+		unstable_pattern
+	}, tuples, handler, processResult, isResult, errorHandler);
+}
+async function callRouteMiddleware(args, middlewares, handler, processResult, isResult, errorHandler, idx = 0) {
+	let { request } = args;
+	if (request.signal.aborted) throw request.signal.reason ?? /* @__PURE__ */ new Error(`Request aborted: ${request.method} ${request.url}`);
+	let tuple = middlewares[idx];
+	if (!tuple) return await handler();
+	let [routeId, middleware] = tuple;
+	let nextResult;
+	let next = async () => {
+		if (nextResult) throw new Error("You may only call `next()` once per middleware");
+		try {
+			nextResult = { value: await callRouteMiddleware(args, middlewares, handler, processResult, isResult, errorHandler, idx + 1) };
+			return nextResult.value;
+		} catch (error) {
+			nextResult = { value: await errorHandler(error, routeId, nextResult) };
+			return nextResult.value;
+		}
+	};
+	try {
+		let value = await middleware(args, next);
+		let result = value != null ? processResult(value) : void 0;
+		if (isResult(result)) return result;
+		else if (nextResult) return result ?? nextResult.value;
+		else {
+			nextResult = { value: await next() };
+			return nextResult.value;
+		}
+	} catch (error) {
+		return await errorHandler(error, routeId, nextResult);
+	}
+}
+function getDataStrategyMatchLazyPromises(mapRouteProperties2, manifest, request, match, lazyRoutePropertiesToSkip) {
+	let lazyMiddlewarePromise = loadLazyRouteProperty({
+		key: "middleware",
+		route: match.route,
+		manifest,
+		mapRouteProperties: mapRouteProperties2
+	});
+	let lazyRoutePromises = loadLazyRoute(match.route, isMutationMethod(request.method) ? "action" : "loader", manifest, mapRouteProperties2, lazyRoutePropertiesToSkip);
+	return {
+		middleware: lazyMiddlewarePromise,
+		route: lazyRoutePromises.lazyRoutePromise,
+		handler: lazyRoutePromises.lazyHandlerPromise
+	};
+}
+function getDataStrategyMatch(mapRouteProperties2, manifest, request, unstable_pattern, match, lazyRoutePropertiesToSkip, scopedContext, shouldLoad, shouldRevalidateArgs = null, callSiteDefaultShouldRevalidate) {
+	let isUsingNewApi = false;
+	let _lazyPromises = getDataStrategyMatchLazyPromises(mapRouteProperties2, manifest, request, match, lazyRoutePropertiesToSkip);
+	return {
+		...match,
+		_lazyPromises,
+		shouldLoad,
+		shouldRevalidateArgs,
+		shouldCallHandler(defaultShouldRevalidate) {
+			isUsingNewApi = true;
+			if (!shouldRevalidateArgs) return shouldLoad;
+			if (typeof callSiteDefaultShouldRevalidate === "boolean") return shouldRevalidateLoader(match, {
+				...shouldRevalidateArgs,
+				defaultShouldRevalidate: callSiteDefaultShouldRevalidate
+			});
+			if (typeof defaultShouldRevalidate === "boolean") return shouldRevalidateLoader(match, {
+				...shouldRevalidateArgs,
+				defaultShouldRevalidate
+			});
+			return shouldRevalidateLoader(match, shouldRevalidateArgs);
+		},
+		resolve(handlerOverride) {
+			let { lazy, loader, middleware } = match.route;
+			let callHandler = isUsingNewApi || shouldLoad || handlerOverride && !isMutationMethod(request.method) && (lazy || loader);
+			let isMiddlewareOnlyRoute = middleware && middleware.length > 0 && !loader && !lazy;
+			if (callHandler && (isMutationMethod(request.method) || !isMiddlewareOnlyRoute)) return callLoaderOrAction({
+				request,
+				unstable_pattern,
+				match,
+				lazyHandlerPromise: _lazyPromises?.handler,
+				lazyRoutePromise: _lazyPromises?.route,
+				handlerOverride,
+				scopedContext
+			});
+			return Promise.resolve({
+				type: "data",
+				result: void 0
+			});
+		}
+	};
+}
+function getTargetedDataStrategyMatches(mapRouteProperties2, manifest, request, matches, targetMatch, lazyRoutePropertiesToSkip, scopedContext, shouldRevalidateArgs = null) {
+	return matches.map((match) => {
+		if (match.route.id !== targetMatch.route.id) return {
+			...match,
+			shouldLoad: false,
+			shouldRevalidateArgs,
+			shouldCallHandler: () => false,
+			_lazyPromises: getDataStrategyMatchLazyPromises(mapRouteProperties2, manifest, request, match, lazyRoutePropertiesToSkip),
+			resolve: () => Promise.resolve({
+				type: "data",
+				result: void 0
+			})
+		};
+		return getDataStrategyMatch(mapRouteProperties2, manifest, request, getRoutePattern(matches), match, lazyRoutePropertiesToSkip, scopedContext, true, shouldRevalidateArgs);
+	});
+}
+async function callDataStrategyImpl(dataStrategyImpl, request, matches, fetcherKey, scopedContext, isStaticHandler) {
+	if (matches.some((m) => m._lazyPromises?.middleware)) await Promise.all(matches.map((m) => m._lazyPromises?.middleware));
+	let dataStrategyArgs = {
+		request,
+		unstable_pattern: getRoutePattern(matches),
+		params: matches[0].params,
+		context: scopedContext,
+		matches
+	};
+	let runClientMiddleware = isStaticHandler ? () => {
+		throw new Error("You cannot call `runClientMiddleware()` from a static handler `dataStrategy`. Middleware is run outside of `dataStrategy` during SSR in order to bubble up the Response.  You can enable middleware via the `respond` API in `query`/`queryRoute`");
+	} : (cb) => {
+		let typedDataStrategyArgs = dataStrategyArgs;
+		return runClientMiddlewarePipeline(typedDataStrategyArgs, () => {
+			return cb({
+				...typedDataStrategyArgs,
+				fetcherKey,
+				runClientMiddleware: () => {
+					throw new Error("Cannot call `runClientMiddleware()` from within an `runClientMiddleware` handler");
+				}
+			});
+		});
+	};
+	let results = await dataStrategyImpl({
+		...dataStrategyArgs,
+		fetcherKey,
+		runClientMiddleware
+	});
+	try {
+		await Promise.all(matches.flatMap((m) => [m._lazyPromises?.handler, m._lazyPromises?.route]));
+	} catch (e) {}
+	return results;
+}
+async function callLoaderOrAction({ request, unstable_pattern, match, lazyHandlerPromise, lazyRoutePromise, handlerOverride, scopedContext }) {
+	let result;
+	let onReject;
+	let isAction = isMutationMethod(request.method);
+	let type = isAction ? "action" : "loader";
+	let runHandler = (handler) => {
+		let reject;
+		let abortPromise = new Promise((_, r) => reject = r);
+		onReject = () => reject();
+		request.signal.addEventListener("abort", onReject);
+		let actualHandler = (ctx) => {
+			if (typeof handler !== "function") return Promise.reject(/* @__PURE__ */ new Error(`You cannot call the handler for a route which defines a boolean "${type}" [routeId: ${match.route.id}]`));
+			return handler({
+				request,
+				unstable_pattern,
+				params: match.params,
+				context: scopedContext
+			}, ...ctx !== void 0 ? [ctx] : []);
+		};
+		let handlerPromise = (async () => {
+			try {
+				return {
+					type: "data",
+					result: await (handlerOverride ? handlerOverride((ctx) => actualHandler(ctx)) : actualHandler())
+				};
+			} catch (e) {
+				return {
+					type: "error",
+					result: e
+				};
+			}
+		})();
+		return Promise.race([handlerPromise, abortPromise]);
+	};
+	try {
+		let handler = isAction ? match.route.action : match.route.loader;
+		if (lazyHandlerPromise || lazyRoutePromise) if (handler) {
+			let handlerError;
+			let [value] = await Promise.all([
+				runHandler(handler).catch((e) => {
+					handlerError = e;
+				}),
+				lazyHandlerPromise,
+				lazyRoutePromise
+			]);
+			if (handlerError !== void 0) throw handlerError;
+			result = value;
+		} else {
+			await lazyHandlerPromise;
+			let handler2 = isAction ? match.route.action : match.route.loader;
+			if (handler2) [result] = await Promise.all([runHandler(handler2), lazyRoutePromise]);
+			else if (type === "action") {
+				let url = new URL(request.url);
+				let pathname = url.pathname + url.search;
+				throw getInternalRouterError(405, {
+					method: request.method,
+					pathname,
+					routeId: match.route.id
+				});
+			} else return {
+				type: "data",
+				result: void 0
+			};
+		}
+		else if (!handler) {
+			let url = new URL(request.url);
+			throw getInternalRouterError(404, { pathname: url.pathname + url.search });
+		} else result = await runHandler(handler);
+	} catch (e) {
+		return {
+			type: "error",
+			result: e
+		};
+	} finally {
+		if (onReject) request.signal.removeEventListener("abort", onReject);
+	}
+	return result;
+}
+async function parseResponseBody(response) {
+	let contentType = response.headers.get("Content-Type");
+	if (contentType && /\bapplication\/json\b/.test(contentType)) return response.body == null ? null : response.json();
+	return response.text();
+}
+async function convertDataStrategyResultToDataResult(dataStrategyResult) {
+	let { result, type } = dataStrategyResult;
+	if (isResponse(result)) {
+		let data2;
+		try {
+			data2 = await parseResponseBody(result);
+		} catch (e) {
+			return {
+				type: "error",
+				error: e
+			};
+		}
+		if (type === "error") return {
+			type: "error",
+			error: new ErrorResponseImpl(result.status, result.statusText, data2),
+			statusCode: result.status,
+			headers: result.headers
+		};
+		return {
+			type: "data",
+			data: data2,
+			statusCode: result.status,
+			headers: result.headers
+		};
+	}
+	if (type === "error") {
+		if (isDataWithResponseInit(result)) {
+			if (result.data instanceof Error) return {
+				type: "error",
+				error: result.data,
+				statusCode: result.init?.status,
+				headers: result.init?.headers ? new Headers(result.init.headers) : void 0
+			};
+			return {
+				type: "error",
+				error: dataWithResponseInitToErrorResponse(result),
+				statusCode: isRouteErrorResponse(result) ? result.status : void 0,
+				headers: result.init?.headers ? new Headers(result.init.headers) : void 0
+			};
+		}
+		return {
+			type: "error",
+			error: result,
+			statusCode: isRouteErrorResponse(result) ? result.status : void 0
+		};
+	}
+	if (isDataWithResponseInit(result)) return {
+		type: "data",
+		data: result.data,
+		statusCode: result.init?.status,
+		headers: result.init?.headers ? new Headers(result.init.headers) : void 0
+	};
+	return {
+		type: "data",
+		data: result
+	};
+}
+function normalizeRelativeRoutingRedirectResponse(response, request, routeId, matches, basename) {
+	let location = response.headers.get("Location");
+	invariant(location, "Redirects returned/thrown from loaders/actions must have a Location header");
+	if (!isAbsoluteUrl(location)) {
+		let trimmedMatches = matches.slice(0, matches.findIndex((m) => m.route.id === routeId) + 1);
+		location = normalizeTo(new URL(request.url), trimmedMatches, basename, location);
+		response.headers.set("Location", location);
+	}
+	return response;
+}
+function normalizeRedirectLocation(location, currentUrl, basename, historyInstance) {
+	let invalidProtocols = [
+		"about:",
+		"blob:",
+		"chrome:",
+		"chrome-untrusted:",
+		"content:",
+		"data:",
+		"devtools:",
+		"file:",
+		"filesystem:",
+		"javascript:"
+	];
+	if (isAbsoluteUrl(location)) {
+		let normalizedLocation = location;
+		let url = normalizedLocation.startsWith("//") ? new URL(currentUrl.protocol + normalizedLocation) : new URL(normalizedLocation);
+		if (invalidProtocols.includes(url.protocol)) throw new Error("Invalid redirect location");
+		let isSameBasename = stripBasename(url.pathname, basename) != null;
+		if (url.origin === currentUrl.origin && isSameBasename) return url.pathname + url.search + url.hash;
+	}
+	try {
+		let url = historyInstance.createURL(location);
+		if (invalidProtocols.includes(url.protocol)) throw new Error("Invalid redirect location");
+	} catch (e) {}
+	return location;
+}
+function createClientSideRequest(history, location, signal, submission) {
+	let url = history.createURL(stripHashFromPath(location)).toString();
+	let init = { signal };
+	if (submission && isMutationMethod(submission.formMethod)) {
+		let { formMethod, formEncType } = submission;
+		init.method = formMethod.toUpperCase();
+		if (formEncType === "application/json") {
+			init.headers = new Headers({ "Content-Type": formEncType });
+			init.body = JSON.stringify(submission.json);
+		} else if (formEncType === "text/plain") init.body = submission.text;
+		else if (formEncType === "application/x-www-form-urlencoded" && submission.formData) init.body = convertFormDataToSearchParams(submission.formData);
+		else init.body = submission.formData;
+	}
+	return new Request(url, init);
+}
+function convertFormDataToSearchParams(formData) {
+	let searchParams = new URLSearchParams();
+	for (let [key, value] of formData.entries()) searchParams.append(key, typeof value === "string" ? value : value.name);
+	return searchParams;
+}
+function convertSearchParamsToFormData(searchParams) {
+	let formData = new FormData();
+	for (let [key, value] of searchParams.entries()) formData.append(key, value);
+	return formData;
+}
+function processRouteLoaderData(matches, results, pendingActionResult, isStaticHandler = false, skipLoaderErrorBubbling = false) {
+	let loaderData = {};
+	let errors = null;
+	let statusCode;
+	let foundError = false;
+	let loaderHeaders = {};
+	let pendingError = pendingActionResult && isErrorResult(pendingActionResult[1]) ? pendingActionResult[1].error : void 0;
+	matches.forEach((match) => {
+		if (!(match.route.id in results)) return;
+		let id = match.route.id;
+		let result = results[id];
+		invariant(!isRedirectResult(result), "Cannot handle redirect results in processLoaderData");
+		if (isErrorResult(result)) {
+			let error = result.error;
+			if (pendingError !== void 0) {
+				error = pendingError;
+				pendingError = void 0;
+			}
+			errors = errors || {};
+			if (skipLoaderErrorBubbling) errors[id] = error;
+			else {
+				let boundaryMatch = findNearestBoundary(matches, id);
+				if (errors[boundaryMatch.route.id] == null) errors[boundaryMatch.route.id] = error;
+			}
+			if (!isStaticHandler) loaderData[id] = ResetLoaderDataSymbol;
+			if (!foundError) {
+				foundError = true;
+				statusCode = isRouteErrorResponse(result.error) ? result.error.status : 500;
+			}
+			if (result.headers) loaderHeaders[id] = result.headers;
+		} else {
+			loaderData[id] = result.data;
+			if (result.statusCode && result.statusCode !== 200 && !foundError) statusCode = result.statusCode;
+			if (result.headers) loaderHeaders[id] = result.headers;
+		}
+	});
+	if (pendingError !== void 0 && pendingActionResult) {
+		errors = { [pendingActionResult[0]]: pendingError };
+		if (pendingActionResult[2]) loaderData[pendingActionResult[2]] = void 0;
+	}
+	return {
+		loaderData,
+		errors,
+		statusCode: statusCode || 200,
+		loaderHeaders
+	};
+}
+function processLoaderData(state, matches, results, pendingActionResult, revalidatingFetchers, fetcherResults) {
+	let { loaderData, errors } = processRouteLoaderData(matches, results, pendingActionResult);
+	revalidatingFetchers.filter((f) => !f.matches || f.matches.some((m) => m.shouldLoad)).forEach((rf) => {
+		let { key, match, controller } = rf;
+		if (controller && controller.signal.aborted) return;
+		let result = fetcherResults[key];
+		invariant(result, "Did not find corresponding fetcher result");
+		if (isErrorResult(result)) {
+			let boundaryMatch = findNearestBoundary(state.matches, match?.route.id);
+			if (!(errors && errors[boundaryMatch.route.id])) errors = {
+				...errors,
+				[boundaryMatch.route.id]: result.error
+			};
+			state.fetchers.delete(key);
+		} else if (isRedirectResult(result)) invariant(false, "Unhandled fetcher revalidation redirect");
+		else {
+			let doneFetcher = getDoneFetcher(result.data);
+			state.fetchers.set(key, doneFetcher);
+		}
+	});
+	return {
+		loaderData,
+		errors
+	};
+}
+function mergeLoaderData(loaderData, newLoaderData, matches, errors) {
+	let mergedLoaderData = Object.entries(newLoaderData).filter(([, v]) => v !== ResetLoaderDataSymbol).reduce((merged, [k, v]) => {
+		merged[k] = v;
+		return merged;
+	}, {});
+	for (let match of matches) {
+		let id = match.route.id;
+		if (!newLoaderData.hasOwnProperty(id) && loaderData.hasOwnProperty(id) && match.route.loader) mergedLoaderData[id] = loaderData[id];
+		if (errors && errors.hasOwnProperty(id)) break;
+	}
+	return mergedLoaderData;
+}
+function getActionDataForCommit(pendingActionResult) {
+	if (!pendingActionResult) return {};
+	return isErrorResult(pendingActionResult[1]) ? { actionData: {} } : { actionData: { [pendingActionResult[0]]: pendingActionResult[1].data } };
+}
+function findNearestBoundary(matches, routeId) {
+	return (routeId ? matches.slice(0, matches.findIndex((m) => m.route.id === routeId) + 1) : [...matches]).reverse().find((m) => m.route.hasErrorBoundary === true) || matches[0];
+}
+function getShortCircuitMatches(routes) {
+	let route = routes.length === 1 ? routes[0] : routes.find((r) => r.index || !r.path || r.path === "/") || { id: `__shim-error-route__` };
+	return {
+		matches: [{
+			params: {},
+			pathname: "",
+			pathnameBase: "",
+			route
+		}],
+		route
+	};
+}
+function getInternalRouterError(status, { pathname, routeId, method, type, message } = {}) {
+	let statusText = "Unknown Server Error";
+	let errorMessage = "Unknown @remix-run/router error";
+	if (status === 400) {
+		statusText = "Bad Request";
+		if (method && pathname && routeId) errorMessage = `You made a ${method} request to "${pathname}" but did not provide a \`loader\` for route "${routeId}", so there is no way to handle the request.`;
+		else if (type === "invalid-body") errorMessage = "Unable to encode submission body";
+	} else if (status === 403) {
+		statusText = "Forbidden";
+		errorMessage = `Route "${routeId}" does not match URL "${pathname}"`;
+	} else if (status === 404) {
+		statusText = "Not Found";
+		errorMessage = `No route matches URL "${pathname}"`;
+	} else if (status === 405) {
+		statusText = "Method Not Allowed";
+		if (method && pathname && routeId) errorMessage = `You made a ${method.toUpperCase()} request to "${pathname}" but did not provide an \`action\` for route "${routeId}", so there is no way to handle the request.`;
+		else if (method) errorMessage = `Invalid request method "${method.toUpperCase()}"`;
+	}
+	return new ErrorResponseImpl(status || 500, statusText, new Error(errorMessage), true);
+}
+function findRedirect(results) {
+	let entries = Object.entries(results);
+	for (let i = entries.length - 1; i >= 0; i--) {
+		let [key, result] = entries[i];
+		if (isRedirectResult(result)) return {
+			key,
+			result
+		};
+	}
+}
+function stripHashFromPath(path) {
+	return createPath({
+		...typeof path === "string" ? parsePath(path) : path,
+		hash: ""
+	});
+}
+function isHashChangeOnly(a, b) {
+	if (a.pathname !== b.pathname || a.search !== b.search) return false;
+	if (a.hash === "") return b.hash !== "";
+	else if (a.hash === b.hash) return true;
+	else if (b.hash !== "") return true;
+	return false;
+}
+function dataWithResponseInitToErrorResponse(data2) {
+	return new ErrorResponseImpl(data2.init?.status ?? 500, data2.init?.statusText ?? "Internal Server Error", data2.data);
+}
+function isDataStrategyResults(result) {
+	return result != null && typeof result === "object" && Object.entries(result).every(([key, value]) => typeof key === "string" && isDataStrategyResult(value));
+}
+function isDataStrategyResult(result) {
+	return result != null && typeof result === "object" && "type" in result && "result" in result && (result.type === "data" || result.type === "error");
+}
+function isRedirectDataStrategyResult(result) {
+	return isResponse(result.result) && redirectStatusCodes.has(result.result.status);
+}
+function isErrorResult(result) {
+	return result.type === "error";
+}
+function isRedirectResult(result) {
+	return (result && result.type) === "redirect";
+}
+function isDataWithResponseInit(value) {
+	return typeof value === "object" && value != null && "type" in value && "data" in value && "init" in value && value.type === "DataWithResponseInit";
+}
+function isResponse(value) {
+	return value != null && typeof value.status === "number" && typeof value.statusText === "string" && typeof value.headers === "object" && typeof value.body !== "undefined";
+}
+function isRedirectStatusCode(statusCode) {
+	return redirectStatusCodes.has(statusCode);
+}
+function isRedirectResponse(result) {
+	return isResponse(result) && isRedirectStatusCode(result.status) && result.headers.has("Location");
+}
+function isValidMethod(method) {
+	return validRequestMethods.has(method.toUpperCase());
+}
+function isMutationMethod(method) {
+	return validMutationMethods.has(method.toUpperCase());
+}
+function hasNakedIndexQuery(search) {
+	return new URLSearchParams(search).getAll("index").some((v) => v === "");
+}
+function getTargetMatch(matches, location) {
+	let search = typeof location === "string" ? parsePath(location).search : location.search;
+	if (matches[matches.length - 1].route.index && hasNakedIndexQuery(search || "")) return matches[matches.length - 1];
+	let pathMatches = getPathContributingMatches(matches);
+	return pathMatches[pathMatches.length - 1];
+}
+function getSubmissionFromNavigation(navigation) {
+	let { formMethod, formAction, formEncType, text, formData, json } = navigation;
+	if (!formMethod || !formAction || !formEncType) return;
+	if (text != null) return {
+		formMethod,
+		formAction,
+		formEncType,
+		formData: void 0,
+		json: void 0,
+		text
+	};
+	else if (formData != null) return {
+		formMethod,
+		formAction,
+		formEncType,
+		formData,
+		json: void 0,
+		text: void 0
+	};
+	else if (json !== void 0) return {
+		formMethod,
+		formAction,
+		formEncType,
+		formData: void 0,
+		json,
+		text: void 0
+	};
+}
+function getLoadingNavigation(location, submission) {
+	if (submission) return {
+		state: "loading",
+		location,
+		formMethod: submission.formMethod,
+		formAction: submission.formAction,
+		formEncType: submission.formEncType,
+		formData: submission.formData,
+		json: submission.json,
+		text: submission.text
+	};
+	else return {
+		state: "loading",
+		location,
+		formMethod: void 0,
+		formAction: void 0,
+		formEncType: void 0,
+		formData: void 0,
+		json: void 0,
+		text: void 0
+	};
+}
+function getSubmittingNavigation(location, submission) {
+	return {
+		state: "submitting",
+		location,
+		formMethod: submission.formMethod,
+		formAction: submission.formAction,
+		formEncType: submission.formEncType,
+		formData: submission.formData,
+		json: submission.json,
+		text: submission.text
+	};
+}
+function getLoadingFetcher(submission, data2) {
+	if (submission) return {
+		state: "loading",
+		formMethod: submission.formMethod,
+		formAction: submission.formAction,
+		formEncType: submission.formEncType,
+		formData: submission.formData,
+		json: submission.json,
+		text: submission.text,
+		data: data2
+	};
+	else return {
+		state: "loading",
+		formMethod: void 0,
+		formAction: void 0,
+		formEncType: void 0,
+		formData: void 0,
+		json: void 0,
+		text: void 0,
+		data: data2
+	};
+}
+function getSubmittingFetcher(submission, existingFetcher) {
+	return {
+		state: "submitting",
+		formMethod: submission.formMethod,
+		formAction: submission.formAction,
+		formEncType: submission.formEncType,
+		formData: submission.formData,
+		json: submission.json,
+		text: submission.text,
+		data: existingFetcher ? existingFetcher.data : void 0
+	};
+}
+function getDoneFetcher(data2) {
+	return {
+		state: "idle",
+		formMethod: void 0,
+		formAction: void 0,
+		formEncType: void 0,
+		formData: void 0,
+		json: void 0,
+		text: void 0,
+		data: data2
+	};
+}
+function restoreAppliedTransitions(_window, transitions) {
+	try {
+		let sessionPositions = _window.sessionStorage.getItem(TRANSITIONS_STORAGE_KEY);
+		if (sessionPositions) {
+			let json = JSON.parse(sessionPositions);
+			for (let [k, v] of Object.entries(json || {})) if (v && Array.isArray(v)) transitions.set(k, new Set(v || []));
+		}
+	} catch (e) {}
+}
+function persistAppliedTransitions(_window, transitions) {
+	if (transitions.size > 0) {
+		let json = {};
+		for (let [k, v] of transitions) json[k] = [...v];
+		try {
+			_window.sessionStorage.setItem(TRANSITIONS_STORAGE_KEY, JSON.stringify(json));
+		} catch (error) {
+			warning(false, `Failed to save applied view transitions in sessionStorage (${error}).`);
+		}
+	}
+}
+function createDeferred() {
+	let resolve;
+	let reject;
+	let promise = new Promise((res, rej) => {
+		resolve = async (val) => {
+			res(val);
+			try {
+				await promise;
+			} catch (e) {}
+		};
+		reject = async (error) => {
+			rej(error);
+			try {
+				await promise;
+			} catch (e) {}
+		};
+	});
+	return {
+		promise,
+		resolve,
+		reject
+	};
+}
 var DataRouterContext = import_react.createContext(null);
 DataRouterContext.displayName = "DataRouter";
 var DataRouterStateContext = import_react.createContext(null);
 DataRouterStateContext.displayName = "DataRouterState";
 var RSCRouterContext = import_react.createContext(false);
+function useIsRSCRouterContext() {
+	return import_react.useContext(RSCRouterContext);
+}
 var ViewTransitionContext = import_react.createContext({ isTransitioning: false });
 ViewTransitionContext.displayName = "ViewTransition";
 var FetchersContext = import_react.createContext(/* @__PURE__ */ new Map());
@@ -16037,9 +18731,6 @@ function useResolvedPath(to, { relative } = {}) {
 		locationPathname,
 		relative
 	]);
-}
-function useRoutes(routes, locationArg) {
-	return useRoutesImpl(routes, locationArg);
 }
 function useRoutesImpl(routes, locationArg, dataRouterOpts) {
 	invariant(useInRouterContext(), `useRoutes() may be used only in the context of a <Router> component.`);
@@ -16341,8 +19032,253 @@ function warningOnce(key, cond, message) {
 		warning(false, message);
 	}
 }
-import_react.useOptimistic;
-import_react.memo(DataRoutes);
+var alreadyWarned2 = {};
+function warnOnce(condition, message) {
+	if (!condition && !alreadyWarned2[message]) {
+		alreadyWarned2[message] = true;
+		console.warn(message);
+	}
+}
+var useOptimisticImpl = import_react.useOptimistic;
+var stableUseOptimisticSetter = () => void 0;
+function useOptimisticSafe(val) {
+	if (useOptimisticImpl) return useOptimisticImpl(val);
+	else return [val, stableUseOptimisticSetter];
+}
+function mapRouteProperties(route) {
+	let updates = { hasErrorBoundary: route.hasErrorBoundary || route.ErrorBoundary != null || route.errorElement != null };
+	if (route.Component) {
+		if (route.element) warning(false, "You should not include both `Component` and `element` on your route - `Component` will be used.");
+		Object.assign(updates, {
+			element: import_react.createElement(route.Component),
+			Component: void 0
+		});
+	}
+	if (route.HydrateFallback) {
+		if (route.hydrateFallbackElement) warning(false, "You should not include both `HydrateFallback` and `hydrateFallbackElement` on your route - `HydrateFallback` will be used.");
+		Object.assign(updates, {
+			hydrateFallbackElement: import_react.createElement(route.HydrateFallback),
+			HydrateFallback: void 0
+		});
+	}
+	if (route.ErrorBoundary) {
+		if (route.errorElement) warning(false, "You should not include both `ErrorBoundary` and `errorElement` on your route - `ErrorBoundary` will be used.");
+		Object.assign(updates, {
+			errorElement: import_react.createElement(route.ErrorBoundary),
+			ErrorBoundary: void 0
+		});
+	}
+	return updates;
+}
+var hydrationRouteProperties = ["HydrateFallback", "hydrateFallbackElement"];
+var Deferred = class {
+	constructor() {
+		this.status = "pending";
+		this.promise = new Promise((resolve, reject) => {
+			this.resolve = (value) => {
+				if (this.status === "pending") {
+					this.status = "resolved";
+					resolve(value);
+				}
+			};
+			this.reject = (reason) => {
+				if (this.status === "pending") {
+					this.status = "rejected";
+					reject(reason);
+				}
+			};
+		});
+	}
+};
+function RouterProvider({ router, flushSync: reactDomFlushSyncImpl, onError, unstable_useTransitions }) {
+	unstable_useTransitions = useIsRSCRouterContext() || unstable_useTransitions;
+	let [_state, setStateImpl] = import_react.useState(router.state);
+	let [state, setOptimisticState] = useOptimisticSafe(_state);
+	let [pendingState, setPendingState] = import_react.useState();
+	let [vtContext, setVtContext] = import_react.useState({ isTransitioning: false });
+	let [renderDfd, setRenderDfd] = import_react.useState();
+	let [transition, setTransition] = import_react.useState();
+	let [interruption, setInterruption] = import_react.useState();
+	let fetcherData = import_react.useRef(/* @__PURE__ */ new Map());
+	let setState = import_react.useCallback((newState, { deletedFetchers, newErrors, flushSync, viewTransitionOpts }) => {
+		if (newErrors && onError) Object.values(newErrors).forEach((error) => onError(error, {
+			location: newState.location,
+			params: newState.matches[0]?.params ?? {},
+			unstable_pattern: getRoutePattern(newState.matches)
+		}));
+		newState.fetchers.forEach((fetcher, key) => {
+			if (fetcher.data !== void 0) fetcherData.current.set(key, fetcher.data);
+		});
+		deletedFetchers.forEach((key) => fetcherData.current.delete(key));
+		warnOnce(flushSync === false || reactDomFlushSyncImpl != null, "You provided the `flushSync` option to a router update, but you are not using the `<RouterProvider>` from `react-router/dom` so `ReactDOM.flushSync()` is unavailable.  Please update your app to `import { RouterProvider } from \"react-router/dom\"` and ensure you have `react-dom` installed as a dependency to use the `flushSync` option.");
+		let isViewTransitionAvailable = router.window != null && router.window.document != null && typeof router.window.document.startViewTransition === "function";
+		warnOnce(viewTransitionOpts == null || isViewTransitionAvailable, "You provided the `viewTransition` option to a router update, but you do not appear to be running in a DOM environment as `window.startViewTransition` is not available.");
+		if (!viewTransitionOpts || !isViewTransitionAvailable) {
+			if (reactDomFlushSyncImpl && flushSync) reactDomFlushSyncImpl(() => setStateImpl(newState));
+			else if (unstable_useTransitions === false) setStateImpl(newState);
+			else import_react.startTransition(() => {
+				if (unstable_useTransitions === true) setOptimisticState((s) => getOptimisticRouterState(s, newState));
+				setStateImpl(newState);
+			});
+			return;
+		}
+		if (reactDomFlushSyncImpl && flushSync) {
+			reactDomFlushSyncImpl(() => {
+				if (transition) {
+					renderDfd?.resolve();
+					transition.skipTransition();
+				}
+				setVtContext({
+					isTransitioning: true,
+					flushSync: true,
+					currentLocation: viewTransitionOpts.currentLocation,
+					nextLocation: viewTransitionOpts.nextLocation
+				});
+			});
+			let t = router.window.document.startViewTransition(() => {
+				reactDomFlushSyncImpl(() => setStateImpl(newState));
+			});
+			t.finished.finally(() => {
+				reactDomFlushSyncImpl(() => {
+					setRenderDfd(void 0);
+					setTransition(void 0);
+					setPendingState(void 0);
+					setVtContext({ isTransitioning: false });
+				});
+			});
+			reactDomFlushSyncImpl(() => setTransition(t));
+			return;
+		}
+		if (transition) {
+			renderDfd?.resolve();
+			transition.skipTransition();
+			setInterruption({
+				state: newState,
+				currentLocation: viewTransitionOpts.currentLocation,
+				nextLocation: viewTransitionOpts.nextLocation
+			});
+		} else {
+			setPendingState(newState);
+			setVtContext({
+				isTransitioning: true,
+				flushSync: false,
+				currentLocation: viewTransitionOpts.currentLocation,
+				nextLocation: viewTransitionOpts.nextLocation
+			});
+		}
+	}, [
+		router.window,
+		reactDomFlushSyncImpl,
+		transition,
+		renderDfd,
+		unstable_useTransitions,
+		setOptimisticState,
+		onError
+	]);
+	import_react.useLayoutEffect(() => router.subscribe(setState), [router, setState]);
+	import_react.useEffect(() => {
+		if (vtContext.isTransitioning && !vtContext.flushSync) setRenderDfd(new Deferred());
+	}, [vtContext]);
+	import_react.useEffect(() => {
+		if (renderDfd && pendingState && router.window) {
+			let newState = pendingState;
+			let renderPromise = renderDfd.promise;
+			let transition2 = router.window.document.startViewTransition(async () => {
+				if (unstable_useTransitions === false) setStateImpl(newState);
+				else import_react.startTransition(() => {
+					if (unstable_useTransitions === true) setOptimisticState((s) => getOptimisticRouterState(s, newState));
+					setStateImpl(newState);
+				});
+				await renderPromise;
+			});
+			transition2.finished.finally(() => {
+				setRenderDfd(void 0);
+				setTransition(void 0);
+				setPendingState(void 0);
+				setVtContext({ isTransitioning: false });
+			});
+			setTransition(transition2);
+		}
+	}, [
+		pendingState,
+		renderDfd,
+		router.window,
+		unstable_useTransitions,
+		setOptimisticState
+	]);
+	import_react.useEffect(() => {
+		if (renderDfd && pendingState && state.location.key === pendingState.location.key) renderDfd.resolve();
+	}, [
+		renderDfd,
+		transition,
+		state.location,
+		pendingState
+	]);
+	import_react.useEffect(() => {
+		if (!vtContext.isTransitioning && interruption) {
+			setPendingState(interruption.state);
+			setVtContext({
+				isTransitioning: true,
+				flushSync: false,
+				currentLocation: interruption.currentLocation,
+				nextLocation: interruption.nextLocation
+			});
+			setInterruption(void 0);
+		}
+	}, [vtContext.isTransitioning, interruption]);
+	let navigator = import_react.useMemo(() => {
+		return {
+			createHref: router.createHref,
+			encodeLocation: router.encodeLocation,
+			go: (n) => router.navigate(n),
+			push: (to, state2, opts) => router.navigate(to, {
+				state: state2,
+				preventScrollReset: opts?.preventScrollReset
+			}),
+			replace: (to, state2, opts) => router.navigate(to, {
+				replace: true,
+				state: state2,
+				preventScrollReset: opts?.preventScrollReset
+			})
+		};
+	}, [router]);
+	let basename = router.basename || "/";
+	let dataRouterContext = import_react.useMemo(() => ({
+		router,
+		navigator,
+		static: false,
+		basename,
+		onError
+	}), [
+		router,
+		navigator,
+		basename,
+		onError
+	]);
+	return /* @__PURE__ */ import_react.createElement(import_react.Fragment, null, /* @__PURE__ */ import_react.createElement(DataRouterContext.Provider, { value: dataRouterContext }, /* @__PURE__ */ import_react.createElement(DataRouterStateContext.Provider, { value: state }, /* @__PURE__ */ import_react.createElement(FetchersContext.Provider, { value: fetcherData.current }, /* @__PURE__ */ import_react.createElement(ViewTransitionContext.Provider, { value: vtContext }, /* @__PURE__ */ import_react.createElement(Router, {
+		basename,
+		location: state.location,
+		navigationType: state.historyAction,
+		navigator,
+		unstable_useTransitions
+	}, /* @__PURE__ */ import_react.createElement(MemoizedDataRoutes, {
+		routes: router.routes,
+		future: router.future,
+		state,
+		isStatic: false,
+		onError
+	})))))), null);
+}
+function getOptimisticRouterState(currentState, newState) {
+	return {
+		...currentState,
+		navigation: newState.navigation.state !== "idle" ? newState.navigation : currentState.navigation,
+		revalidation: newState.revalidation !== "idle" ? newState.revalidation : currentState.revalidation,
+		actionData: newState.navigation.state !== "submitting" ? newState.actionData : currentState.actionData,
+		fetchers: newState.fetchers
+	};
+}
+var MemoizedDataRoutes = import_react.memo(DataRoutes);
 function DataRoutes({ routes, future, state, isStatic, onError }) {
 	return useRoutesImpl(routes, void 0, {
 		state,
@@ -16353,9 +19289,6 @@ function DataRoutes({ routes, future, state, isStatic, onError }) {
 }
 function Outlet(props) {
 	return useOutlet(props.context);
-}
-function Route(props) {
-	invariant(false, `A <Route> is only ever to be used as the child of <Routes> element, never rendered directly. Please wrap your <Route> in a <Routes>.`);
 }
 function Router({ basename: basenameProp = "/", children = null, location: locationProp, navigationType = "POP", navigator, static: staticProp = false, unstable_useTransitions }) {
 	invariant(!useInRouterContext(), `You cannot render a <Router> inside another <Router>. You should never have more than one in your app.`);
@@ -16404,44 +19337,6 @@ function Router({ basename: basenameProp = "/", children = null, location: locat
 		children,
 		value: locationContext
 	}));
-}
-function Routes({ children, location }) {
-	return useRoutes(createRoutesFromChildren(children), location);
-}
-function createRoutesFromChildren(children, parentPath = []) {
-	let routes = [];
-	import_react.Children.forEach(children, (element, index) => {
-		if (!import_react.isValidElement(element)) return;
-		let treePath = [...parentPath, index];
-		if (element.type === import_react.Fragment) {
-			routes.push.apply(routes, createRoutesFromChildren(element.props.children, treePath));
-			return;
-		}
-		invariant(element.type === Route, `[${typeof element.type === "string" ? element.type : element.type.name}] is not a <Route> component. All component children of <Routes> must be a <Route> or <React.Fragment>`);
-		invariant(!element.props.index || !element.props.children, "An index route cannot have child routes.");
-		let route = {
-			id: element.props.id || treePath.join("-"),
-			caseSensitive: element.props.caseSensitive,
-			element: element.props.element,
-			Component: element.props.Component,
-			index: element.props.index,
-			path: element.props.path,
-			middleware: element.props.middleware,
-			loader: element.props.loader,
-			action: element.props.action,
-			hydrateFallbackElement: element.props.hydrateFallbackElement,
-			HydrateFallback: element.props.HydrateFallback,
-			errorElement: element.props.errorElement,
-			ErrorBoundary: element.props.ErrorBoundary,
-			hasErrorBoundary: element.props.hasErrorBoundary === true || element.props.ErrorBoundary != null || element.props.errorElement != null,
-			shouldRevalidate: element.props.shouldRevalidate,
-			handle: element.props.handle,
-			lazy: element.props.lazy
-		};
-		if (element.props.children) route.children = createRoutesFromChildren(element.props.children, treePath);
-		routes.push(route);
-	});
-	return routes;
 }
 var defaultMethod = "get";
 var defaultEncType = "application/x-www-form-urlencoded";
@@ -16855,30 +19750,51 @@ var isBrowser2 = typeof window !== "undefined" && typeof window.document !== "un
 try {
 	if (isBrowser2) window.__reactRouterVersion = "7.13.1";
 } catch (e) {}
-function BrowserRouter({ basename, children, unstable_useTransitions, window: window2 }) {
-	let historyRef = import_react.useRef();
-	if (historyRef.current == null) historyRef.current = createBrowserHistory({
-		window: window2,
-		v5Compat: true
-	});
-	let history = historyRef.current;
-	let [state, setStateImpl] = import_react.useState({
-		action: history.action,
-		location: history.location
-	});
-	let setState = import_react.useCallback((newState) => {
-		if (unstable_useTransitions === false) setStateImpl(newState);
-		else import_react.startTransition(() => setStateImpl(newState));
-	}, [unstable_useTransitions]);
-	import_react.useLayoutEffect(() => history.listen(setState), [history, setState]);
-	return /* @__PURE__ */ import_react.createElement(Router, {
-		basename,
-		children,
-		location: state.location,
-		navigationType: state.action,
-		navigator: history,
-		unstable_useTransitions
-	});
+function createBrowserRouter(routes, opts) {
+	return createRouter({
+		basename: opts?.basename,
+		getContext: opts?.getContext,
+		future: opts?.future,
+		history: createBrowserHistory({ window: opts?.window }),
+		hydrationData: opts?.hydrationData || parseHydrationData(),
+		routes,
+		mapRouteProperties,
+		hydrationRouteProperties,
+		dataStrategy: opts?.dataStrategy,
+		patchRoutesOnNavigation: opts?.patchRoutesOnNavigation,
+		window: opts?.window,
+		unstable_instrumentations: opts?.unstable_instrumentations
+	}).initialize();
+}
+function parseHydrationData() {
+	let state = window?.__staticRouterHydrationData;
+	if (state && state.errors) state = {
+		...state,
+		errors: deserializeErrors(state.errors)
+	};
+	return state;
+}
+function deserializeErrors(errors) {
+	if (!errors) return null;
+	let entries = Object.entries(errors);
+	let serialized = {};
+	for (let [key, val] of entries) if (val && val.__type === "RouteErrorResponse") serialized[key] = new ErrorResponseImpl(val.status, val.statusText, val.data, val.internal === true);
+	else if (val && val.__type === "Error") {
+		if (val.__subType) {
+			let ErrorConstructor = window[val.__subType];
+			if (typeof ErrorConstructor === "function") try {
+				let error = new ErrorConstructor(val.message);
+				error.stack = "";
+				serialized[key] = error;
+			} catch (e) {}
+		}
+		if (serialized[key] == null) {
+			let error = new Error(val.message);
+			error.stack = "";
+			serialized[key] = error;
+		}
+	} else serialized[key] = val;
+	return serialized;
 }
 function HistoryRouter({ basename, children, history, unstable_useTransitions }) {
 	let [state, setStateImpl] = import_react.useState({
@@ -17274,6 +20190,26 @@ function useViewTransitionState(to, { relative } = {}) {
 	return matchPath(path.pathname, nextPath) != null || matchPath(path.pathname, currentPath) != null;
 }
 //#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/react-router@7.13.1_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/react-router/dist/development/dom-export.mjs
+/**
+* react-router v7.13.1
+*
+* Copyright (c) Remix Software Inc.
+*
+* This source code is licensed under the MIT license found in the
+* LICENSE.md file in the root directory of this source tree.
+*
+* @license MIT
+*/
+var import_react_dom = /* @__PURE__ */ __toESM(require_react_dom(), 1);
+function RouterProvider2(props) {
+	return /* @__PURE__ */ import_react.createElement(RouterProvider, {
+		flushSync: import_react_dom.flushSync,
+		...props
+	});
+}
+createContext();
+//#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.js
 /**
 * @license lucide-react v0.577.0 - ISC
@@ -17386,39 +20322,6 @@ var Activity = createLucideIcon("activity", [["path", {
 	d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",
 	key: "169zse"
 }]]);
-var ArrowRight = createLucideIcon("arrow-right", [["path", {
-	d: "M5 12h14",
-	key: "1ays0h"
-}], ["path", {
-	d: "m12 5 7 7-7 7",
-	key: "xquz4c"
-}]]);
-var Calendar = createLucideIcon("calendar", [
-	["path", {
-		d: "M8 2v4",
-		key: "1cmpym"
-	}],
-	["path", {
-		d: "M16 2v4",
-		key: "4m81vk"
-	}],
-	["rect", {
-		width: "18",
-		height: "18",
-		x: "3",
-		y: "4",
-		rx: "2",
-		key: "1hopcy"
-	}],
-	["path", {
-		d: "M3 10h18",
-		key: "8toen8"
-	}]
-]);
-var Check = createLucideIcon("check", [["path", {
-	d: "M20 6 9 17l-5-5",
-	key: "1gmf2c"
-}]]);
 var ChevronDown = createLucideIcon("chevron-down", [["path", {
 	d: "m6 9 6 6 6-6",
 	key: "qrunsl"
@@ -17433,10 +20336,6 @@ var HeartPulse = createLucideIcon("heart-pulse", [["path", {
 }], ["path", {
 	d: "M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27",
 	key: "auskq0"
-}]]);
-var Heart = createLucideIcon("heart", [["path", {
-	d: "M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5",
-	key: "mvr1a0"
 }]]);
 var House = createLucideIcon("house", [["path", {
 	d: "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8",
@@ -17574,6 +20473,33 @@ var X = createLucideIcon("x", [["path", {
 	d: "m6 6 12 12",
 	key: "d8bk6v"
 }]]);
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-compose-refs@1.1.2_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-compose-refs/dist/index.mjs
+var import_client = require_client();
+function setRef(ref, value) {
+	if (typeof ref === "function") return ref(value);
+	else if (ref !== null && ref !== void 0) ref.current = value;
+}
+function composeRefs(...refs) {
+	return (node) => {
+		let hasCleanup = false;
+		const cleanups = refs.map((ref) => {
+			const cleanup = setRef(ref, node);
+			if (!hasCleanup && typeof cleanup == "function") hasCleanup = true;
+			return cleanup;
+		});
+		if (hasCleanup) return () => {
+			for (let i = 0; i < cleanups.length; i++) {
+				const cleanup = cleanups[i];
+				if (typeof cleanup == "function") cleanup();
+				else setRef(refs[i], null);
+			}
+		};
+	};
+}
+function useComposedRefs(...refs) {
+	return import_react.useCallback(composeRefs(...refs), refs);
+}
 //#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/react@19.2.4/node_modules/react/cjs/react-jsx-runtime.development.js
 /**
@@ -17774,494 +20700,102 @@ var require_react_jsx_runtime_development = /* @__PURE__ */ __commonJSMin(((expo
 	})();
 }));
 //#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/react@19.2.4/node_modules/react/jsx-runtime.js
-var require_jsx_runtime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-slot@1.2.4_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-slot/dist/index.mjs
+var import_jsx_runtime = (/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = require_react_jsx_runtime_development();
-}));
-//#endregion
-//#region src/components/Header.tsx
-var import_client = require_client();
-var import_jsx_runtime = require_jsx_runtime();
-function Header$1() {
-	const [isScrolled, setIsScrolled] = (0, import_react.useState)(false);
-	const [isMobileMenuOpen, setIsMobileMenuOpen] = (0, import_react.useState)(false);
-	(0, import_react.useEffect)(() => {
-		const handleScroll = () => {
-			setIsScrolled(window.scrollY > 20);
-		};
-		window.addEventListener("scroll", handleScroll);
-		return () => window.removeEventListener("scroll", handleScroll);
-	}, []);
-	const navLinks = [
-		{
-			name: "Início",
-			href: "#"
-		},
-		{
-			name: "Sobre Nós",
-			href: "#sobre"
-		},
-		{
-			name: "Serviços",
-			href: "#servicos"
-		},
-		{
-			name: "Equipe",
-			href: "#equipe"
-		},
-		{
-			name: "Perguntas Frequentes",
-			href: "#faq"
+})))();
+var REACT_LAZY_TYPE = Symbol.for("react.lazy");
+var use = import_react[" use ".trim().toString()];
+function isPromiseLike(value) {
+	return typeof value === "object" && value !== null && "then" in value;
+}
+function isLazyComponent(element) {
+	return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
+}
+/* @__NO_SIDE_EFFECTS__ */
+function createSlot$1(ownerName) {
+	const SlotClone = /* @__PURE__ */ createSlotClone$1(ownerName);
+	const Slot2 = import_react.forwardRef((props, forwardedRef) => {
+		let { children, ...slotProps } = props;
+		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
+		const childrenArray = import_react.Children.toArray(children);
+		const slottable = childrenArray.find(isSlottable$1);
+		if (slottable) {
+			const newElement = slottable.props.children;
+			const newChildren = childrenArray.map((child) => {
+				if (child === slottable) {
+					if (import_react.Children.count(newElement) > 1) return import_react.Children.only(null);
+					return import_react.isValidElement(newElement) ? newElement.props.children : null;
+				} else return child;
+			});
+			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
+				...slotProps,
+				ref: forwardedRef,
+				children: import_react.isValidElement(newElement) ? import_react.cloneElement(newElement, void 0, newChildren) : null
+			});
 		}
-	];
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", {
-		"data-uid": "src/components/Header.tsx:25:5",
-		"data-prohibitions": "[editContent]",
-		className: `fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm py-2" : "bg-white py-4"}`,
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			"data-uid": "src/components/Header.tsx:30:7",
-			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4 md:px-6",
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/Header.tsx:31:9",
-				"data-prohibitions": "[editContent]",
-				className: "flex items-center justify-between",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
-						"data-uid": "src/components/Header.tsx:32:11",
-						"data-prohibitions": "[]",
-						href: "#",
-						className: "flex items-center gap-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-							"data-uid": "src/components/Header.tsx:33:13",
-							"data-prohibitions": "[editContent]",
-							src: "https://img.usecurling.com/i?q=leaf&shape=lineal-color&color=green",
-							alt: "Casa Vita Logo",
-							className: "h-10 w-10 object-contain"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							"data-uid": "src/components/Header.tsx:38:13",
-							"data-prohibitions": "[]",
-							className: "text-xl font-bold text-primary",
-							children: "Casa Vita"
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("nav", {
-						"data-uid": "src/components/Header.tsx:42:11",
-						"data-prohibitions": "[editContent]",
-						className: "hidden lg:flex items-center gap-8",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
-							"data-uid": "src/components/Header.tsx:43:13",
-							"data-prohibitions": "[editContent]",
-							className: "flex items-center gap-6",
-							children: navLinks.map((link) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-								"data-uid": "src/components/Header.tsx:45:17",
-								"data-prohibitions": "[editContent]",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-									"data-uid": "src/components/Header.tsx:46:19",
-									"data-prohibitions": "[editContent]",
-									href: link.href,
-									className: "text-sm font-medium text-muted-foreground hover:text-primary transition-colors",
-									children: link.name
-								})
-							}, link.name))
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							"data-uid": "src/components/Header.tsx:55:13",
-							"data-prohibitions": "[]",
-							className: "flex items-center gap-4 text-sm",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								"data-uid": "src/components/Header.tsx:56:15",
-								"data-prohibitions": "[]",
-								className: "flex items-center gap-2 text-muted-foreground",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
-									"data-uid": "src/components/Header.tsx:57:17",
-									"data-prohibitions": "[editContent]",
-									className: "h-4 w-4 text-primary"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									"data-uid": "src/components/Header.tsx:58:17",
-									"data-prohibitions": "[]",
-									children: "(11) 5081-5421"
-								})]
-							})
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-						"data-uid": "src/components/Header.tsx:64:11",
-						"data-prohibitions": "[editContent]",
-						className: "lg:hidden p-2 text-muted-foreground hover:text-primary transition-colors",
-						onClick: () => setIsMobileMenuOpen(!isMobileMenuOpen),
-						children: isMobileMenuOpen ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, {
-							"data-uid": "src/components/Header.tsx:68:33",
-							"data-prohibitions": "[editContent]",
-							className: "h-6 w-6"
-						}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Menu, {
-							"data-uid": "src/components/Header.tsx:68:61",
-							"data-prohibitions": "[editContent]",
-							className: "h-6 w-6"
-						})
-					})
-				]
-			})
-		}), isMobileMenuOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/Header.tsx:75:9",
-			"data-prohibitions": "[editContent]",
-			className: "lg:hidden absolute top-full left-0 w-full bg-white border-b border-border py-4 px-4 shadow-lg animate-fade-in-down",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
-				"data-uid": "src/components/Header.tsx:76:11",
-				"data-prohibitions": "[editContent]",
-				className: "flex flex-col gap-4",
-				children: navLinks.map((link) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-					"data-uid": "src/components/Header.tsx:78:15",
-					"data-prohibitions": "[editContent]",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-						"data-uid": "src/components/Header.tsx:79:17",
-						"data-prohibitions": "[editContent]",
-						href: link.href,
-						className: "block text-base font-medium text-foreground hover:text-primary transition-colors",
-						onClick: () => setIsMobileMenuOpen(false),
-						children: link.name
-					})
-				}, link.name))
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/Header.tsx:89:11",
-				"data-prohibitions": "[]",
-				className: "mt-6 pt-6 border-t border-border flex flex-col gap-4",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/Header.tsx:90:13",
-					"data-prohibitions": "[]",
-					className: "flex items-center gap-2 text-muted-foreground",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
-						"data-uid": "src/components/Header.tsx:91:15",
-						"data-prohibitions": "[editContent]",
-						className: "h-5 w-5 text-primary"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-						"data-uid": "src/components/Header.tsx:92:15",
-						"data-prohibitions": "[]",
-						children: "(11) 5081-5421"
-					})]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/Header.tsx:94:13",
-					"data-prohibitions": "[]",
-					className: "flex items-start gap-2 text-muted-foreground",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MapPin, {
-						"data-uid": "src/components/Header.tsx:95:15",
-						"data-prohibitions": "[editContent]",
-						className: "h-5 w-5 text-primary shrink-0"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-						"data-uid": "src/components/Header.tsx:96:15",
-						"data-prohibitions": "[]",
-						className: "text-sm",
-						children: "Rua Doutor Diogo de Faria, 753 - Vila Clementino, São Paulo - SP"
-					})]
-				})]
-			})]
-		})]
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
+			...slotProps,
+			ref: forwardedRef,
+			children
+		});
 	});
+	Slot2.displayName = `${ownerName}.Slot`;
+	return Slot2;
 }
-//#endregion
-//#region src/components/Footer.tsx
-function Footer() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("footer", {
-		"data-uid": "src/components/Footer.tsx:5:5",
-		"data-prohibitions": "[editContent]",
-		className: "bg-primary/5 pt-16 pb-8 border-t border-primary/10",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/Footer.tsx:6:7",
-			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4 md:px-6",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/Footer.tsx:7:9",
-				"data-prohibitions": "[editContent]",
-				className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/Footer.tsx:9:11",
-						"data-prohibitions": "[]",
-						className: "flex flex-col gap-4",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
-								"data-uid": "src/components/Footer.tsx:10:13",
-								"data-prohibitions": "[]",
-								href: "#",
-								className: "flex items-center gap-2",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-									"data-uid": "src/components/Footer.tsx:11:15",
-									"data-prohibitions": "[editContent]",
-									src: "https://img.usecurling.com/i?q=leaf&shape=lineal-color&color=green",
-									alt: "Casa Vita Logo",
-									className: "h-10 w-10 object-contain"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									"data-uid": "src/components/Footer.tsx:16:15",
-									"data-prohibitions": "[]",
-									className: "text-xl font-bold text-primary",
-									children: "Casa Vita"
-								})]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-								"data-uid": "src/components/Footer.tsx:18:13",
-								"data-prohibitions": "[]",
-								className: "text-muted-foreground text-sm leading-relaxed",
-								children: "Um ambiente acolhedor, com infraestrutura moderna e equipe especializada para garantir qualidade de vida, segurança e bem-estar aos nossos residentes."
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								"data-uid": "src/components/Footer.tsx:22:13",
-								"data-prohibitions": "[]",
-								className: "flex gap-4 mt-2",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-									"data-uid": "src/components/Footer.tsx:23:15",
-									"data-prohibitions": "[]",
-									href: "#",
-									className: "h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Instagram, {
-										"data-uid": "src/components/Footer.tsx:27:17",
-										"data-prohibitions": "[editContent]",
-										className: "h-5 w-5"
-									})
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-									"data-uid": "src/components/Footer.tsx:29:15",
-									"data-prohibitions": "[]",
-									href: "#",
-									className: "h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Facebook, {
-										"data-uid": "src/components/Footer.tsx:33:17",
-										"data-prohibitions": "[editContent]",
-										className: "h-5 w-5"
-									})
-								})]
-							})
-						]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/Footer.tsx:39:11",
-						"data-prohibitions": "[]",
-						className: "flex flex-col gap-4",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-							"data-uid": "src/components/Footer.tsx:40:13",
-							"data-prohibitions": "[]",
-							className: "font-semibold text-lg text-foreground",
-							children: "Links Úteis"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
-							"data-uid": "src/components/Footer.tsx:41:13",
-							"data-prohibitions": "[]",
-							className: "flex flex-col gap-2",
-							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:42:15",
-									"data-prohibitions": "[]",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-										"data-uid": "src/components/Footer.tsx:43:17",
-										"data-prohibitions": "[]",
-										href: "#",
-										className: "text-muted-foreground hover:text-primary transition-colors text-sm",
-										children: "Início"
-									})
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:50:15",
-									"data-prohibitions": "[]",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-										"data-uid": "src/components/Footer.tsx:51:17",
-										"data-prohibitions": "[]",
-										href: "#sobre",
-										className: "text-muted-foreground hover:text-primary transition-colors text-sm",
-										children: "Sobre Nós"
-									})
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:58:15",
-									"data-prohibitions": "[]",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-										"data-uid": "src/components/Footer.tsx:59:17",
-										"data-prohibitions": "[]",
-										href: "#servicos",
-										className: "text-muted-foreground hover:text-primary transition-colors text-sm",
-										children: "Serviços"
-									})
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:66:15",
-									"data-prohibitions": "[]",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-										"data-uid": "src/components/Footer.tsx:67:17",
-										"data-prohibitions": "[]",
-										href: "#equipe",
-										className: "text-muted-foreground hover:text-primary transition-colors text-sm",
-										children: "Nossa Equipe"
-									})
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:74:15",
-									"data-prohibitions": "[]",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-										"data-uid": "src/components/Footer.tsx:75:17",
-										"data-prohibitions": "[]",
-										href: "#faq",
-										className: "text-muted-foreground hover:text-primary transition-colors text-sm",
-										children: "Perguntas Frequentes"
-									})
-								})
-							]
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/Footer.tsx:86:11",
-						"data-prohibitions": "[]",
-						className: "flex flex-col gap-4",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-							"data-uid": "src/components/Footer.tsx:87:13",
-							"data-prohibitions": "[]",
-							className: "font-semibold text-lg text-foreground",
-							children: "Serviços"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
-							"data-uid": "src/components/Footer.tsx:88:13",
-							"data-prohibitions": "[]",
-							className: "flex flex-col gap-2",
-							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:89:15",
-									"data-prohibitions": "[]",
-									className: "text-muted-foreground text-sm",
-									children: "Hospedagem Permanente"
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:90:15",
-									"data-prohibitions": "[]",
-									className: "text-muted-foreground text-sm",
-									children: "Hospedagem Temporária"
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:91:15",
-									"data-prohibitions": "[]",
-									className: "text-muted-foreground text-sm",
-									children: "Cuidados 24h"
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:92:15",
-									"data-prohibitions": "[]",
-									className: "text-muted-foreground text-sm",
-									children: "Reabilitação Motora"
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:93:15",
-									"data-prohibitions": "[]",
-									className: "text-muted-foreground text-sm",
-									children: "Acompanhamento Médico"
-								})
-							]
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/Footer.tsx:98:11",
-						"data-prohibitions": "[]",
-						className: "flex flex-col gap-4",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-							"data-uid": "src/components/Footer.tsx:99:13",
-							"data-prohibitions": "[]",
-							className: "font-semibold text-lg text-foreground",
-							children: "Contato"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
-							"data-uid": "src/components/Footer.tsx:100:13",
-							"data-prohibitions": "[]",
-							className: "flex flex-col gap-4",
-							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
-									"data-uid": "src/components/Footer.tsx:101:15",
-									"data-prohibitions": "[]",
-									className: "flex items-start gap-3 text-muted-foreground",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MapPin, {
-										"data-uid": "src/components/Footer.tsx:102:17",
-										"data-prohibitions": "[editContent]",
-										className: "h-5 w-5 text-primary shrink-0 mt-0.5"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-										"data-uid": "src/components/Footer.tsx:103:17",
-										"data-prohibitions": "[]",
-										className: "text-sm",
-										children: [
-											"Rua Doutor Diogo de Faria, 753",
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
-												"data-uid": "src/components/Footer.tsx:105:19",
-												"data-prohibitions": "[editContent]"
-											}),
-											"Vila Clementino, São Paulo - SP",
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
-												"data-uid": "src/components/Footer.tsx:107:19",
-												"data-prohibitions": "[editContent]"
-											}),
-											"CEP: 04037-002"
-										]
-									})]
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
-									"data-uid": "src/components/Footer.tsx:111:15",
-									"data-prohibitions": "[]",
-									className: "flex items-center gap-3 text-muted-foreground",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
-										"data-uid": "src/components/Footer.tsx:112:17",
-										"data-prohibitions": "[editContent]",
-										className: "h-5 w-5 text-primary shrink-0"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-										"data-uid": "src/components/Footer.tsx:113:17",
-										"data-prohibitions": "[]",
-										className: "text-sm",
-										children: [
-											"(11) 5081-5421",
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
-												"data-uid": "src/components/Footer.tsx:115:19",
-												"data-prohibitions": "[editContent]"
-											}),
-											"(11) 98118-2882"
-										]
-									})]
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
-									"data-uid": "src/components/Footer.tsx:119:15",
-									"data-prohibitions": "[]",
-									className: "flex items-center gap-3 text-muted-foreground",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Mail, {
-										"data-uid": "src/components/Footer.tsx:120:17",
-										"data-prohibitions": "[editContent]",
-										className: "h-5 w-5 text-primary shrink-0"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										"data-uid": "src/components/Footer.tsx:121:17",
-										"data-prohibitions": "[]",
-										className: "text-sm",
-										children: "contato@casavita.com.br"
-									})]
-								})
-							]
-						})]
-					})
-				]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				"data-uid": "src/components/Footer.tsx:127:9",
-				"data-prohibitions": "[editContent]",
-				className: "pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-					"data-uid": "src/components/Footer.tsx:128:11",
-					"data-prohibitions": "[editContent]",
-					className: "text-sm text-muted-foreground text-center md:text-left",
-					children: [
-						"© ",
-						(/* @__PURE__ */ new Date()).getFullYear(),
-						" Casa Vita Repouso. Todos os direitos reservados."
-					]
-				})
-			})]
-		})
+var Slot = /* @__PURE__ */ createSlot$1("Slot");
+/* @__NO_SIDE_EFFECTS__ */
+function createSlotClone$1(ownerName) {
+	const SlotClone = import_react.forwardRef((props, forwardedRef) => {
+		let { children, ...slotProps } = props;
+		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
+		if (import_react.isValidElement(children)) {
+			const childrenRef = getElementRef$2(children);
+			const props2 = mergeProps$1(slotProps, children.props);
+			if (children.type !== import_react.Fragment) props2.ref = forwardedRef ? composeRefs(forwardedRef, childrenRef) : childrenRef;
+			return import_react.cloneElement(children, props2);
+		}
+		return import_react.Children.count(children) > 1 ? import_react.Children.only(null) : null;
 	});
+	SlotClone.displayName = `${ownerName}.SlotClone`;
+	return SlotClone;
 }
-//#endregion
-//#region src/lib/tracking.ts
-var trackConversion = (eventName, data) => {
-	if (typeof window !== "undefined" && window.gtag) window.gtag("event", eventName, data);
-	console.log(`Conversion tracked: ${eventName}`, data);
-};
-var trackWhatsAppClick = () => {
-	trackConversion("conversion", {
-		send_to: "AW-CONVERSION_ID/whatsapp_click",
-		value: 1,
-		currency: "BRL"
-	});
-};
+var SLOTTABLE_IDENTIFIER$1 = Symbol("radix.slottable");
+function isSlottable$1(child) {
+	return import_react.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER$1;
+}
+function mergeProps$1(slotProps, childProps) {
+	const overrideProps = { ...childProps };
+	for (const propName in childProps) {
+		const slotPropValue = slotProps[propName];
+		const childPropValue = childProps[propName];
+		if (/^on[A-Z]/.test(propName)) {
+			if (slotPropValue && childPropValue) overrideProps[propName] = (...args) => {
+				const result = childPropValue(...args);
+				slotPropValue(...args);
+				return result;
+			};
+			else if (slotPropValue) overrideProps[propName] = slotPropValue;
+		} else if (propName === "style") overrideProps[propName] = {
+			...slotPropValue,
+			...childPropValue
+		};
+		else if (propName === "className") overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
+	}
+	return {
+		...slotProps,
+		...overrideProps
+	};
+}
+function getElementRef$2(element) {
+	let getter = Object.getOwnPropertyDescriptor(element.props, "ref")?.get;
+	let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+	if (mayWarn) return element.ref;
+	getter = Object.getOwnPropertyDescriptor(element, "ref")?.get;
+	mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+	if (mayWarn) return element.props.ref;
+	return element.props.ref || element.ref;
+}
 //#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs
 function r(e) {
@@ -18277,6 +20811,59 @@ function clsx() {
 	for (var e, t, f = 0, n = "", o = arguments.length; f < o; f++) (e = arguments[f]) && (t = r(e)) && (n && (n += " "), n += t);
 	return n;
 }
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/class-variance-authority@0.7.1/node_modules/class-variance-authority/dist/index.mjs
+/**
+* Copyright 2022 Joe Bell. All rights reserved.
+*
+* This file is licensed to you under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with the
+* License. You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+* WARRANTIES OR REPRESENTATIONS OF ANY KIND, either express or implied. See the
+* License for the specific language governing permissions and limitations under
+* the License.
+*/ var falsyToString = (value) => typeof value === "boolean" ? `${value}` : value === 0 ? "0" : value;
+var cx = clsx;
+var cva = (base, config) => (props) => {
+	var _config_compoundVariants;
+	if ((config === null || config === void 0 ? void 0 : config.variants) == null) return cx(base, props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
+	const { variants, defaultVariants } = config;
+	const getVariantClassNames = Object.keys(variants).map((variant) => {
+		const variantProp = props === null || props === void 0 ? void 0 : props[variant];
+		const defaultVariantProp = defaultVariants === null || defaultVariants === void 0 ? void 0 : defaultVariants[variant];
+		if (variantProp === null) return null;
+		const variantKey = falsyToString(variantProp) || falsyToString(defaultVariantProp);
+		return variants[variant][variantKey];
+	});
+	const propsWithoutUndefined = props && Object.entries(props).reduce((acc, param) => {
+		let [key, value] = param;
+		if (value === void 0) return acc;
+		acc[key] = value;
+		return acc;
+	}, {});
+	return cx(base, getVariantClassNames, config === null || config === void 0 ? void 0 : (_config_compoundVariants = config.compoundVariants) === null || _config_compoundVariants === void 0 ? void 0 : _config_compoundVariants.reduce((acc, param) => {
+		let { class: cvClass, className: cvClassName, ...compoundVariantOptions } = param;
+		return Object.entries(compoundVariantOptions).every((param) => {
+			let [key, value] = param;
+			return Array.isArray(value) ? value.includes({
+				...defaultVariants,
+				...propsWithoutUndefined
+			}[key]) : {
+				...defaultVariants,
+				...propsWithoutUndefined
+			}[key] === value;
+		}) ? [
+			...acc,
+			cvClass,
+			cvClassName
+		] : acc;
+	}, []), props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
+};
 //#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/tailwind-merge@2.6.1/node_modules/tailwind-merge/dist/bundle-mjs.mjs
 var CLASS_PART_SEPARATOR = "-";
@@ -19699,244 +22286,6 @@ function cn$1(...inputs) {
 	return twMerge(clsx(inputs));
 }
 //#endregion
-//#region src/components/FloatingWhatsApp.tsx
-function FloatingWhatsApp() {
-	const [isVisible, setIsVisible] = (0, import_react.useState)(false);
-	(0, import_react.useEffect)(() => {
-		const handleScroll = () => {
-			setIsVisible(window.scrollY > 300);
-		};
-		window.addEventListener("scroll", handleScroll);
-		return () => window.removeEventListener("scroll", handleScroll);
-	}, []);
-	const handleClick = () => {
-		trackWhatsAppClick();
-		window.open("https://wa.me/5511981182882", "_blank");
-	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-		"data-uid": "src/components/FloatingWhatsApp.tsx:24:5",
-		"data-prohibitions": "[editContent]",
-		onClick: handleClick,
-		className: cn$1("fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 px-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105", isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"),
-		"aria-label": "Falar no WhatsApp",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
-			"data-uid": "src/components/FloatingWhatsApp.tsx:32:7",
-			"data-prohibitions": "[editContent]",
-			className: "h-6 w-6"
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-			"data-uid": "src/components/FloatingWhatsApp.tsx:33:7",
-			"data-prohibitions": "[]",
-			className: "font-semibold hidden sm:inline-block",
-			children: "Fale Conosco"
-		})]
-	});
-}
-//#endregion
-//#region src/components/Layout.tsx
-function Layout() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		"data-uid": "src/components/Layout.tsx:8:5",
-		"data-prohibitions": "[]",
-		className: "min-h-screen font-sans antialiased text-slate-900 bg-slate-50 flex flex-col",
-		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Header$1, {
-				"data-uid": "src/components/Layout.tsx:9:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("main", {
-				"data-uid": "src/components/Layout.tsx:10:7",
-				"data-prohibitions": "[]",
-				className: "flex-grow",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {
-					"data-uid": "src/components/Layout.tsx:11:9",
-					"data-prohibitions": "[editContent]"
-				})
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Footer, {
-				"data-uid": "src/components/Layout.tsx:13:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FloatingWhatsApp, {
-				"data-uid": "src/components/Layout.tsx:14:7",
-				"data-prohibitions": "[editContent]"
-			})
-		]
-	});
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-compose-refs@1.1.2_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-compose-refs/dist/index.mjs
-function setRef(ref, value) {
-	if (typeof ref === "function") return ref(value);
-	else if (ref !== null && ref !== void 0) ref.current = value;
-}
-function composeRefs(...refs) {
-	return (node) => {
-		let hasCleanup = false;
-		const cleanups = refs.map((ref) => {
-			const cleanup = setRef(ref, node);
-			if (!hasCleanup && typeof cleanup == "function") hasCleanup = true;
-			return cleanup;
-		});
-		if (hasCleanup) return () => {
-			for (let i = 0; i < cleanups.length; i++) {
-				const cleanup = cleanups[i];
-				if (typeof cleanup == "function") cleanup();
-				else setRef(refs[i], null);
-			}
-		};
-	};
-}
-function useComposedRefs(...refs) {
-	return import_react.useCallback(composeRefs(...refs), refs);
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-slot@1.2.4_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-slot/dist/index.mjs
-var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-var use = import_react[" use ".trim().toString()];
-function isPromiseLike(value) {
-	return typeof value === "object" && value !== null && "then" in value;
-}
-function isLazyComponent(element) {
-	return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
-}
-/* @__NO_SIDE_EFFECTS__ */
-function createSlot$1(ownerName) {
-	const SlotClone = /* @__PURE__ */ createSlotClone$1(ownerName);
-	const Slot2 = import_react.forwardRef((props, forwardedRef) => {
-		let { children, ...slotProps } = props;
-		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
-		const childrenArray = import_react.Children.toArray(children);
-		const slottable = childrenArray.find(isSlottable$1);
-		if (slottable) {
-			const newElement = slottable.props.children;
-			const newChildren = childrenArray.map((child) => {
-				if (child === slottable) {
-					if (import_react.Children.count(newElement) > 1) return import_react.Children.only(null);
-					return import_react.isValidElement(newElement) ? newElement.props.children : null;
-				} else return child;
-			});
-			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
-				...slotProps,
-				ref: forwardedRef,
-				children: import_react.isValidElement(newElement) ? import_react.cloneElement(newElement, void 0, newChildren) : null
-			});
-		}
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
-			...slotProps,
-			ref: forwardedRef,
-			children
-		});
-	});
-	Slot2.displayName = `${ownerName}.Slot`;
-	return Slot2;
-}
-var Slot = /* @__PURE__ */ createSlot$1("Slot");
-/* @__NO_SIDE_EFFECTS__ */
-function createSlotClone$1(ownerName) {
-	const SlotClone = import_react.forwardRef((props, forwardedRef) => {
-		let { children, ...slotProps } = props;
-		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
-		if (import_react.isValidElement(children)) {
-			const childrenRef = getElementRef$2(children);
-			const props2 = mergeProps$1(slotProps, children.props);
-			if (children.type !== import_react.Fragment) props2.ref = forwardedRef ? composeRefs(forwardedRef, childrenRef) : childrenRef;
-			return import_react.cloneElement(children, props2);
-		}
-		return import_react.Children.count(children) > 1 ? import_react.Children.only(null) : null;
-	});
-	SlotClone.displayName = `${ownerName}.SlotClone`;
-	return SlotClone;
-}
-var SLOTTABLE_IDENTIFIER$1 = Symbol("radix.slottable");
-function isSlottable$1(child) {
-	return import_react.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER$1;
-}
-function mergeProps$1(slotProps, childProps) {
-	const overrideProps = { ...childProps };
-	for (const propName in childProps) {
-		const slotPropValue = slotProps[propName];
-		const childPropValue = childProps[propName];
-		if (/^on[A-Z]/.test(propName)) {
-			if (slotPropValue && childPropValue) overrideProps[propName] = (...args) => {
-				const result = childPropValue(...args);
-				slotPropValue(...args);
-				return result;
-			};
-			else if (slotPropValue) overrideProps[propName] = slotPropValue;
-		} else if (propName === "style") overrideProps[propName] = {
-			...slotPropValue,
-			...childPropValue
-		};
-		else if (propName === "className") overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
-	}
-	return {
-		...slotProps,
-		...overrideProps
-	};
-}
-function getElementRef$2(element) {
-	let getter = Object.getOwnPropertyDescriptor(element.props, "ref")?.get;
-	let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
-	if (mayWarn) return element.ref;
-	getter = Object.getOwnPropertyDescriptor(element, "ref")?.get;
-	mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
-	if (mayWarn) return element.props.ref;
-	return element.props.ref || element.ref;
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/class-variance-authority@0.7.1/node_modules/class-variance-authority/dist/index.mjs
-/**
-* Copyright 2022 Joe Bell. All rights reserved.
-*
-* This file is licensed to you under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with the
-* License. You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-* WARRANTIES OR REPRESENTATIONS OF ANY KIND, either express or implied. See the
-* License for the specific language governing permissions and limitations under
-* the License.
-*/ var falsyToString = (value) => typeof value === "boolean" ? `${value}` : value === 0 ? "0" : value;
-var cx = clsx;
-var cva = (base, config) => (props) => {
-	var _config_compoundVariants;
-	if ((config === null || config === void 0 ? void 0 : config.variants) == null) return cx(base, props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
-	const { variants, defaultVariants } = config;
-	const getVariantClassNames = Object.keys(variants).map((variant) => {
-		const variantProp = props === null || props === void 0 ? void 0 : props[variant];
-		const defaultVariantProp = defaultVariants === null || defaultVariants === void 0 ? void 0 : defaultVariants[variant];
-		if (variantProp === null) return null;
-		const variantKey = falsyToString(variantProp) || falsyToString(defaultVariantProp);
-		return variants[variant][variantKey];
-	});
-	const propsWithoutUndefined = props && Object.entries(props).reduce((acc, param) => {
-		let [key, value] = param;
-		if (value === void 0) return acc;
-		acc[key] = value;
-		return acc;
-	}, {});
-	return cx(base, getVariantClassNames, config === null || config === void 0 ? void 0 : (_config_compoundVariants = config.compoundVariants) === null || _config_compoundVariants === void 0 ? void 0 : _config_compoundVariants.reduce((acc, param) => {
-		let { class: cvClass, className: cvClassName, ...compoundVariantOptions } = param;
-		return Object.entries(compoundVariantOptions).every((param) => {
-			let [key, value] = param;
-			return Array.isArray(value) ? value.includes({
-				...defaultVariants,
-				...propsWithoutUndefined
-			}[key]) : {
-				...defaultVariants,
-				...propsWithoutUndefined
-			}[key] === value;
-		}) ? [
-			...acc,
-			cvClass,
-			cvClassName
-		] : acc;
-	}, []), props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
-};
-//#endregion
 //#region src/components/ui/button.tsx
 var buttonVariants = cva("inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", {
 	variants: {
@@ -19975,101 +22324,604 @@ var Button = import_react.forwardRef(({ className, variant, size, asChild = fals
 });
 Button.displayName = "Button";
 //#endregion
-//#region src/assets/poster-b2fef.jpg
-var poster_b2fef_default = "/assets/poster-b2fef-CKGigr5J.jpg";
+//#region src/assets/casavita_300rgb-1-1738e.jpg
+var casavita_300rgb_1_1738e_default = "/assets/casavita_300rgb-1-1738e-Bs0xZhD6.jpg";
+//#endregion
+//#region src/lib/tracking.ts
+var trackWhatsAppClick = () => {
+	if (typeof window !== "undefined" && window.gtag) window.gtag("event", "conversion", { send_to: "AW-CONVERSION_ID/CONVERSION_LABEL" });
+	console.log("WhatsApp conversion tracked");
+};
+//#endregion
+//#region src/components/Header.tsx
+var navigation$1 = [
+	{
+		name: "Início",
+		href: "#"
+	},
+	{
+		name: "Sobre",
+		href: "#about"
+	},
+	{
+		name: "Serviços",
+		href: "#services"
+	},
+	{
+		name: "Equipe",
+		href: "#team"
+	},
+	{
+		name: "FAQ",
+		href: "#faq"
+	}
+];
+function Header$1() {
+	const [mobileMenuOpen, setMobileMenuOpen] = (0, import_react.useState)(false);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", {
+		"data-uid": "src/components/Header.tsx:19:5",
+		"data-prohibitions": "[editContent]",
+		className: "fixed inset-x-0 top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm transition-all duration-300",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("nav", {
+			"data-uid": "src/components/Header.tsx:20:7",
+			"data-prohibitions": "[editContent]",
+			className: "container mx-auto flex items-center justify-between p-4 lg:px-8",
+			"aria-label": "Global",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					"data-uid": "src/components/Header.tsx:24:9",
+					"data-prohibitions": "[]",
+					className: "flex lg:flex-1",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+						"data-uid": "src/components/Header.tsx:25:11",
+						"data-prohibitions": "[]",
+						href: "#",
+						className: "-m-1.5 p-1.5",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							"data-uid": "src/components/Header.tsx:26:13",
+							"data-prohibitions": "[]",
+							className: "sr-only",
+							children: "Casa Vita"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+							"data-uid": "src/components/Header.tsx:27:13",
+							"data-prohibitions": "[editContent]",
+							className: "h-14 w-auto object-contain transition-transform duration-300 hover:scale-105",
+							src: casavita_300rgb_1_1738e_default,
+							alt: "Casa Vita Logo"
+						})]
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					"data-uid": "src/components/Header.tsx:34:9",
+					"data-prohibitions": "[]",
+					className: "flex lg:hidden",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+						"data-uid": "src/components/Header.tsx:35:11",
+						"data-prohibitions": "[]",
+						type: "button",
+						className: "-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700",
+						onClick: () => setMobileMenuOpen(true),
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							"data-uid": "src/components/Header.tsx:40:13",
+							"data-prohibitions": "[]",
+							className: "sr-only",
+							children: "Abrir menu principal"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Menu, {
+							"data-uid": "src/components/Header.tsx:41:13",
+							"data-prohibitions": "[editContent]",
+							className: "h-6 w-6",
+							"aria-hidden": "true"
+						})]
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					"data-uid": "src/components/Header.tsx:44:9",
+					"data-prohibitions": "[editContent]",
+					className: "hidden lg:flex lg:gap-x-8",
+					children: navigation$1.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+						"data-uid": "src/components/Header.tsx:46:13",
+						"data-prohibitions": "[editContent]",
+						href: item.href,
+						className: "text-sm font-semibold leading-6 text-gray-700 hover:text-[#B4D330] transition-colors",
+						children: item.name
+					}, item.name))
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					"data-uid": "src/components/Header.tsx:55:9",
+					"data-prohibitions": "[]",
+					className: "hidden lg:flex lg:flex-1 lg:justify-end",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+						"data-uid": "src/components/Header.tsx:56:11",
+						"data-prohibitions": "[]",
+						href: "https://wa.me/5511999999999",
+						target: "_blank",
+						rel: "noopener noreferrer",
+						onClick: trackWhatsAppClick,
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							"data-uid": "src/components/Header.tsx:62:13",
+							"data-prohibitions": "[]",
+							className: "rounded-full bg-[#B4D330] hover:bg-[#a0bc2a] text-white px-6 shadow-md hover:shadow-lg transition-all",
+							children: "Fale Conosco"
+						})
+					})
+				})
+			]
+		}), mobileMenuOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/Header.tsx:69:9",
+			"data-prohibitions": "[editContent]",
+			className: "lg:hidden",
+			role: "dialog",
+			"aria-modal": "true",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				"data-uid": "src/components/Header.tsx:70:11",
+				"data-prohibitions": "[editContent]",
+				className: "fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm",
+				onClick: () => setMobileMenuOpen(false)
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/Header.tsx:74:11",
+				"data-prohibitions": "[editContent]",
+				className: "fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/Header.tsx:75:13",
+					"data-prohibitions": "[]",
+					className: "flex items-center justify-between",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+						"data-uid": "src/components/Header.tsx:76:15",
+						"data-prohibitions": "[]",
+						href: "#",
+						className: "-m-1.5 p-1.5",
+						onClick: () => setMobileMenuOpen(false),
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							"data-uid": "src/components/Header.tsx:77:17",
+							"data-prohibitions": "[]",
+							className: "sr-only",
+							children: "Casa Vita"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+							"data-uid": "src/components/Header.tsx:78:17",
+							"data-prohibitions": "[editContent]",
+							className: "h-10 w-auto object-contain",
+							src: "/assets/casavita_300rgb-1-1738e-Bs0xZhD6.jpg",
+							alt: "Casa Vita Logo"
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+						"data-uid": "src/components/Header.tsx:80:15",
+						"data-prohibitions": "[]",
+						type: "button",
+						className: "-m-2.5 rounded-md p-2.5 text-gray-700 hover:bg-gray-100 transition-colors",
+						onClick: () => setMobileMenuOpen(false),
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							"data-uid": "src/components/Header.tsx:85:17",
+							"data-prohibitions": "[]",
+							className: "sr-only",
+							children: "Fechar menu"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, {
+							"data-uid": "src/components/Header.tsx:86:17",
+							"data-prohibitions": "[editContent]",
+							className: "h-6 w-6",
+							"aria-hidden": "true"
+						})]
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					"data-uid": "src/components/Header.tsx:89:13",
+					"data-prohibitions": "[editContent]",
+					className: "mt-6 flow-root",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/Header.tsx:90:15",
+						"data-prohibitions": "[editContent]",
+						className: "-my-6 divide-y divide-gray-100",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							"data-uid": "src/components/Header.tsx:91:17",
+							"data-prohibitions": "[editContent]",
+							className: "space-y-2 py-6",
+							children: navigation$1.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+								"data-uid": "src/components/Header.tsx:93:21",
+								"data-prohibitions": "[editContent]",
+								href: item.href,
+								className: "-mx-3 block rounded-xl px-3 py-2 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50 hover:text-[#B4D330] transition-colors",
+								onClick: () => setMobileMenuOpen(false),
+								children: item.name
+							}, item.name))
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							"data-uid": "src/components/Header.tsx:103:17",
+							"data-prohibitions": "[]",
+							className: "py-6",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+								"data-uid": "src/components/Header.tsx:104:19",
+								"data-prohibitions": "[]",
+								href: "https://wa.me/5511999999999",
+								target: "_blank",
+								rel: "noopener noreferrer",
+								onClick: () => {
+									trackWhatsAppClick();
+									setMobileMenuOpen(false);
+								},
+								className: "-mx-3 block rounded-xl px-3 py-2.5 text-base font-semibold leading-7 text-[#B4D330] hover:bg-gray-50 transition-colors",
+								children: "Contato via WhatsApp"
+							})
+						})]
+					})
+				})]
+			})]
+		})]
+	});
+}
+//#endregion
+//#region src/components/Footer.tsx
+function Footer() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("footer", {
+		"data-uid": "src/components/Footer.tsx:6:5",
+		"data-prohibitions": "[editContent]",
+		className: "bg-white border-t border-gray-100",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/Footer.tsx:7:7",
+			"data-prohibitions": "[editContent]",
+			className: "container mx-auto px-4 pb-8 pt-16 sm:px-6 lg:px-8",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/Footer.tsx:8:9",
+				"data-prohibitions": "[]",
+				className: "xl:grid xl:grid-cols-3 xl:gap-8",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/Footer.tsx:9:11",
+					"data-prohibitions": "[]",
+					className: "space-y-8",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+							"data-uid": "src/components/Footer.tsx:10:13",
+							"data-prohibitions": "[editContent]",
+							className: "h-16 w-auto object-contain",
+							src: casavita_300rgb_1_1738e_default,
+							alt: "Casa Vita"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							"data-uid": "src/components/Footer.tsx:11:13",
+							"data-prohibitions": "[]",
+							className: "text-sm leading-6 text-gray-600 max-w-xs",
+							children: "Moradia assistida para idosos, proporcionando qualidade de vida, segurança e muito carinho em um ambiente alegre e acolhedor."
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							"data-uid": "src/components/Footer.tsx:15:13",
+							"data-prohibitions": "[]",
+							className: "flex space-x-6",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+								"data-uid": "src/components/Footer.tsx:16:15",
+								"data-prohibitions": "[]",
+								href: "#",
+								className: "text-gray-400 hover:text-[#B4D330] transition-colors",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									"data-uid": "src/components/Footer.tsx:17:17",
+									"data-prohibitions": "[]",
+									className: "sr-only",
+									children: "Facebook"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Facebook, {
+									"data-uid": "src/components/Footer.tsx:18:17",
+									"data-prohibitions": "[editContent]",
+									className: "h-6 w-6"
+								})]
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+								"data-uid": "src/components/Footer.tsx:20:15",
+								"data-prohibitions": "[]",
+								href: "#",
+								className: "text-gray-400 hover:text-[#B4D330] transition-colors",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									"data-uid": "src/components/Footer.tsx:21:17",
+									"data-prohibitions": "[]",
+									className: "sr-only",
+									children: "Instagram"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Instagram, {
+									"data-uid": "src/components/Footer.tsx:22:17",
+									"data-prohibitions": "[editContent]",
+									className: "h-6 w-6"
+								})]
+							})]
+						})
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/Footer.tsx:26:11",
+					"data-prohibitions": "[]",
+					className: "mt-16 grid grid-cols-1 gap-8 xl:col-span-2 xl:mt-0 md:grid-cols-2",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/Footer.tsx:27:13",
+						"data-prohibitions": "[]",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							"data-uid": "src/components/Footer.tsx:28:15",
+							"data-prohibitions": "[]",
+							className: "text-sm font-semibold leading-6 text-gray-900",
+							children: "Links Rápidos"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+							"data-uid": "src/components/Footer.tsx:29:15",
+							"data-prohibitions": "[]",
+							role: "list",
+							className: "mt-6 space-y-4",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:30:17",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:31:19",
+										"data-prohibitions": "[]",
+										href: "#about",
+										className: "text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors",
+										children: "Sobre Nós"
+									})
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:38:17",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:39:19",
+										"data-prohibitions": "[]",
+										href: "#services",
+										className: "text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors",
+										children: "Serviços"
+									})
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:46:17",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:47:19",
+										"data-prohibitions": "[]",
+										href: "#team",
+										className: "text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors",
+										children: "Nossa Equipe"
+									})
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:54:17",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:55:19",
+										"data-prohibitions": "[]",
+										href: "#faq",
+										className: "text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors",
+										children: "Dúvidas Frequentes"
+									})
+								})
+							]
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/Footer.tsx:64:13",
+						"data-prohibitions": "[]",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							"data-uid": "src/components/Footer.tsx:65:15",
+							"data-prohibitions": "[]",
+							className: "text-sm font-semibold leading-6 text-gray-900",
+							children: "Contato"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+							"data-uid": "src/components/Footer.tsx:66:15",
+							"data-prohibitions": "[]",
+							role: "list",
+							className: "mt-6 space-y-4",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
+									"data-uid": "src/components/Footer.tsx:67:17",
+									"data-prohibitions": "[]",
+									className: "flex items-start gap-3",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MapPin, {
+										"data-uid": "src/components/Footer.tsx:68:19",
+										"data-prohibitions": "[editContent]",
+										className: "h-5 w-5 text-[#B4D330] shrink-0 mt-0.5"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+										"data-uid": "src/components/Footer.tsx:69:19",
+										"data-prohibitions": "[]",
+										className: "text-sm leading-6 text-gray-600",
+										children: [
+											"Rua Correia Dias, 134 - Paraíso",
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
+												"data-uid": "src/components/Footer.tsx:71:21",
+												"data-prohibitions": "[editContent]"
+											}),
+											"São Paulo - SP"
+										]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
+									"data-uid": "src/components/Footer.tsx:75:17",
+									"data-prohibitions": "[]",
+									className: "flex items-center gap-3",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
+										"data-uid": "src/components/Footer.tsx:76:19",
+										"data-prohibitions": "[editContent]",
+										className: "h-5 w-5 text-[#B4D330] shrink-0"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:77:19",
+										"data-prohibitions": "[]",
+										href: "tel:+5511999999999",
+										className: "text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors",
+										children: "(11) 99999-9999"
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
+									"data-uid": "src/components/Footer.tsx:84:17",
+									"data-prohibitions": "[]",
+									className: "flex items-center gap-3",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Mail, {
+										"data-uid": "src/components/Footer.tsx:85:19",
+										"data-prohibitions": "[editContent]",
+										className: "h-5 w-5 text-[#B4D330] shrink-0"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:86:19",
+										"data-prohibitions": "[]",
+										href: "mailto:contato@casavita.com.br",
+										className: "text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors",
+										children: "contato@casavita.com.br"
+									})]
+								})
+							]
+						})]
+					})]
+				})]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				"data-uid": "src/components/Footer.tsx:97:9",
+				"data-prohibitions": "[editContent]",
+				className: "mt-16 border-t border-gray-100 pt-8 sm:mt-20 lg:mt-24",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+					"data-uid": "src/components/Footer.tsx:98:11",
+					"data-prohibitions": "[editContent]",
+					className: "text-xs leading-5 text-gray-500 text-center",
+					children: [
+						"© ",
+						(/* @__PURE__ */ new Date()).getFullYear(),
+						" Casa Vita. Todos os direitos reservados."
+					]
+				})
+			})]
+		})
+	});
+}
+//#endregion
+//#region src/components/FloatingWhatsApp.tsx
+function FloatingWhatsApp() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+		"data-uid": "src/components/FloatingWhatsApp.tsx:6:5",
+		"data-prohibitions": "[]",
+		href: "https://wa.me/5511999999999",
+		target: "_blank",
+		rel: "noopener noreferrer",
+		onClick: trackWhatsAppClick,
+		className: "fixed bottom-6 right-6 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-[#25D366] focus:ring-offset-2 group",
+		"aria-label": "Fale conosco pelo WhatsApp",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			"data-uid": "src/components/FloatingWhatsApp.tsx:14:7",
+			"data-prohibitions": "[]",
+			className: "absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-20"
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
+			"data-uid": "src/components/FloatingWhatsApp.tsx:15:7",
+			"data-prohibitions": "[editContent]",
+			className: "h-8 w-8 relative z-10 group-hover:rotate-12 transition-transform duration-300"
+		})]
+	});
+}
+//#endregion
+//#region src/components/Layout.tsx
+function Layout() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		"data-uid": "src/components/Layout.tsx:8:5",
+		"data-prohibitions": "[]",
+		className: "min-h-screen bg-white font-sans text-slate-900 antialiased selection:bg-[#B4D330] selection:text-white",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Header$1, {
+				"data-uid": "src/components/Layout.tsx:9:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("main", {
+				"data-uid": "src/components/Layout.tsx:10:7",
+				"data-prohibitions": "[]",
+				className: "pt-[72px]",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {
+					"data-uid": "src/components/Layout.tsx:11:9",
+					"data-prohibitions": "[editContent]"
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Footer, {
+				"data-uid": "src/components/Layout.tsx:13:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FloatingWhatsApp, {
+				"data-uid": "src/components/Layout.tsx:14:7",
+				"data-prohibitions": "[editContent]"
+			})
+		]
+	});
+}
 //#endregion
 //#region src/components/sections/Hero.tsx
 function Hero() {
-	const handleWhatsAppClick = () => {
-		trackWhatsAppClick();
-		window.open("https://wa.me/5511981182882", "_blank");
-	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
-		"data-uid": "src/components/sections/Hero.tsx:13:5",
+		"data-uid": "src/components/sections/Hero.tsx:6:5",
 		"data-prohibitions": "[]",
-		className: "relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-primary/5 pt-20",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/Hero.tsx:14:7",
-			"data-prohibitions": "[]",
-			className: "absolute inset-0 z-0",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-				"data-uid": "src/components/sections/Hero.tsx:15:9",
-				"data-prohibitions": "[editContent]",
-				src: poster_b2fef_default,
-				alt: "Cuidados com carinho na Casa Vita",
-				className: "w-full h-full object-cover object-center opacity-30 md:opacity-100"
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				"data-uid": "src/components/sections/Hero.tsx:20:9",
-				"data-prohibitions": "[]",
-				className: "absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-transparent md:w-3/4 lg:w-2/3 xl:w-1/2"
-			})]
+		className: "relative overflow-hidden bg-white pt-24 pb-16 md:pt-32 md:pb-24",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			"data-uid": "src/components/sections/Hero.tsx:7:7",
+			"data-prohibitions": "[editContent]",
+			className: "absolute inset-0 bg-gradient-to-b from-[#B4D330]/5 to-transparent -z-10"
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			"data-uid": "src/components/sections/Hero.tsx:23:7",
+			"data-uid": "src/components/sections/Hero.tsx:8:7",
 			"data-prohibitions": "[]",
-			className: "container relative z-10 mx-auto px-4 md:px-6",
+			className: "container mx-auto px-4 sm:px-6 lg:px-8",
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/Hero.tsx:24:9",
+				"data-uid": "src/components/sections/Hero.tsx:9:9",
 				"data-prohibitions": "[]",
-				className: "max-w-2xl animate-fade-in-up",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/sections/Hero.tsx:25:11",
-						"data-prohibitions": "[]",
-						className: "inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Heart, {
-							"data-uid": "src/components/sections/Hero.tsx:26:13",
-							"data-prohibitions": "[editContent]",
-							className: "h-4 w-4 fill-primary"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							"data-uid": "src/components/sections/Hero.tsx:27:13",
+				className: "grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-8 items-center",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/sections/Hero.tsx:10:11",
+					"data-prohibitions": "[]",
+					className: "max-w-2xl",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h1", {
+							"data-uid": "src/components/sections/Hero.tsx:11:13",
 							"data-prohibitions": "[]",
-							className: "text-sm font-semibold",
-							children: "Cuidado e Acolhimento"
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h1", {
-						"data-uid": "src/components/sections/Hero.tsx:30:11",
-						"data-prohibitions": "[]",
-						className: "text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6",
-						children: ["O lar perfeito para quem você ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							"data-uid": "src/components/sections/Hero.tsx:31:43",
-							"data-prohibitions": "[]",
-							className: "text-primary",
-							children: "mais ama."
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-						"data-uid": "src/components/sections/Hero.tsx:34:11",
-						"data-prohibitions": "[]",
-						className: "text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed",
-						children: "Na Casa Vita, oferecemos um ambiente moderno, seguro e cheio de vida. Nossa equipe especializada proporciona cuidados 24h com muito respeito, carinho e dedicação profissional."
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/sections/Hero.tsx:40:11",
-						"data-prohibitions": "[]",
-						className: "flex flex-col sm:flex-row gap-4",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-							"data-uid": "src/components/sections/Hero.tsx:41:13",
-							"data-prohibitions": "[]",
-							size: "lg",
-							className: "rounded-2xl text-base px-8 h-14 bg-primary hover:bg-primary/90",
-							onClick: handleWhatsAppClick,
-							children: ["Falar com um Especialista", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, {
-								"data-uid": "src/components/sections/Hero.tsx:47:15",
-								"data-prohibitions": "[editContent]",
-								className: "ml-2 h-5 w-5"
+							className: "text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl leading-tight",
+							children: ["Alegria, carinho e ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								"data-uid": "src/components/sections/Hero.tsx:12:34",
+								"data-prohibitions": "[]",
+								className: "text-[#B4D330]",
+								children: "qualidade de vida"
 							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-							"data-uid": "src/components/sections/Hero.tsx:49:13",
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							"data-uid": "src/components/sections/Hero.tsx:14:13",
 							"data-prohibitions": "[]",
-							size: "lg",
-							variant: "outline",
-							className: "rounded-2xl text-base px-8 h-14 border-primary text-primary hover:bg-primary/5 bg-white/50 backdrop-blur-sm",
-							onClick: () => document.getElementById("servicos")?.scrollIntoView({ behavior: "smooth" }),
-							children: "Conhecer Nossos Serviços"
+							className: "mt-6 text-lg leading-8 text-gray-600",
+							children: "Na Casa Vita, oferecemos uma moradia assistida com foco no bem-estar e na segurança de quem você ama. Nossa equipe especializada proporciona cuidados diários em um ambiente acolhedor e cheio de vida."
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							"data-uid": "src/components/sections/Hero.tsx:19:13",
+							"data-prohibitions": "[]",
+							className: "mt-8 flex flex-wrap items-center gap-4 sm:gap-6",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+								"data-uid": "src/components/sections/Hero.tsx:20:15",
+								"data-prohibitions": "[]",
+								href: "https://wa.me/5511999999999",
+								target: "_blank",
+								rel: "noopener noreferrer",
+								onClick: trackWhatsAppClick,
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+									"data-uid": "src/components/sections/Hero.tsx:26:17",
+									"data-prohibitions": "[]",
+									size: "lg",
+									className: "rounded-full bg-[#B4D330] hover:bg-[#a0bc2a] text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all",
+									children: "Fale pelo WhatsApp"
+								})
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+								"data-uid": "src/components/sections/Hero.tsx:33:15",
+								"data-prohibitions": "[]",
+								href: "#about",
+								className: "text-base font-semibold leading-6 text-gray-900 hover:text-[#B4D330] transition-colors px-4 py-2",
+								children: ["Conheça a Casa Vita ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									"data-uid": "src/components/sections/Hero.tsx:37:37",
+									"data-prohibitions": "[]",
+									"aria-hidden": "true",
+									children: "→"
+								})]
+							})]
+						})
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/sections/Hero.tsx:41:11",
+					"data-prohibitions": "[]",
+					className: "relative mx-auto w-full max-w-lg lg:max-w-none group",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						"data-uid": "src/components/sections/Hero.tsx:42:13",
+						"data-prohibitions": "[editContent]",
+						className: "absolute -top-4 -right-4 w-72 h-72 bg-[#B4D330]/20 rounded-full blur-3xl -z-10 transition-all duration-500 group-hover:bg-[#B4D330]/30"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/sections/Hero.tsx:43:13",
+						"data-prohibitions": "[]",
+						className: "relative rounded-3xl overflow-hidden shadow-2xl transition-transform duration-500 hover:scale-[1.02]",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+							"data-uid": "src/components/sections/Hero.tsx:44:15",
+							"data-prohibitions": "[editContent]",
+							src: "https://img.usecurling.com/p/800/600?q=happy%20seniors%20smiling",
+							alt: "Idosos felizes e sorridentes na Casa Vita",
+							className: "w-full h-[500px] object-cover"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							"data-uid": "src/components/sections/Hero.tsx:49:15",
+							"data-prohibitions": "[editContent]",
+							className: "absolute inset-0 rounded-3xl ring-1 ring-inset ring-gray-900/10"
 						})]
-					})
-				]
+					})]
+				})]
 			})
 		})]
 	});
@@ -20077,103 +22929,105 @@ function Hero() {
 //#endregion
 //#region src/components/sections/About.tsx
 function About() {
-	const benefits = [
-		"Ambiente seguro e monitorado",
-		"Equipe multidisciplinar qualificada",
-		"Atendimento humanizado",
-		"Infraestrutura acessível",
-		"Atividades recreativas diárias",
-		"Alimentação balanceada"
-	];
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/About.tsx:14:5",
-		"data-prohibitions": "[editContent]",
-		id: "sobre",
-		className: "py-20 bg-white overflow-hidden",
+		"data-uid": "src/components/sections/About.tsx:3:5",
+		"data-prohibitions": "[]",
+		id: "about",
+		className: "py-24 sm:py-32 bg-white overflow-hidden",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			"data-uid": "src/components/sections/About.tsx:15:7",
-			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4 md:px-6",
+			"data-uid": "src/components/sections/About.tsx:4:7",
+			"data-prohibitions": "[]",
+			className: "container mx-auto px-4 sm:px-6 lg:px-8",
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/About.tsx:16:9",
-				"data-prohibitions": "[editContent]",
-				className: "flex flex-col lg:flex-row items-center gap-12 lg:gap-20",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				"data-uid": "src/components/sections/About.tsx:5:9",
+				"data-prohibitions": "[]",
+				className: "grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:gap-x-16 items-center",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/sections/About.tsx:6:11",
+					"data-prohibitions": "[]",
+					className: "relative order-2 lg:order-1 group",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							"data-uid": "src/components/sections/About.tsx:7:13",
+							"data-prohibitions": "[]",
+							className: "relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] transition-transform duration-500 hover:scale-[1.02]",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+								"data-uid": "src/components/sections/About.tsx:8:15",
+								"data-prohibitions": "[editContent]",
+								src: "https://img.usecurling.com/p/800/600?q=nursing%20home%20garden",
+								alt: "Jardim da Casa Vita",
+								className: "w-full h-full object-cover"
+							})
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							"data-uid": "src/components/sections/About.tsx:14:13",
+							"data-prohibitions": "[]",
+							className: "absolute -bottom-6 -right-6 w-48 h-48 bg-[#B4D330]/20 rounded-full -z-10 blur-2xl transition-all duration-500 group-hover:scale-110"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							"data-uid": "src/components/sections/About.tsx:15:13",
+							"data-prohibitions": "[]",
+							className: "absolute -top-6 -left-6 w-48 h-48 bg-gray-200 rounded-full -z-10 blur-2xl transition-all duration-500 group-hover:scale-110"
+						})
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					"data-uid": "src/components/sections/About.tsx:17:11",
 					"data-prohibitions": "[]",
-					className: "w-full lg:w-1/2",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/sections/About.tsx:18:13",
-						"data-prohibitions": "[]",
-						className: "relative rounded-[2rem] overflow-hidden aspect-[4/3] shadow-2xl",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-							"data-uid": "src/components/sections/About.tsx:19:15",
-							"data-prohibitions": "[editContent]",
-							src: "https://img.usecurling.com/p/800/600?q=senior%20care&color=blue",
-							alt: "Ambiente Casa Vita",
-							className: "w-full h-full object-cover"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							"data-uid": "src/components/sections/About.tsx:24:15",
-							"data-prohibitions": "[]",
-							className: "absolute inset-0 bg-primary/10 mix-blend-multiply"
-						})]
-					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/sections/About.tsx:28:11",
-					"data-prohibitions": "[editContent]",
-					className: "w-full lg:w-1/2 space-y-6",
+					className: "order-1 lg:order-2",
 					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h2", {
-							"data-uid": "src/components/sections/About.tsx:29:13",
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+							"data-uid": "src/components/sections/About.tsx:18:13",
 							"data-prohibitions": "[]",
-							className: "text-3xl md:text-4xl font-bold text-foreground",
-							children: [
-								"Muito mais que uma casa de repouso,",
-								" ",
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									"data-uid": "src/components/sections/About.tsx:31:15",
-									"data-prohibitions": "[]",
-									className: "text-primary",
-									children: "uma verdadeira família."
-								})
-							]
+							className: "text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-6",
+							children: "Sobre a Casa Vita"
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							"data-uid": "src/components/sections/About.tsx:33:13",
+							"data-uid": "src/components/sections/About.tsx:21:13",
 							"data-prohibitions": "[]",
-							className: "text-lg text-muted-foreground leading-relaxed",
-							children: "A Casa Vita nasceu do desejo de proporcionar um envelhecimento com dignidade, respeito e muita alegria. Nossas instalações foram projetadas pensando exclusivamente na segurança e no conforto da terceira idade."
+							className: "text-lg text-gray-600 mb-6",
+							children: "A Casa Vita é uma moradia assistida para idosos focada em proporcionar um ambiente acolhedor, seguro e alegre. Nossa missão é oferecer qualidade de vida e bem-estar, respeitando a individualidade e a história de cada residente."
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							"data-uid": "src/components/sections/About.tsx:38:13",
+							"data-uid": "src/components/sections/About.tsx:26:13",
 							"data-prohibitions": "[]",
-							className: "text-lg text-muted-foreground leading-relaxed",
-							children: "Entendemos que cada residente tem sua história, suas preferências e suas necessidades. Por isso, nosso atendimento é personalizado e focado no bem-estar integral físico e emocional."
+							className: "text-lg text-gray-600 mb-8",
+							children: "Contamos com uma infraestrutura completa, adaptada para garantir a mobilidade e segurança, além de uma equipe multidisciplinar apaixonada pelo que faz, oferecendo Cuidados 24h com muito carinho e dedicação."
 						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
-							"data-uid": "src/components/sections/About.tsx:44:13",
-							"data-prohibitions": "[editContent]",
-							className: "grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8",
-							children: benefits.map((benefit, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
-								"data-uid": "src/components/sections/About.tsx:46:17",
-								"data-prohibitions": "[editContent]",
-								className: "flex items-center gap-3",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									"data-uid": "src/components/sections/About.tsx:47:19",
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							"data-uid": "src/components/sections/About.tsx:31:13",
+							"data-prohibitions": "[]",
+							className: "grid grid-cols-2 gap-6",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								"data-uid": "src/components/sections/About.tsx:32:15",
+								"data-prohibitions": "[]",
+								className: "border-l-4 border-[#B4D330] pl-4",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+									"data-uid": "src/components/sections/About.tsx:33:17",
 									"data-prohibitions": "[]",
-									className: "h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, {
-										"data-uid": "src/components/sections/About.tsx:48:21",
-										"data-prohibitions": "[editContent]",
-										className: "h-4 w-4 text-primary"
-									})
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									"data-uid": "src/components/sections/About.tsx:50:19",
-									"data-prohibitions": "[editContent]",
-									className: "text-foreground font-medium",
-									children: benefit
+									className: "text-3xl font-bold text-gray-900",
+									children: "10+"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+									"data-uid": "src/components/sections/About.tsx:34:17",
+									"data-prohibitions": "[]",
+									className: "text-sm font-medium text-gray-600 mt-1",
+									children: "Anos de Experiência"
 								})]
-							}, index))
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								"data-uid": "src/components/sections/About.tsx:36:15",
+								"data-prohibitions": "[]",
+								className: "border-l-4 border-[#B4D330] pl-4",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+									"data-uid": "src/components/sections/About.tsx:37:17",
+									"data-prohibitions": "[]",
+									className: "text-3xl font-bold text-gray-900",
+									children: "100%"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+									"data-uid": "src/components/sections/About.tsx:38:17",
+									"data-prohibitions": "[]",
+									className: "text-sm font-medium text-gray-600 mt-1",
+									children: "Dedicação e Amor"
+								})]
+							})]
 						})
 					]
 				})]
@@ -20236,32 +23090,32 @@ CardFooter.displayName = "CardFooter";
 var services = [
 	{
 		title: "Cuidados 24h",
-		description: "Equipe de cuidadores e técnicos de enfermagem disponíveis 24 horas por dia, 7 dias por semana, garantindo assistência contínua.",
+		description: "Equipe especializada disponível dia e noite para garantir a segurança, conforto e o bem-estar dos residentes.",
 		icon: HeartPulse
 	},
 	{
-		title: "Acompanhamento Médico",
-		description: "Visitas médicas regulares e acompanhamento rigoroso da saúde de cada residente para prevenir e tratar qualquer condição.",
-		icon: Stethoscope
-	},
-	{
-		title: "Hospedagem Permanente",
-		description: "Um verdadeiro lar com conforto, segurança e uma infraestrutura adaptada para as necessidades da terceira idade.",
+		title: "Hospedagem Confortável",
+		description: "Acomodações adaptadas, seguras e aconchegantes, com design elegante e pensadas para o máximo conforto.",
 		icon: House
 	},
 	{
-		title: "Nutrição Especializada",
-		description: "Cardápios balanceados elaborados por nutricionistas, respeitando as restrições e preferências alimentares.",
+		title: "Nutrição Balanceada",
+		description: "Refeições diárias preparadas com carinho e acompanhamento nutricional personalizado para cada necessidade.",
 		icon: Utensils
 	},
 	{
-		title: "Fisioterapia e Reabilitação",
-		description: "Sessões focadas na manutenção e recuperação da capacidade motora, promovendo maior autonomia e qualidade de vida.",
+		title: "Atividades Recreativas",
+		description: "Programação contínua de atividades físicas e mentais para manter a vitalidade, autonomia e a alegria.",
 		icon: Activity
 	},
 	{
+		title: "Acompanhamento Médico",
+		description: "Controle rigoroso de medicamentos e tratamentos, garantindo saúde e prevenção de forma contínua.",
+		icon: Stethoscope
+	},
+	{
 		title: "Convívio Social",
-		description: "Atividades recreativas, oficinas de memória e eventos que estimulam a socialização e o bem-estar mental e emocional.",
+		description: "Ambiente familiar que estimula a socialização, a troca de experiências e a formação de novas amizades.",
 		icon: Users
 	}
 ];
@@ -20269,64 +23123,69 @@ function Services() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
 		"data-uid": "src/components/sections/Services.tsx:45:5",
 		"data-prohibitions": "[editContent]",
-		id: "servicos",
-		className: "py-20 bg-white",
+		id: "services",
+		className: "bg-gray-50/50 py-24 sm:py-32",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 			"data-uid": "src/components/sections/Services.tsx:46:7",
 			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4 md:px-6",
+			className: "container mx-auto px-4 sm:px-6 lg:px-8",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				"data-uid": "src/components/sections/Services.tsx:47:9",
 				"data-prohibitions": "[]",
-				className: "text-center max-w-3xl mx-auto mb-16",
+				className: "mx-auto max-w-2xl text-center",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
 					"data-uid": "src/components/sections/Services.tsx:48:11",
 					"data-prohibitions": "[]",
-					className: "text-3xl md:text-4xl font-bold text-foreground mb-4",
+					className: "text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl",
 					children: "Nossos Serviços"
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					"data-uid": "src/components/sections/Services.tsx:49:11",
+					"data-uid": "src/components/sections/Services.tsx:51:11",
 					"data-prohibitions": "[]",
-					className: "text-lg text-muted-foreground",
-					children: "Oferecemos uma estrutura completa de atendimento multidisciplinar, pensada em cada detalhe para promover saúde e alegria."
+					className: "mt-6 text-lg leading-8 text-gray-600",
+					children: "Oferecemos uma estrutura completa e uma equipe multidisciplinar dedicada a proporcionar a melhor qualidade de vida."
 				})]
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				"data-uid": "src/components/sections/Services.tsx:55:9",
+				"data-uid": "src/components/sections/Services.tsx:56:9",
 				"data-prohibitions": "[editContent]",
-				className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8",
-				children: services.map((service, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-					"data-uid": "src/components/sections/Services.tsx:57:13",
+				className: "mx-auto mt-16 max-w-7xl",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					"data-uid": "src/components/sections/Services.tsx:57:11",
 					"data-prohibitions": "[editContent]",
-					className: "rounded-2xl border-none shadow-lg hover:shadow-xl transition-shadow bg-primary/5",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
-						"data-uid": "src/components/sections/Services.tsx:61:15",
+					className: "grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3",
+					children: services.map((service) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+						"data-uid": "src/components/sections/Services.tsx:59:15",
 						"data-prohibitions": "[editContent]",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							"data-uid": "src/components/sections/Services.tsx:62:17",
-							"data-prohibitions": "[]",
-							className: "h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(service.icon, {
-								"data-uid": "src/components/sections/Services.tsx:63:19",
+						className: "rounded-3xl border-none shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
+							"data-uid": "src/components/sections/Services.tsx:63:17",
+							"data-prohibitions": "[editContent]",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								"data-uid": "src/components/sections/Services.tsx:64:19",
+								"data-prohibitions": "[]",
+								className: "mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#B4D330]/10 text-[#B4D330] transition-colors group-hover:bg-[#B4D330] group-hover:text-white",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(service.icon, {
+									"data-uid": "src/components/sections/Services.tsx:65:21",
+									"data-prohibitions": "[editContent]",
+									className: "h-7 w-7"
+								})
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
+								"data-uid": "src/components/sections/Services.tsx:67:19",
 								"data-prohibitions": "[editContent]",
-								className: "h-7 w-7 text-primary"
+								className: "text-xl text-gray-900",
+								children: service.title
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
+							"data-uid": "src/components/sections/Services.tsx:69:17",
+							"data-prohibitions": "[editContent]",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, {
+								"data-uid": "src/components/sections/Services.tsx:70:19",
+								"data-prohibitions": "[editContent]",
+								className: "text-base text-gray-600 leading-relaxed",
+								children: service.description
 							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
-							"data-uid": "src/components/sections/Services.tsx:65:17",
-							"data-prohibitions": "[editContent]",
-							className: "text-xl",
-							children: service.title
 						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
-						"data-uid": "src/components/sections/Services.tsx:67:15",
-						"data-prohibitions": "[editContent]",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, {
-							"data-uid": "src/components/sections/Services.tsx:68:17",
-							"data-prohibitions": "[editContent]",
-							className: "text-base leading-relaxed",
-							children: service.description
-						})
-					})]
-				}, index))
+					}, service.title))
+				})
 			})]
 		})
 	});
@@ -20334,96 +23193,153 @@ function Services() {
 //#endregion
 //#region src/components/sections/Team.tsx
 var team = [{
-	name: "Thiago Pereira",
-	role: "Sócio Diretor",
-	description: "Administrador de Empresas, atua na gestão da Casa Vita focando no bem-estar dos residentes e na excelência do atendimento, garantindo um ambiente acolhedor e eficiente.",
-	image: "/assets/foto_thiago-c3243-CeAbnlLX.png"
+	name: "Thiago",
+	role: "Diretor",
+	image: "https://img.usecurling.com/ppl/large?gender=male&seed=thiago",
+	description: "Com vasta experiência na gestão de moradias assistidas, Thiago dedica-se a proporcionar o melhor ambiente, conforto e atendimento acolhedor para todos os residentes da Casa Vita."
 }, {
-	name: "Luis Pereira",
-	role: "Sócio Diretor",
-	description: "Médico e responsável técnico pela Casa Vita, garantindo que todos os padrões de saúde e cuidados sejam rigorosamente seguidos com humanização e segurança.",
-	image: "/assets/foto_luis-8c5cf-CNb7-zCF.png"
+	name: "Luis",
+	role: "Diretor Clínico",
+	image: "https://img.usecurling.com/ppl/large?gender=male&seed=luis",
+	description: "Responsável por garantir que todas as necessidades de saúde e bem-estar sejam atendidas com excelência, coordenando nossos Cuidados 24h com muito carinho e empatia."
 }];
 function Team() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/Team.tsx:24:5",
+		"data-uid": "src/components/sections/Team.tsx:22:5",
 		"data-prohibitions": "[editContent]",
-		id: "equipe",
-		className: "py-20 bg-primary/5",
+		id: "team",
+		className: "py-24 sm:py-32 bg-white",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/Team.tsx:25:7",
+			"data-uid": "src/components/sections/Team.tsx:23:7",
 			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4 md:px-6",
+			className: "container mx-auto px-4 sm:px-6 lg:px-8",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/Team.tsx:26:9",
+				"data-uid": "src/components/sections/Team.tsx:24:9",
 				"data-prohibitions": "[]",
-				className: "text-center max-w-3xl mx-auto mb-16",
+				className: "mx-auto max-w-2xl text-center mb-16",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-					"data-uid": "src/components/sections/Team.tsx:27:11",
+					"data-uid": "src/components/sections/Team.tsx:25:11",
 					"data-prohibitions": "[]",
-					className: "text-3xl md:text-4xl font-bold text-foreground mb-4",
-					children: "Nossa Liderança"
+					className: "text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl",
+					children: "Nossa Equipe"
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 					"data-uid": "src/components/sections/Team.tsx:28:11",
 					"data-prohibitions": "[]",
-					className: "text-lg text-muted-foreground",
-					children: "Uma gestão familiar e profissional dedicada a oferecer o mais alto padrão de qualidade em cuidados para idosos."
+					className: "mt-4 text-lg text-gray-600",
+					children: "Conheça os profissionais dedicados que fazem da Casa Vita um verdadeiro lar para quem você ama."
 				})]
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				"data-uid": "src/components/sections/Team.tsx:34:9",
+				"data-uid": "src/components/sections/Team.tsx:33:9",
 				"data-prohibitions": "[editContent]",
-				className: "grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto",
-				children: team.map((member, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card, {
-					"data-uid": "src/components/sections/Team.tsx:36:13",
+				className: "mx-auto max-w-4xl grid grid-cols-1 gap-10 sm:grid-cols-2",
+				children: team.map((member) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card, {
+					"data-uid": "src/components/sections/Team.tsx:35:13",
 					"data-prohibitions": "[editContent]",
-					className: "rounded-2xl overflow-hidden border-none shadow-lg bg-white",
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
-						"data-uid": "src/components/sections/Team.tsx:40:15",
+					className: "overflow-hidden border-none shadow-lg rounded-3xl hover:shadow-2xl transition-all duration-300 group",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/sections/Team.tsx:39:15",
 						"data-prohibitions": "[editContent]",
-						className: "p-0 flex flex-col sm:flex-row h-full",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							"data-uid": "src/components/sections/Team.tsx:41:17",
-							"data-prohibitions": "[]",
-							className: "sm:w-2/5 p-6 flex justify-center items-center bg-primary/5",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								"data-uid": "src/components/sections/Team.tsx:42:19",
+						className: "aspect-[4/5] relative overflow-hidden",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+								"data-uid": "src/components/sections/Team.tsx:40:17",
+								"data-prohibitions": "[editContent]",
+								src: member.image,
+								alt: member.name,
+								className: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								"data-uid": "src/components/sections/Team.tsx:45:17",
 								"data-prohibitions": "[]",
-								className: "w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-md",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-									"data-uid": "src/components/sections/Team.tsx:43:21",
-									"data-prohibitions": "[editContent]",
-									src: member.image,
-									alt: member.name,
-									className: "w-full h-full object-cover object-center"
-								})
+								className: "absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/30 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100"
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								"data-uid": "src/components/sections/Team.tsx:46:17",
+								"data-prohibitions": "[editContent]",
+								className: "absolute bottom-0 left-0 right-0 p-8 transform transition-transform duration-300 translate-y-4 group-hover:translate-y-0",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+										"data-uid": "src/components/sections/Team.tsx:47:19",
+										"data-prohibitions": "[editContent]",
+										className: "text-3xl font-bold text-white mb-1",
+										children: member.name
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+										"data-uid": "src/components/sections/Team.tsx:48:19",
+										"data-prohibitions": "[editContent]",
+										className: "text-[#B4D330] font-semibold mb-4 text-lg",
+										children: member.role
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+										"data-uid": "src/components/sections/Team.tsx:49:19",
+										"data-prohibitions": "[editContent]",
+										className: "text-gray-200 text-sm leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100",
+										children: member.description
+									})
+								]
 							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							"data-uid": "src/components/sections/Team.tsx:50:17",
-							"data-prohibitions": "[editContent]",
-							className: "sm:w-3/5 p-8 flex flex-col justify-center",
-							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-									"data-uid": "src/components/sections/Team.tsx:51:19",
-									"data-prohibitions": "[editContent]",
-									className: "text-2xl font-bold text-foreground mb-1",
-									children: member.name
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-									"data-uid": "src/components/sections/Team.tsx:52:19",
-									"data-prohibitions": "[editContent]",
-									className: "text-primary font-medium mb-4",
-									children: member.role
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-									"data-uid": "src/components/sections/Team.tsx:53:19",
-									"data-prohibitions": "[editContent]",
-									className: "text-muted-foreground leading-relaxed",
-									children: member.description
-								})
-							]
-						})]
+						]
 					})
-				}, index))
+				}, member.name))
+			})]
+		})
+	});
+}
+//#endregion
+//#region src/components/sections/Gallery.tsx
+function Gallery() {
+	const images = [
+		"https://img.usecurling.com/p/600/400?q=living%20room%20cozy",
+		"https://img.usecurling.com/p/600/400?q=healthy%20food",
+		"https://img.usecurling.com/p/600/400?q=elderly%20activities",
+		"https://img.usecurling.com/p/600/400?q=garden%20sunny",
+		"https://img.usecurling.com/p/600/400?q=bedroom%20comfortable",
+		"https://img.usecurling.com/p/600/400?q=senior%20care"
+	];
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
+		"data-uid": "src/components/sections/Gallery.tsx:12:5",
+		"data-prohibitions": "[editContent]",
+		id: "gallery",
+		className: "py-24 sm:py-32 bg-gray-50/50",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/sections/Gallery.tsx:13:7",
+			"data-prohibitions": "[editContent]",
+			className: "container mx-auto px-4 sm:px-6 lg:px-8",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/sections/Gallery.tsx:14:9",
+				"data-prohibitions": "[]",
+				className: "mx-auto max-w-2xl text-center mb-16",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+					"data-uid": "src/components/sections/Gallery.tsx:15:11",
+					"data-prohibitions": "[]",
+					className: "text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl",
+					children: "Conheça Nosso Espaço"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					"data-uid": "src/components/sections/Gallery.tsx:18:11",
+					"data-prohibitions": "[]",
+					className: "mt-4 text-lg text-gray-600",
+					children: "Ambientes amplos, modernos e planejados para oferecer máximo conforto e segurança."
+				})]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				"data-uid": "src/components/sections/Gallery.tsx:22:9",
+				"data-prohibitions": "[editContent]",
+				className: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6",
+				children: images.map((src, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/sections/Gallery.tsx:24:13",
+					"data-prohibitions": "[]",
+					className: "relative group overflow-hidden rounded-3xl aspect-[4/3] shadow-md hover:shadow-xl transition-all duration-300",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+						"data-uid": "src/components/sections/Gallery.tsx:28:15",
+						"data-prohibitions": "[editContent]",
+						src,
+						alt: `Galeria Casa Vita ${idx + 1}`,
+						className: "w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						"data-uid": "src/components/sections/Gallery.tsx:33:15",
+						"data-prohibitions": "[]",
+						className: "absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+					})]
+				}, idx))
 			})]
 		})
 	});
@@ -20715,7 +23631,6 @@ function isFunction(value) {
 }
 //#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-primitive@2.1.3_@types+react-dom@19.2.3_@types+react@19.2.14__@types+re_1181ea5061ec9212248424669240e4ec/node_modules/@radix-ui/react-primitive/dist/index.mjs
-var import_react_dom = /* @__PURE__ */ __toESM(require_react_dom(), 1);
 var Primitive = [
 	"a",
 	"button",
@@ -20751,9 +23666,6 @@ var Primitive = [
 		[node]: Node
 	};
 }, {});
-function dispatchDiscreteCustomEvent(target, event) {
-	if (target) import_react_dom.flushSync(() => target.dispatchEvent(event));
-}
 //#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-presence@1.1.5_@types+react-dom@19.2.3_@types+react@19.2.14__@types+rea_c01c26c80b5ab5e3ecefbda6eca51ad1/node_modules/@radix-ui/react-presence/dist/index.mjs
 function useStateMachine(initialState, machine) {
@@ -20856,11 +23768,11 @@ function getElementRef(element) {
 //#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-id@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-id/dist/index.mjs
 var useReactId = import_react[" useId ".trim().toString()] || (() => void 0);
-var count$1 = 0;
+var count = 0;
 function useId(deterministicId) {
 	const [id, setId] = import_react.useState(useReactId());
 	useLayoutEffect2(() => {
-		if (!deterministicId) setId((reactId) => reactId ?? String(count$1++));
+		if (!deterministicId) setId((reactId) => reactId ?? String(count++));
 	}, [deterministicId]);
 	return deterministicId || (id ? `radix-${id}` : "");
 }
@@ -20977,7 +23889,7 @@ var CollapsibleContentImpl = import_react.forwardRef((props, forwardedRef) => {
 function getState$1(open) {
 	return open ? "open" : "closed";
 }
-var Root$1 = Collapsible;
+var Root = Collapsible;
 var Trigger = CollapsibleTrigger;
 var Content = CollapsibleContent;
 //#endregion
@@ -20998,14 +23910,14 @@ var ACCORDION_KEYS = [
 	"ArrowLeft",
 	"ArrowRight"
 ];
-var [Collection$1, useCollection$1, createCollectionScope$1] = createCollection(ACCORDION_NAME);
-var [createAccordionContext, createAccordionScope] = createContextScope(ACCORDION_NAME, [createCollectionScope$1, createCollapsibleScope]);
+var [Collection, useCollection, createCollectionScope] = createCollection(ACCORDION_NAME);
+var [createAccordionContext, createAccordionScope] = createContextScope(ACCORDION_NAME, [createCollectionScope, createCollapsibleScope]);
 var useCollapsibleScope = createCollapsibleScope();
 var Accordion$1 = import_react.forwardRef((props, forwardedRef) => {
 	const { type, ...accordionProps } = props;
 	const singleProps = accordionProps;
 	const multipleProps = accordionProps;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$1.Provider, {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.Provider, {
 		scope: props.__scopeAccordion,
 		children: type === "multiple" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionImplMultiple, {
 			...multipleProps,
@@ -21071,7 +23983,7 @@ var [AccordionImplProvider, useAccordionContext] = createAccordionContext(ACCORD
 var AccordionImpl = import_react.forwardRef((props, forwardedRef) => {
 	const { __scopeAccordion, disabled, dir, orientation = "vertical", ...accordionProps } = props;
 	const composedRefs = useComposedRefs(import_react.useRef(null), forwardedRef);
-	const getItems = useCollection$1(__scopeAccordion);
+	const getItems = useCollection(__scopeAccordion);
 	const isDirectionLTR = useDirection(dir) === "ltr";
 	const handleKeyDown = composeEventHandlers(props.onKeyDown, (event) => {
 		if (!ACCORDION_KEYS.includes(event.key)) return;
@@ -21121,7 +24033,7 @@ var AccordionImpl = import_react.forwardRef((props, forwardedRef) => {
 		disabled,
 		direction: dir,
 		orientation,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$1.Slot, {
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.Slot, {
 			scope: __scopeAccordion,
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
 				...accordionProps,
@@ -21147,7 +24059,7 @@ var AccordionItem$1 = import_react.forwardRef((props, forwardedRef) => {
 		open,
 		disabled,
 		triggerId,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$1, {
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
 			"data-orientation": accordionContext.orientation,
 			"data-state": getState(open),
 			...collapsibleScope,
@@ -21184,7 +24096,7 @@ var AccordionTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
 	const itemContext = useAccordionItemContext(TRIGGER_NAME, __scopeAccordion);
 	const collapsibleContext = useAccordionCollapsibleContext(TRIGGER_NAME, __scopeAccordion);
 	const collapsibleScope = useCollapsibleScope(__scopeAccordion);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$1.ItemSlot, {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.ItemSlot, {
 		scope: __scopeAccordion,
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trigger, {
 			"aria-disabled": itemContext.open && !collapsibleContext.collapsible || void 0,
@@ -21221,14 +24133,14 @@ AccordionContent$1.displayName = CONTENT_NAME;
 function getState(open) {
 	return open ? "open" : "closed";
 }
-var Root2$1 = Accordion$1;
+var Root2 = Accordion$1;
 var Item = AccordionItem$1;
 var Header = AccordionHeader;
 var Trigger2 = AccordionTrigger$1;
 var Content2 = AccordionContent$1;
 //#endregion
 //#region src/components/ui/accordion.tsx
-var Accordion = Root2$1;
+var Accordion = Root2;
 var AccordionItem = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Item, {
 	"data-uid": "src/components/ui/accordion.tsx:14:3",
 	"data-prohibitions": "[editContent]",
@@ -21274,23 +24186,23 @@ AccordionContent.displayName = Content2.displayName;
 var faqs = [
 	{
 		question: "Quais são os horários de visita?",
-		answer: "As visitas na Casa Vita são abertas diariamente das 10h às 17h. Acreditamos que o convívio com a família é essencial para o bem-estar e a alegria dos nossos residentes."
+		answer: "As visitas são abertas diariamente, das 10h às 17h. Acreditamos que a presença e o carinho da família são fundamentais para o bem-estar e a alegria dos nossos residentes."
 	},
 	{
-		question: "Quais serviços estão inclusos na mensalidade?",
-		answer: "Nossa mensalidade inclui hospedagem, alimentação balanceada com acompanhamento nutricional, cuidados 24h por nossa equipe especializada, lavanderia, além de atividades de recreação e estímulo cognitivo."
+		question: "O serviço de Cuidados 24h está incluído?",
+		answer: "Sim, todos os nossos residentes contam com Cuidados 24h. Nossa equipe multidisciplinar está sempre presente para garantir acompanhamento contínuo e assistência imediata."
 	},
 	{
-		question: "A Casa Vita aceita convênios médicos?",
-		answer: "Trabalhamos de forma particular, mas auxiliamos os familiares com os trâmites necessários para solicitar o sistema de reembolso junto aos convênios médicos dos residentes, de acordo com o plano de saúde."
+		question: "Como funciona a alimentação na Casa Vita?",
+		answer: "Oferecemos 6 refeições diárias balanceadas e saborosas, elaboradas por nossa equipe de nutrição. O cardápio é adaptado de acordo com as restrições médicas e preferências de cada idoso."
 	},
 	{
-		question: "Como funciona o processo de adaptação?",
-		answer: "O processo de adaptação é feito de forma gradual e humanizada. Nossa equipe multidisciplinar acompanha de perto os primeiros dias, integrando o residente às atividades e aos demais moradores para que ele se sinta verdadeiramente em casa."
+		question: "Quais atividades são oferecidas aos residentes?",
+		answer: "Promovemos uma programação rica que inclui atividades de estímulo cognitivo, fisioterapia preventiva, musicoterapia, oficinas de artes e momentos de lazer ao ar livre."
 	},
 	{
-		question: "Existe a opção de hospedagem temporária?",
-		answer: "Sim! Oferecemos opções de hospedagem tanto permanente quanto temporária, ideal para situações de pós-operatório, reabilitação ou quando a família precisa viajar e necessita de um local seguro para o idoso."
+		question: "É possível agendar uma visita para conhecer o espaço?",
+		answer: "Com certeza! Adoramos receber visitantes. Você pode agendar uma visita facilmente através do nosso WhatsApp, escolhendo o melhor dia e horário para vir nos conhecer."
 	}
 ];
 function FAQ() {
@@ -21298,113 +24210,54 @@ function FAQ() {
 		"data-uid": "src/components/sections/FAQ.tsx:38:5",
 		"data-prohibitions": "[editContent]",
 		id: "faq",
-		className: "py-20 bg-white",
+		className: "bg-white py-24 sm:py-32",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 			"data-uid": "src/components/sections/FAQ.tsx:39:7",
 			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4 md:px-6 max-w-4xl",
+			className: "container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				"data-uid": "src/components/sections/FAQ.tsx:40:9",
 				"data-prohibitions": "[]",
-				className: "text-center mb-12",
+				className: "text-center mb-16",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
 					"data-uid": "src/components/sections/FAQ.tsx:41:11",
 					"data-prohibitions": "[]",
-					className: "text-3xl md:text-4xl font-bold text-foreground mb-4",
+					className: "text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl",
 					children: "Perguntas Frequentes"
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 					"data-uid": "src/components/sections/FAQ.tsx:44:11",
 					"data-prohibitions": "[]",
-					className: "text-lg text-muted-foreground",
-					children: "Tire suas dúvidas sobre o funcionamento e os serviços oferecidos pela Casa Vita."
-				})]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Accordion, {
-				"data-uid": "src/components/sections/FAQ.tsx:49:9",
-				"data-prohibitions": "[editContent]",
-				type: "single",
-				collapsible: true,
-				className: "w-full space-y-4",
-				children: faqs.map((faq, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AccordionItem, {
-					"data-uid": "src/components/sections/FAQ.tsx:51:13",
-					"data-prohibitions": "[editContent]",
-					value: `item-${index}`,
-					className: "border border-border rounded-xl px-6 bg-primary/5 data-[state=open]:bg-white data-[state=open]:border-primary/20 transition-colors",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionTrigger, {
-						"data-uid": "src/components/sections/FAQ.tsx:56:15",
-						"data-prohibitions": "[editContent]",
-						className: "text-left font-semibold text-lg hover:no-underline py-6",
-						children: faq.question
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionContent, {
-						"data-uid": "src/components/sections/FAQ.tsx:59:15",
-						"data-prohibitions": "[editContent]",
-						className: "text-muted-foreground text-base leading-relaxed pb-6",
-						children: faq.answer
-					})]
-				}, index))
-			})]
-		})
-	});
-}
-//#endregion
-//#region src/components/sections/Gallery.tsx
-function Gallery() {
-	const images = [
-		"https://img.usecurling.com/p/600/400?q=senior%20activities&color=orange",
-		"https://img.usecurling.com/p/600/400?q=nursing%20home%20garden",
-		"https://img.usecurling.com/p/600/400?q=elderly%20care%20room",
-		"https://img.usecurling.com/p/600/400?q=senior%20dining&color=green",
-		"https://img.usecurling.com/p/600/400?q=physical%20therapy%20elderly",
-		"https://img.usecurling.com/p/600/400?q=happy%20senior%20people&color=blue"
-	];
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/Gallery.tsx:12:5",
-		"data-prohibitions": "[editContent]",
-		className: "py-20 bg-primary/5",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/Gallery.tsx:13:7",
-			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4 md:px-6",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/Gallery.tsx:14:9",
-				"data-prohibitions": "[]",
-				className: "text-center max-w-3xl mx-auto mb-16",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-					"data-uid": "src/components/sections/Gallery.tsx:15:11",
-					"data-prohibitions": "[]",
-					className: "text-3xl md:text-4xl font-bold text-foreground mb-4",
-					children: "Nossos Ambientes"
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					"data-uid": "src/components/sections/Gallery.tsx:16:11",
-					"data-prohibitions": "[]",
-					className: "text-lg text-muted-foreground",
-					children: "Conheça um pouco das nossas instalações, preparadas com carinho para oferecer o máximo de conforto."
+					className: "mt-4 text-lg text-gray-600",
+					children: "Tire suas dúvidas sobre a rotina e os serviços da Casa Vita."
 				})]
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				"data-uid": "src/components/sections/Gallery.tsx:22:9",
+				"data-uid": "src/components/sections/FAQ.tsx:48:9",
 				"data-prohibitions": "[editContent]",
-				className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6",
-				children: images.map((src, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/sections/Gallery.tsx:24:13",
-					"data-prohibitions": "[]",
-					className: "group relative rounded-2xl overflow-hidden aspect-[4/3] bg-white shadow-sm hover:shadow-xl transition-all duration-300",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-						"data-uid": "src/components/sections/Gallery.tsx:28:15",
+				className: "bg-white rounded-3xl p-6 sm:p-8 shadow-lg border border-gray-100",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Accordion, {
+					"data-uid": "src/components/sections/FAQ.tsx:49:11",
+					"data-prohibitions": "[editContent]",
+					type: "single",
+					collapsible: true,
+					className: "w-full",
+					children: faqs.map((faq, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AccordionItem, {
+						"data-uid": "src/components/sections/FAQ.tsx:51:15",
 						"data-prohibitions": "[editContent]",
-						src,
-						alt: `Galeria Casa Vita ${index + 1}`,
-						className: "w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-						"data-uid": "src/components/sections/Gallery.tsx:33:15",
-						"data-prohibitions": "[]",
-						className: "absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							"data-uid": "src/components/sections/Gallery.tsx:34:17",
-							"data-prohibitions": "[]",
-							className: "text-white font-medium px-4 py-2 border-2 border-white rounded-full",
-							children: "Ver Ampliado"
-						})
-					})]
-				}, index))
+						value: `item-${index}`,
+						className: "border-b border-gray-100 last:border-0",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionTrigger, {
+							"data-uid": "src/components/sections/FAQ.tsx:56:17",
+							"data-prohibitions": "[editContent]",
+							className: "text-left text-lg font-medium text-gray-900 hover:text-[#B4D330] py-5 transition-colors",
+							children: faq.question
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionContent, {
+							"data-uid": "src/components/sections/FAQ.tsx:59:17",
+							"data-prohibitions": "[editContent]",
+							className: "text-base text-gray-600 pb-5 leading-relaxed",
+							children: faq.answer
+						})]
+					}, index))
+				})
 			})]
 		})
 	});
@@ -21415,63 +24268,55 @@ function CTA() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
 		"data-uid": "src/components/sections/CTA.tsx:7:5",
 		"data-prohibitions": "[]",
-		className: "py-24 bg-white relative overflow-hidden",
+		className: "bg-[#B4D330] py-16 sm:py-24 relative overflow-hidden",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 			"data-uid": "src/components/sections/CTA.tsx:8:7",
 			"data-prohibitions": "[]",
-			className: "absolute inset-0 bg-primary/5"
+			className: "absolute inset-0 opacity-10 bg-[url('https://img.usecurling.com/p/800/600?q=pattern')] bg-cover mix-blend-overlay"
 		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			"data-uid": "src/components/sections/CTA.tsx:10:7",
+			"data-uid": "src/components/sections/CTA.tsx:9:7",
 			"data-prohibitions": "[]",
-			className: "container relative z-10 mx-auto px-4 md:px-6",
+			className: "container mx-auto px-4 sm:px-6 lg:px-8 relative z-10",
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/CTA.tsx:11:9",
+				"data-uid": "src/components/sections/CTA.tsx:10:9",
 				"data-prohibitions": "[]",
-				className: "max-w-4xl mx-auto bg-primary rounded-[3rem] p-10 md:p-16 text-center text-primary-foreground shadow-2xl",
+				className: "mx-auto max-w-3xl text-center",
 				children: [
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-						"data-uid": "src/components/sections/CTA.tsx:12:11",
+						"data-uid": "src/components/sections/CTA.tsx:11:11",
 						"data-prohibitions": "[]",
-						className: "text-3xl md:text-5xl font-bold mb-6",
-						children: "Venha conhecer a Casa Vita"
+						className: "text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl",
+						children: "Venha nos fazer uma visita"
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-						"data-uid": "src/components/sections/CTA.tsx:13:11",
+						"data-uid": "src/components/sections/CTA.tsx:14:11",
 						"data-prohibitions": "[]",
-						className: "text-lg md:text-xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto leading-relaxed",
-						children: "Agende uma visita e descubra por que somos a escolha número um das famílias que buscam excelência em cuidados e qualidade de vida."
+						className: "mx-auto mt-6 max-w-xl text-lg leading-8 text-white/90",
+						children: "Estamos de portas abertas para receber você e sua família. Agende uma visita e conheça de perto o carinho e a estrutura elegante que oferecemos."
 					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 						"data-uid": "src/components/sections/CTA.tsx:18:11",
 						"data-prohibitions": "[]",
-						className: "flex flex-col sm:flex-row items-center justify-center gap-4",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						className: "mt-10 flex items-center justify-center",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
 							"data-uid": "src/components/sections/CTA.tsx:19:13",
 							"data-prohibitions": "[]",
-							size: "lg",
-							className: "w-full sm:w-auto rounded-full bg-white text-primary hover:bg-white/90 h-14 px-8 text-base font-semibold",
-							onClick: () => {
-								trackWhatsAppClick();
-								window.open("https://wa.me/5511981182882", "_blank");
-							},
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
-								"data-uid": "src/components/sections/CTA.tsx:27:15",
-								"data-prohibitions": "[editContent]",
-								className: "mr-2 h-5 w-5"
-							}), "Agendar via WhatsApp"]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-							"data-uid": "src/components/sections/CTA.tsx:31:13",
-							"data-prohibitions": "[]",
-							size: "lg",
-							variant: "outline",
-							className: "w-full sm:w-auto rounded-full border-white text-white hover:bg-white/10 h-14 px-8 text-base font-semibold bg-transparent",
-							onClick: () => document.getElementById("sobre")?.scrollIntoView({ behavior: "smooth" }),
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Calendar, {
-								"data-uid": "src/components/sections/CTA.tsx:39:15",
-								"data-prohibitions": "[editContent]",
-								className: "mr-2 h-5 w-5"
-							}), "Saber Mais"]
-						})]
+							href: "https://wa.me/5511999999999",
+							target: "_blank",
+							rel: "noopener noreferrer",
+							onClick: trackWhatsAppClick,
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+								"data-uid": "src/components/sections/CTA.tsx:25:15",
+								"data-prohibitions": "[]",
+								size: "lg",
+								className: "rounded-full bg-white text-[#B4D330] hover:bg-gray-50 px-8 py-7 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all hover:scale-105 group",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
+									"data-uid": "src/components/sections/CTA.tsx:29:17",
+									"data-prohibitions": "[editContent]",
+									className: "mr-2 h-6 w-6 group-hover:text-[#25D366] transition-colors"
+								}), "Agendar pelo WhatsApp"]
+							})
+						})
 					})
 				]
 			})
@@ -21523,1031 +24368,38 @@ function NotFound() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		"data-uid": "src/pages/NotFound.tsx:6:5",
 		"data-prohibitions": "[]",
-		className: "flex flex-col items-center justify-center min-h-[70vh] text-center px-4",
+		className: "flex flex-col items-center justify-center min-h-[70vh] px-4 text-center",
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
 				"data-uid": "src/pages/NotFound.tsx:7:7",
 				"data-prohibitions": "[]",
-				className: "text-8xl font-black text-emerald-600 mb-4",
+				className: "text-8xl font-bold text-[#B4D330] mb-4",
 				children: "404"
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
 				"data-uid": "src/pages/NotFound.tsx:8:7",
 				"data-prohibitions": "[]",
-				className: "text-3xl font-bold text-slate-800 mb-6",
+				className: "text-3xl font-semibold text-gray-900 mb-6",
 				children: "Página não encontrada"
 			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 				"data-uid": "src/pages/NotFound.tsx:9:7",
 				"data-prohibitions": "[]",
-				className: "text-slate-600 text-lg mb-8 max-w-md",
-				children: "A página que você está procurando pode ter sido removida, mudou de nome ou está temporariamente indisponível."
+				className: "text-lg text-gray-600 mb-8 max-w-md",
+				children: "Desculpe, a página que você está procurando não existe ou foi movida."
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-				"data-uid": "src/pages/NotFound.tsx:13:7",
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+				"data-uid": "src/pages/NotFound.tsx:12:7",
 				"data-prohibitions": "[]",
-				asChild: true,
-				className: "bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-8 h-14 text-lg transition-transform hover:scale-105",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
-					"data-uid": "src/pages/NotFound.tsx:17:9",
+				to: "/",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+					"data-uid": "src/pages/NotFound.tsx:13:9",
 					"data-prohibitions": "[]",
-					to: "/",
-					children: "Voltar para a Página Inicial"
+					className: "rounded-full bg-[#B4D330] hover:bg-[#a0bc2a] text-white px-8 py-6 text-lg shadow-md hover:shadow-lg transition-all",
+					children: "Voltar para o Início"
 				})
 			})
 		]
-	});
-}
-//#endregion
-//#region src/hooks/use-toast.ts
-var TOAST_LIMIT = 1;
-var TOAST_REMOVE_DELAY = 1e6;
-var count = 0;
-function genId() {
-	count = (count + 1) % Number.MAX_SAFE_INTEGER;
-	return count.toString();
-}
-var toastTimeouts = /* @__PURE__ */ new Map();
-var addToRemoveQueue = (toastId) => {
-	if (toastTimeouts.has(toastId)) return;
-	const timeout = setTimeout(() => {
-		toastTimeouts.delete(toastId);
-		dispatch({
-			type: "REMOVE_TOAST",
-			toastId
-		});
-	}, TOAST_REMOVE_DELAY);
-	toastTimeouts.set(toastId, timeout);
-};
-var reducer = (state, action) => {
-	switch (action.type) {
-		case "ADD_TOAST": return {
-			...state,
-			toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT)
-		};
-		case "UPDATE_TOAST": return {
-			...state,
-			toasts: state.toasts.map((t) => t.id === action.toast.id ? {
-				...t,
-				...action.toast
-			} : t)
-		};
-		case "DISMISS_TOAST": {
-			const { toastId } = action;
-			if (toastId) addToRemoveQueue(toastId);
-			else state.toasts.forEach((toast) => {
-				addToRemoveQueue(toast.id);
-			});
-			return {
-				...state,
-				toasts: state.toasts.map((t) => t.id === toastId || toastId === void 0 ? {
-					...t,
-					open: false
-				} : t)
-			};
-		}
-		case "REMOVE_TOAST":
-			if (action.toastId === void 0) return {
-				...state,
-				toasts: []
-			};
-			return {
-				...state,
-				toasts: state.toasts.filter((t) => t.id !== action.toastId)
-			};
-	}
-};
-var listeners = [];
-var memoryState = { toasts: [] };
-function dispatch(action) {
-	memoryState = reducer(memoryState, action);
-	listeners.forEach((listener) => {
-		listener(memoryState);
-	});
-}
-function toast$1({ ...props }) {
-	const id = genId();
-	const update = (props) => dispatch({
-		type: "UPDATE_TOAST",
-		toast: {
-			...props,
-			id
-		}
-	});
-	const dismiss = () => dispatch({
-		type: "DISMISS_TOAST",
-		toastId: id
-	});
-	dispatch({
-		type: "ADD_TOAST",
-		toast: {
-			...props,
-			id,
-			open: true,
-			onOpenChange: (open) => {
-				if (!open) dismiss();
-			}
-		}
-	});
-	return {
-		id,
-		dismiss,
-		update
-	};
-}
-function useToast() {
-	const [state, setState] = import_react.useState(memoryState);
-	import_react.useEffect(() => {
-		listeners.push(setState);
-		return () => {
-			const index = listeners.indexOf(setState);
-			if (index > -1) listeners.splice(index, 1);
-		};
-	}, [state]);
-	return {
-		...state,
-		toast: toast$1,
-		dismiss: (toastId) => dispatch({
-			type: "DISMISS_TOAST",
-			toastId
-		})
-	};
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-use-callback-ref@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-use-callback-ref/dist/index.mjs
-function useCallbackRef(callback) {
-	const callbackRef = import_react.useRef(callback);
-	import_react.useEffect(() => {
-		callbackRef.current = callback;
-	});
-	return import_react.useMemo(() => (...args) => callbackRef.current?.(...args), []);
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-use-escape-keydown@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-use-escape-keydown/dist/index.mjs
-function useEscapeKeydown(onEscapeKeyDownProp, ownerDocument = globalThis?.document) {
-	const onEscapeKeyDown = useCallbackRef(onEscapeKeyDownProp);
-	import_react.useEffect(() => {
-		const handleKeyDown = (event) => {
-			if (event.key === "Escape") onEscapeKeyDown(event);
-		};
-		ownerDocument.addEventListener("keydown", handleKeyDown, { capture: true });
-		return () => ownerDocument.removeEventListener("keydown", handleKeyDown, { capture: true });
-	}, [onEscapeKeyDown, ownerDocument]);
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-dismissable-layer@1.1.11_@types+react-dom@19.2.3_@types+react@19.2.14___3d3960154a4c07d09bb90cb341135fc5/node_modules/@radix-ui/react-dismissable-layer/dist/index.mjs
-var DISMISSABLE_LAYER_NAME = "DismissableLayer";
-var CONTEXT_UPDATE = "dismissableLayer.update";
-var POINTER_DOWN_OUTSIDE = "dismissableLayer.pointerDownOutside";
-var FOCUS_OUTSIDE = "dismissableLayer.focusOutside";
-var originalBodyPointerEvents;
-var DismissableLayerContext = import_react.createContext({
-	layers: /* @__PURE__ */ new Set(),
-	layersWithOutsidePointerEventsDisabled: /* @__PURE__ */ new Set(),
-	branches: /* @__PURE__ */ new Set()
-});
-var DismissableLayer = import_react.forwardRef((props, forwardedRef) => {
-	const { disableOutsidePointerEvents = false, onEscapeKeyDown, onPointerDownOutside, onFocusOutside, onInteractOutside, onDismiss, ...layerProps } = props;
-	const context = import_react.useContext(DismissableLayerContext);
-	const [node, setNode] = import_react.useState(null);
-	const ownerDocument = node?.ownerDocument ?? globalThis?.document;
-	const [, force] = import_react.useState({});
-	const composedRefs = useComposedRefs(forwardedRef, (node2) => setNode(node2));
-	const layers = Array.from(context.layers);
-	const [highestLayerWithOutsidePointerEventsDisabled] = [...context.layersWithOutsidePointerEventsDisabled].slice(-1);
-	const highestLayerWithOutsidePointerEventsDisabledIndex = layers.indexOf(highestLayerWithOutsidePointerEventsDisabled);
-	const index = node ? layers.indexOf(node) : -1;
-	const isBodyPointerEventsDisabled = context.layersWithOutsidePointerEventsDisabled.size > 0;
-	const isPointerEventsEnabled = index >= highestLayerWithOutsidePointerEventsDisabledIndex;
-	const pointerDownOutside = usePointerDownOutside((event) => {
-		const target = event.target;
-		const isPointerDownOnBranch = [...context.branches].some((branch) => branch.contains(target));
-		if (!isPointerEventsEnabled || isPointerDownOnBranch) return;
-		onPointerDownOutside?.(event);
-		onInteractOutside?.(event);
-		if (!event.defaultPrevented) onDismiss?.();
-	}, ownerDocument);
-	const focusOutside = useFocusOutside((event) => {
-		const target = event.target;
-		if ([...context.branches].some((branch) => branch.contains(target))) return;
-		onFocusOutside?.(event);
-		onInteractOutside?.(event);
-		if (!event.defaultPrevented) onDismiss?.();
-	}, ownerDocument);
-	useEscapeKeydown((event) => {
-		if (!(index === context.layers.size - 1)) return;
-		onEscapeKeyDown?.(event);
-		if (!event.defaultPrevented && onDismiss) {
-			event.preventDefault();
-			onDismiss();
-		}
-	}, ownerDocument);
-	import_react.useEffect(() => {
-		if (!node) return;
-		if (disableOutsidePointerEvents) {
-			if (context.layersWithOutsidePointerEventsDisabled.size === 0) {
-				originalBodyPointerEvents = ownerDocument.body.style.pointerEvents;
-				ownerDocument.body.style.pointerEvents = "none";
-			}
-			context.layersWithOutsidePointerEventsDisabled.add(node);
-		}
-		context.layers.add(node);
-		dispatchUpdate();
-		return () => {
-			if (disableOutsidePointerEvents && context.layersWithOutsidePointerEventsDisabled.size === 1) ownerDocument.body.style.pointerEvents = originalBodyPointerEvents;
-		};
-	}, [
-		node,
-		ownerDocument,
-		disableOutsidePointerEvents,
-		context
-	]);
-	import_react.useEffect(() => {
-		return () => {
-			if (!node) return;
-			context.layers.delete(node);
-			context.layersWithOutsidePointerEventsDisabled.delete(node);
-			dispatchUpdate();
-		};
-	}, [node, context]);
-	import_react.useEffect(() => {
-		const handleUpdate = () => force({});
-		document.addEventListener(CONTEXT_UPDATE, handleUpdate);
-		return () => document.removeEventListener(CONTEXT_UPDATE, handleUpdate);
-	}, []);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
-		...layerProps,
-		ref: composedRefs,
-		style: {
-			pointerEvents: isBodyPointerEventsDisabled ? isPointerEventsEnabled ? "auto" : "none" : void 0,
-			...props.style
-		},
-		onFocusCapture: composeEventHandlers(props.onFocusCapture, focusOutside.onFocusCapture),
-		onBlurCapture: composeEventHandlers(props.onBlurCapture, focusOutside.onBlurCapture),
-		onPointerDownCapture: composeEventHandlers(props.onPointerDownCapture, pointerDownOutside.onPointerDownCapture)
-	});
-});
-DismissableLayer.displayName = DISMISSABLE_LAYER_NAME;
-var BRANCH_NAME = "DismissableLayerBranch";
-var DismissableLayerBranch = import_react.forwardRef((props, forwardedRef) => {
-	const context = import_react.useContext(DismissableLayerContext);
-	const ref = import_react.useRef(null);
-	const composedRefs = useComposedRefs(forwardedRef, ref);
-	import_react.useEffect(() => {
-		const node = ref.current;
-		if (node) {
-			context.branches.add(node);
-			return () => {
-				context.branches.delete(node);
-			};
-		}
-	}, [context.branches]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
-		...props,
-		ref: composedRefs
-	});
-});
-DismissableLayerBranch.displayName = BRANCH_NAME;
-function usePointerDownOutside(onPointerDownOutside, ownerDocument = globalThis?.document) {
-	const handlePointerDownOutside = useCallbackRef(onPointerDownOutside);
-	const isPointerInsideReactTreeRef = import_react.useRef(false);
-	const handleClickRef = import_react.useRef(() => {});
-	import_react.useEffect(() => {
-		const handlePointerDown = (event) => {
-			if (event.target && !isPointerInsideReactTreeRef.current) {
-				let handleAndDispatchPointerDownOutsideEvent2 = function() {
-					handleAndDispatchCustomEvent$1(POINTER_DOWN_OUTSIDE, handlePointerDownOutside, eventDetail, { discrete: true });
-				};
-				const eventDetail = { originalEvent: event };
-				if (event.pointerType === "touch") {
-					ownerDocument.removeEventListener("click", handleClickRef.current);
-					handleClickRef.current = handleAndDispatchPointerDownOutsideEvent2;
-					ownerDocument.addEventListener("click", handleClickRef.current, { once: true });
-				} else handleAndDispatchPointerDownOutsideEvent2();
-			} else ownerDocument.removeEventListener("click", handleClickRef.current);
-			isPointerInsideReactTreeRef.current = false;
-		};
-		const timerId = window.setTimeout(() => {
-			ownerDocument.addEventListener("pointerdown", handlePointerDown);
-		}, 0);
-		return () => {
-			window.clearTimeout(timerId);
-			ownerDocument.removeEventListener("pointerdown", handlePointerDown);
-			ownerDocument.removeEventListener("click", handleClickRef.current);
-		};
-	}, [ownerDocument, handlePointerDownOutside]);
-	return { onPointerDownCapture: () => isPointerInsideReactTreeRef.current = true };
-}
-function useFocusOutside(onFocusOutside, ownerDocument = globalThis?.document) {
-	const handleFocusOutside = useCallbackRef(onFocusOutside);
-	const isFocusInsideReactTreeRef = import_react.useRef(false);
-	import_react.useEffect(() => {
-		const handleFocus = (event) => {
-			if (event.target && !isFocusInsideReactTreeRef.current) handleAndDispatchCustomEvent$1(FOCUS_OUTSIDE, handleFocusOutside, { originalEvent: event }, { discrete: false });
-		};
-		ownerDocument.addEventListener("focusin", handleFocus);
-		return () => ownerDocument.removeEventListener("focusin", handleFocus);
-	}, [ownerDocument, handleFocusOutside]);
-	return {
-		onFocusCapture: () => isFocusInsideReactTreeRef.current = true,
-		onBlurCapture: () => isFocusInsideReactTreeRef.current = false
-	};
-}
-function dispatchUpdate() {
-	const event = new CustomEvent(CONTEXT_UPDATE);
-	document.dispatchEvent(event);
-}
-function handleAndDispatchCustomEvent$1(name, handler, detail, { discrete }) {
-	const target = detail.originalEvent.target;
-	const event = new CustomEvent(name, {
-		bubbles: false,
-		cancelable: true,
-		detail
-	});
-	if (handler) target.addEventListener(name, handler, { once: true });
-	if (discrete) dispatchDiscreteCustomEvent(target, event);
-	else target.dispatchEvent(event);
-}
-var Root = DismissableLayer;
-var Branch = DismissableLayerBranch;
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-portal@1.1.9_@types+react-dom@19.2.3_@types+react@19.2.14__@types+react_7668895bec2444446faa4e0f4eb5244b/node_modules/@radix-ui/react-portal/dist/index.mjs
-var PORTAL_NAME = "Portal";
-var Portal = import_react.forwardRef((props, forwardedRef) => {
-	const { container: containerProp, ...portalProps } = props;
-	const [mounted, setMounted] = import_react.useState(false);
-	useLayoutEffect2(() => setMounted(true), []);
-	const container = containerProp || mounted && globalThis?.document?.body;
-	return container ? import_react_dom.createPortal(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
-		...portalProps,
-		ref: forwardedRef
-	}), container) : null;
-});
-Portal.displayName = PORTAL_NAME;
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-visually-hidden@1.2.3_@types+react-dom@19.2.3_@types+react@19.2.14__@ty_fa89646d7248b32d1762bf88948f6339/node_modules/@radix-ui/react-visually-hidden/dist/index.mjs
-var VISUALLY_HIDDEN_STYLES = Object.freeze({
-	position: "absolute",
-	border: 0,
-	width: 1,
-	height: 1,
-	padding: 0,
-	margin: -1,
-	overflow: "hidden",
-	clip: "rect(0, 0, 0, 0)",
-	whiteSpace: "nowrap",
-	wordWrap: "normal"
-});
-var NAME = "VisuallyHidden";
-var VisuallyHidden = import_react.forwardRef((props, forwardedRef) => {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
-		...props,
-		ref: forwardedRef,
-		style: {
-			...VISUALLY_HIDDEN_STYLES,
-			...props.style
-		}
-	});
-});
-VisuallyHidden.displayName = NAME;
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-toast@1.2.15_@types+react-dom@19.2.3_@types+react@19.2.14__@types+react_4581e89c6ba13e4159ce65546c8b2a16/node_modules/@radix-ui/react-toast/dist/index.mjs
-var PROVIDER_NAME = "ToastProvider";
-var [Collection, useCollection, createCollectionScope] = createCollection("Toast");
-var [createToastContext, createToastScope] = createContextScope("Toast", [createCollectionScope]);
-var [ToastProviderProvider, useToastProviderContext] = createToastContext(PROVIDER_NAME);
-var ToastProvider$1 = (props) => {
-	const { __scopeToast, label = "Notification", duration = 5e3, swipeDirection = "right", swipeThreshold = 50, children } = props;
-	const [viewport, setViewport] = import_react.useState(null);
-	const [toastCount, setToastCount] = import_react.useState(0);
-	const isFocusedToastEscapeKeyDownRef = import_react.useRef(false);
-	const isClosePausedRef = import_react.useRef(false);
-	if (!label.trim()) console.error(`Invalid prop \`label\` supplied to \`${PROVIDER_NAME}\`. Expected non-empty \`string\`.`);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.Provider, {
-		scope: __scopeToast,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastProviderProvider, {
-			scope: __scopeToast,
-			label,
-			duration,
-			swipeDirection,
-			swipeThreshold,
-			toastCount,
-			viewport,
-			onViewportChange: setViewport,
-			onToastAdd: import_react.useCallback(() => setToastCount((prevCount) => prevCount + 1), []),
-			onToastRemove: import_react.useCallback(() => setToastCount((prevCount) => prevCount - 1), []),
-			isFocusedToastEscapeKeyDownRef,
-			isClosePausedRef,
-			children
-		})
-	});
-};
-ToastProvider$1.displayName = PROVIDER_NAME;
-var VIEWPORT_NAME = "ToastViewport";
-var VIEWPORT_DEFAULT_HOTKEY = ["F8"];
-var VIEWPORT_PAUSE = "toast.viewportPause";
-var VIEWPORT_RESUME = "toast.viewportResume";
-var ToastViewport$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, hotkey = VIEWPORT_DEFAULT_HOTKEY, label = "Notifications ({hotkey})", ...viewportProps } = props;
-	const context = useToastProviderContext(VIEWPORT_NAME, __scopeToast);
-	const getItems = useCollection(__scopeToast);
-	const wrapperRef = import_react.useRef(null);
-	const headFocusProxyRef = import_react.useRef(null);
-	const tailFocusProxyRef = import_react.useRef(null);
-	const ref = import_react.useRef(null);
-	const composedRefs = useComposedRefs(forwardedRef, ref, context.onViewportChange);
-	const hotkeyLabel = hotkey.join("+").replace(/Key/g, "").replace(/Digit/g, "");
-	const hasToasts = context.toastCount > 0;
-	import_react.useEffect(() => {
-		const handleKeyDown = (event) => {
-			if (hotkey.length !== 0 && hotkey.every((key) => event[key] || event.code === key)) ref.current?.focus();
-		};
-		document.addEventListener("keydown", handleKeyDown);
-		return () => document.removeEventListener("keydown", handleKeyDown);
-	}, [hotkey]);
-	import_react.useEffect(() => {
-		const wrapper = wrapperRef.current;
-		const viewport = ref.current;
-		if (hasToasts && wrapper && viewport) {
-			const handlePause = () => {
-				if (!context.isClosePausedRef.current) {
-					const pauseEvent = new CustomEvent(VIEWPORT_PAUSE);
-					viewport.dispatchEvent(pauseEvent);
-					context.isClosePausedRef.current = true;
-				}
-			};
-			const handleResume = () => {
-				if (context.isClosePausedRef.current) {
-					const resumeEvent = new CustomEvent(VIEWPORT_RESUME);
-					viewport.dispatchEvent(resumeEvent);
-					context.isClosePausedRef.current = false;
-				}
-			};
-			const handleFocusOutResume = (event) => {
-				if (!wrapper.contains(event.relatedTarget)) handleResume();
-			};
-			const handlePointerLeaveResume = () => {
-				if (!wrapper.contains(document.activeElement)) handleResume();
-			};
-			wrapper.addEventListener("focusin", handlePause);
-			wrapper.addEventListener("focusout", handleFocusOutResume);
-			wrapper.addEventListener("pointermove", handlePause);
-			wrapper.addEventListener("pointerleave", handlePointerLeaveResume);
-			window.addEventListener("blur", handlePause);
-			window.addEventListener("focus", handleResume);
-			return () => {
-				wrapper.removeEventListener("focusin", handlePause);
-				wrapper.removeEventListener("focusout", handleFocusOutResume);
-				wrapper.removeEventListener("pointermove", handlePause);
-				wrapper.removeEventListener("pointerleave", handlePointerLeaveResume);
-				window.removeEventListener("blur", handlePause);
-				window.removeEventListener("focus", handleResume);
-			};
-		}
-	}, [hasToasts, context.isClosePausedRef]);
-	const getSortedTabbableCandidates = import_react.useCallback(({ tabbingDirection }) => {
-		const tabbableCandidates = getItems().map((toastItem) => {
-			const toastNode = toastItem.ref.current;
-			const toastTabbableCandidates = [toastNode, ...getTabbableCandidates(toastNode)];
-			return tabbingDirection === "forwards" ? toastTabbableCandidates : toastTabbableCandidates.reverse();
-		});
-		return (tabbingDirection === "forwards" ? tabbableCandidates.reverse() : tabbableCandidates).flat();
-	}, [getItems]);
-	import_react.useEffect(() => {
-		const viewport = ref.current;
-		if (viewport) {
-			const handleKeyDown = (event) => {
-				const isMetaKey = event.altKey || event.ctrlKey || event.metaKey;
-				if (event.key === "Tab" && !isMetaKey) {
-					const focusedElement = document.activeElement;
-					const isTabbingBackwards = event.shiftKey;
-					if (event.target === viewport && isTabbingBackwards) {
-						headFocusProxyRef.current?.focus();
-						return;
-					}
-					const sortedCandidates = getSortedTabbableCandidates({ tabbingDirection: isTabbingBackwards ? "backwards" : "forwards" });
-					const index = sortedCandidates.findIndex((candidate) => candidate === focusedElement);
-					if (focusFirst(sortedCandidates.slice(index + 1))) event.preventDefault();
-					else isTabbingBackwards ? headFocusProxyRef.current?.focus() : tailFocusProxyRef.current?.focus();
-				}
-			};
-			viewport.addEventListener("keydown", handleKeyDown);
-			return () => viewport.removeEventListener("keydown", handleKeyDown);
-		}
-	}, [getItems, getSortedTabbableCandidates]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Branch, {
-		ref: wrapperRef,
-		role: "region",
-		"aria-label": label.replace("{hotkey}", hotkeyLabel),
-		tabIndex: -1,
-		style: { pointerEvents: hasToasts ? void 0 : "none" },
-		children: [
-			hasToasts && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FocusProxy, {
-				ref: headFocusProxyRef,
-				onFocusFromOutsideViewport: () => {
-					focusFirst(getSortedTabbableCandidates({ tabbingDirection: "forwards" }));
-				}
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.Slot, {
-				scope: __scopeToast,
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.ol, {
-					tabIndex: -1,
-					...viewportProps,
-					ref: composedRefs
-				})
-			}),
-			hasToasts && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FocusProxy, {
-				ref: tailFocusProxyRef,
-				onFocusFromOutsideViewport: () => {
-					focusFirst(getSortedTabbableCandidates({ tabbingDirection: "backwards" }));
-				}
-			})
-		]
-	});
-});
-ToastViewport$1.displayName = VIEWPORT_NAME;
-var FOCUS_PROXY_NAME = "ToastFocusProxy";
-var FocusProxy = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, onFocusFromOutsideViewport, ...proxyProps } = props;
-	const context = useToastProviderContext(FOCUS_PROXY_NAME, __scopeToast);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(VisuallyHidden, {
-		tabIndex: 0,
-		...proxyProps,
-		ref: forwardedRef,
-		style: { position: "fixed" },
-		onFocus: (event) => {
-			const prevFocusedElement = event.relatedTarget;
-			if (!context.viewport?.contains(prevFocusedElement)) onFocusFromOutsideViewport();
-		}
-	});
-});
-FocusProxy.displayName = FOCUS_PROXY_NAME;
-var TOAST_NAME = "Toast";
-var TOAST_SWIPE_START = "toast.swipeStart";
-var TOAST_SWIPE_MOVE = "toast.swipeMove";
-var TOAST_SWIPE_CANCEL = "toast.swipeCancel";
-var TOAST_SWIPE_END = "toast.swipeEnd";
-var Toast$2 = import_react.forwardRef((props, forwardedRef) => {
-	const { forceMount, open: openProp, defaultOpen, onOpenChange, ...toastProps } = props;
-	const [open, setOpen] = useControllableState({
-		prop: openProp,
-		defaultProp: defaultOpen ?? true,
-		onChange: onOpenChange,
-		caller: TOAST_NAME
-	});
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Presence, {
-		present: forceMount || open,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastImpl, {
-			open,
-			...toastProps,
-			ref: forwardedRef,
-			onClose: () => setOpen(false),
-			onPause: useCallbackRef(props.onPause),
-			onResume: useCallbackRef(props.onResume),
-			onSwipeStart: composeEventHandlers(props.onSwipeStart, (event) => {
-				event.currentTarget.setAttribute("data-swipe", "start");
-			}),
-			onSwipeMove: composeEventHandlers(props.onSwipeMove, (event) => {
-				const { x, y } = event.detail.delta;
-				event.currentTarget.setAttribute("data-swipe", "move");
-				event.currentTarget.style.setProperty("--radix-toast-swipe-move-x", `${x}px`);
-				event.currentTarget.style.setProperty("--radix-toast-swipe-move-y", `${y}px`);
-			}),
-			onSwipeCancel: composeEventHandlers(props.onSwipeCancel, (event) => {
-				event.currentTarget.setAttribute("data-swipe", "cancel");
-				event.currentTarget.style.removeProperty("--radix-toast-swipe-move-x");
-				event.currentTarget.style.removeProperty("--radix-toast-swipe-move-y");
-				event.currentTarget.style.removeProperty("--radix-toast-swipe-end-x");
-				event.currentTarget.style.removeProperty("--radix-toast-swipe-end-y");
-			}),
-			onSwipeEnd: composeEventHandlers(props.onSwipeEnd, (event) => {
-				const { x, y } = event.detail.delta;
-				event.currentTarget.setAttribute("data-swipe", "end");
-				event.currentTarget.style.removeProperty("--radix-toast-swipe-move-x");
-				event.currentTarget.style.removeProperty("--radix-toast-swipe-move-y");
-				event.currentTarget.style.setProperty("--radix-toast-swipe-end-x", `${x}px`);
-				event.currentTarget.style.setProperty("--radix-toast-swipe-end-y", `${y}px`);
-				setOpen(false);
-			})
-		})
-	});
-});
-Toast$2.displayName = TOAST_NAME;
-var [ToastInteractiveProvider, useToastInteractiveContext] = createToastContext(TOAST_NAME, { onClose() {} });
-var ToastImpl = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, type = "foreground", duration: durationProp, open, onClose, onEscapeKeyDown, onPause, onResume, onSwipeStart, onSwipeMove, onSwipeCancel, onSwipeEnd, ...toastProps } = props;
-	const context = useToastProviderContext(TOAST_NAME, __scopeToast);
-	const [node, setNode] = import_react.useState(null);
-	const composedRefs = useComposedRefs(forwardedRef, (node2) => setNode(node2));
-	const pointerStartRef = import_react.useRef(null);
-	const swipeDeltaRef = import_react.useRef(null);
-	const duration = durationProp || context.duration;
-	const closeTimerStartTimeRef = import_react.useRef(0);
-	const closeTimerRemainingTimeRef = import_react.useRef(duration);
-	const closeTimerRef = import_react.useRef(0);
-	const { onToastAdd, onToastRemove } = context;
-	const handleClose = useCallbackRef(() => {
-		if (node?.contains(document.activeElement)) context.viewport?.focus();
-		onClose();
-	});
-	const startTimer = import_react.useCallback((duration2) => {
-		if (!duration2 || duration2 === Infinity) return;
-		window.clearTimeout(closeTimerRef.current);
-		closeTimerStartTimeRef.current = (/* @__PURE__ */ new Date()).getTime();
-		closeTimerRef.current = window.setTimeout(handleClose, duration2);
-	}, [handleClose]);
-	import_react.useEffect(() => {
-		const viewport = context.viewport;
-		if (viewport) {
-			const handleResume = () => {
-				startTimer(closeTimerRemainingTimeRef.current);
-				onResume?.();
-			};
-			const handlePause = () => {
-				const elapsedTime = (/* @__PURE__ */ new Date()).getTime() - closeTimerStartTimeRef.current;
-				closeTimerRemainingTimeRef.current = closeTimerRemainingTimeRef.current - elapsedTime;
-				window.clearTimeout(closeTimerRef.current);
-				onPause?.();
-			};
-			viewport.addEventListener(VIEWPORT_PAUSE, handlePause);
-			viewport.addEventListener(VIEWPORT_RESUME, handleResume);
-			return () => {
-				viewport.removeEventListener(VIEWPORT_PAUSE, handlePause);
-				viewport.removeEventListener(VIEWPORT_RESUME, handleResume);
-			};
-		}
-	}, [
-		context.viewport,
-		duration,
-		onPause,
-		onResume,
-		startTimer
-	]);
-	import_react.useEffect(() => {
-		if (open && !context.isClosePausedRef.current) startTimer(duration);
-	}, [
-		open,
-		duration,
-		context.isClosePausedRef,
-		startTimer
-	]);
-	import_react.useEffect(() => {
-		onToastAdd();
-		return () => onToastRemove();
-	}, [onToastAdd, onToastRemove]);
-	const announceTextContent = import_react.useMemo(() => {
-		return node ? getAnnounceTextContent(node) : null;
-	}, [node]);
-	if (!context.viewport) return null;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [announceTextContent && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastAnnounce, {
-		__scopeToast,
-		role: "status",
-		"aria-live": type === "foreground" ? "assertive" : "polite",
-		children: announceTextContent
-	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastInteractiveProvider, {
-		scope: __scopeToast,
-		onClose: handleClose,
-		children: import_react_dom.createPortal(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.ItemSlot, {
-			scope: __scopeToast,
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
-				asChild: true,
-				onEscapeKeyDown: composeEventHandlers(onEscapeKeyDown, () => {
-					if (!context.isFocusedToastEscapeKeyDownRef.current) handleClose();
-					context.isFocusedToastEscapeKeyDownRef.current = false;
-				}),
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.li, {
-					tabIndex: 0,
-					"data-state": open ? "open" : "closed",
-					"data-swipe-direction": context.swipeDirection,
-					...toastProps,
-					ref: composedRefs,
-					style: {
-						userSelect: "none",
-						touchAction: "none",
-						...props.style
-					},
-					onKeyDown: composeEventHandlers(props.onKeyDown, (event) => {
-						if (event.key !== "Escape") return;
-						onEscapeKeyDown?.(event.nativeEvent);
-						if (!event.nativeEvent.defaultPrevented) {
-							context.isFocusedToastEscapeKeyDownRef.current = true;
-							handleClose();
-						}
-					}),
-					onPointerDown: composeEventHandlers(props.onPointerDown, (event) => {
-						if (event.button !== 0) return;
-						pointerStartRef.current = {
-							x: event.clientX,
-							y: event.clientY
-						};
-					}),
-					onPointerMove: composeEventHandlers(props.onPointerMove, (event) => {
-						if (!pointerStartRef.current) return;
-						const x = event.clientX - pointerStartRef.current.x;
-						const y = event.clientY - pointerStartRef.current.y;
-						const hasSwipeMoveStarted = Boolean(swipeDeltaRef.current);
-						const isHorizontalSwipe = ["left", "right"].includes(context.swipeDirection);
-						const clamp = ["left", "up"].includes(context.swipeDirection) ? Math.min : Math.max;
-						const clampedX = isHorizontalSwipe ? clamp(0, x) : 0;
-						const clampedY = !isHorizontalSwipe ? clamp(0, y) : 0;
-						const moveStartBuffer = event.pointerType === "touch" ? 10 : 2;
-						const delta = {
-							x: clampedX,
-							y: clampedY
-						};
-						const eventDetail = {
-							originalEvent: event,
-							delta
-						};
-						if (hasSwipeMoveStarted) {
-							swipeDeltaRef.current = delta;
-							handleAndDispatchCustomEvent(TOAST_SWIPE_MOVE, onSwipeMove, eventDetail, { discrete: false });
-						} else if (isDeltaInDirection(delta, context.swipeDirection, moveStartBuffer)) {
-							swipeDeltaRef.current = delta;
-							handleAndDispatchCustomEvent(TOAST_SWIPE_START, onSwipeStart, eventDetail, { discrete: false });
-							event.target.setPointerCapture(event.pointerId);
-						} else if (Math.abs(x) > moveStartBuffer || Math.abs(y) > moveStartBuffer) pointerStartRef.current = null;
-					}),
-					onPointerUp: composeEventHandlers(props.onPointerUp, (event) => {
-						const delta = swipeDeltaRef.current;
-						const target = event.target;
-						if (target.hasPointerCapture(event.pointerId)) target.releasePointerCapture(event.pointerId);
-						swipeDeltaRef.current = null;
-						pointerStartRef.current = null;
-						if (delta) {
-							const toast = event.currentTarget;
-							const eventDetail = {
-								originalEvent: event,
-								delta
-							};
-							if (isDeltaInDirection(delta, context.swipeDirection, context.swipeThreshold)) handleAndDispatchCustomEvent(TOAST_SWIPE_END, onSwipeEnd, eventDetail, { discrete: true });
-							else handleAndDispatchCustomEvent(TOAST_SWIPE_CANCEL, onSwipeCancel, eventDetail, { discrete: true });
-							toast.addEventListener("click", (event2) => event2.preventDefault(), { once: true });
-						}
-					})
-				})
-			})
-		}), context.viewport)
-	})] });
-});
-var ToastAnnounce = (props) => {
-	const { __scopeToast, children, ...announceProps } = props;
-	const context = useToastProviderContext(TOAST_NAME, __scopeToast);
-	const [renderAnnounceText, setRenderAnnounceText] = import_react.useState(false);
-	const [isAnnounced, setIsAnnounced] = import_react.useState(false);
-	useNextFrame(() => setRenderAnnounceText(true));
-	import_react.useEffect(() => {
-		const timer = window.setTimeout(() => setIsAnnounced(true), 1e3);
-		return () => window.clearTimeout(timer);
-	}, []);
-	return isAnnounced ? null : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Portal, {
-		asChild: true,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(VisuallyHidden, {
-			...announceProps,
-			children: renderAnnounceText && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-				context.label,
-				" ",
-				children
-			] })
-		})
-	});
-};
-var TITLE_NAME = "ToastTitle";
-var ToastTitle$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, ...titleProps } = props;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
-		...titleProps,
-		ref: forwardedRef
-	});
-});
-ToastTitle$1.displayName = TITLE_NAME;
-var DESCRIPTION_NAME = "ToastDescription";
-var ToastDescription$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, ...descriptionProps } = props;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
-		...descriptionProps,
-		ref: forwardedRef
-	});
-});
-ToastDescription$1.displayName = DESCRIPTION_NAME;
-var ACTION_NAME = "ToastAction";
-var ToastAction$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { altText, ...actionProps } = props;
-	if (!altText.trim()) {
-		console.error(`Invalid prop \`altText\` supplied to \`${ACTION_NAME}\`. Expected non-empty \`string\`.`);
-		return null;
-	}
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastAnnounceExclude, {
-		altText,
-		asChild: true,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastClose$1, {
-			...actionProps,
-			ref: forwardedRef
-		})
-	});
-});
-ToastAction$1.displayName = ACTION_NAME;
-var CLOSE_NAME = "ToastClose";
-var ToastClose$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, ...closeProps } = props;
-	const interactiveContext = useToastInteractiveContext(CLOSE_NAME, __scopeToast);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastAnnounceExclude, {
-		asChild: true,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
-			type: "button",
-			...closeProps,
-			ref: forwardedRef,
-			onClick: composeEventHandlers(props.onClick, interactiveContext.onClose)
-		})
-	});
-});
-ToastClose$1.displayName = CLOSE_NAME;
-var ToastAnnounceExclude = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, altText, ...announceExcludeProps } = props;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
-		"data-radix-toast-announce-exclude": "",
-		"data-radix-toast-announce-alt": altText || void 0,
-		...announceExcludeProps,
-		ref: forwardedRef
-	});
-});
-function getAnnounceTextContent(container) {
-	const textContent = [];
-	Array.from(container.childNodes).forEach((node) => {
-		if (node.nodeType === node.TEXT_NODE && node.textContent) textContent.push(node.textContent);
-		if (isHTMLElement(node)) {
-			const isHidden = node.ariaHidden || node.hidden || node.style.display === "none";
-			const isExcluded = node.dataset.radixToastAnnounceExclude === "";
-			if (!isHidden) if (isExcluded) {
-				const altText = node.dataset.radixToastAnnounceAlt;
-				if (altText) textContent.push(altText);
-			} else textContent.push(...getAnnounceTextContent(node));
-		}
-	});
-	return textContent;
-}
-function handleAndDispatchCustomEvent(name, handler, detail, { discrete }) {
-	const currentTarget = detail.originalEvent.currentTarget;
-	const event = new CustomEvent(name, {
-		bubbles: true,
-		cancelable: true,
-		detail
-	});
-	if (handler) currentTarget.addEventListener(name, handler, { once: true });
-	if (discrete) dispatchDiscreteCustomEvent(currentTarget, event);
-	else currentTarget.dispatchEvent(event);
-}
-var isDeltaInDirection = (delta, direction, threshold = 0) => {
-	const deltaX = Math.abs(delta.x);
-	const deltaY = Math.abs(delta.y);
-	const isDeltaX = deltaX > deltaY;
-	if (direction === "left" || direction === "right") return isDeltaX && deltaX > threshold;
-	else return !isDeltaX && deltaY > threshold;
-};
-function useNextFrame(callback = () => {}) {
-	const fn = useCallbackRef(callback);
-	useLayoutEffect2(() => {
-		let raf1 = 0;
-		let raf2 = 0;
-		raf1 = window.requestAnimationFrame(() => raf2 = window.requestAnimationFrame(fn));
-		return () => {
-			window.cancelAnimationFrame(raf1);
-			window.cancelAnimationFrame(raf2);
-		};
-	}, [fn]);
-}
-function isHTMLElement(node) {
-	return node.nodeType === node.ELEMENT_NODE;
-}
-function getTabbableCandidates(container) {
-	const nodes = [];
-	const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, { acceptNode: (node) => {
-		const isHiddenInput = node.tagName === "INPUT" && node.type === "hidden";
-		if (node.disabled || node.hidden || isHiddenInput) return NodeFilter.FILTER_SKIP;
-		return node.tabIndex >= 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
-	} });
-	while (walker.nextNode()) nodes.push(walker.currentNode);
-	return nodes;
-}
-function focusFirst(candidates) {
-	const previouslyFocusedElement = document.activeElement;
-	return candidates.some((candidate) => {
-		if (candidate === previouslyFocusedElement) return true;
-		candidate.focus();
-		return document.activeElement !== previouslyFocusedElement;
-	});
-}
-var Provider = ToastProvider$1;
-var Viewport = ToastViewport$1;
-var Root2 = Toast$2;
-var Title = ToastTitle$1;
-var Description = ToastDescription$1;
-var Action = ToastAction$1;
-var Close = ToastClose$1;
-//#endregion
-//#region src/components/ui/toast.tsx
-var ToastProvider = Provider;
-var ToastViewport = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Viewport, {
-	"data-uid": "src/components/ui/toast.tsx:15:3",
-	"data-prohibitions": "[editContent]",
-	ref,
-	className: cn$1("fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]", className),
-	...props
-}));
-ToastViewport.displayName = Viewport.displayName;
-var toastVariants = cva("group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full", {
-	variants: { variant: {
-		default: "border bg-background text-foreground",
-		destructive: "destructive group border-destructive bg-destructive text-destructive-foreground"
-	} },
-	defaultVariants: { variant: "default" }
-});
-var Toast$1 = import_react.forwardRef(({ className, variant, ...props }, ref) => {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root2, {
-		"data-uid": "src/components/ui/toast.tsx:47:5",
-		"data-prohibitions": "[editContent]",
-		ref,
-		className: cn$1(toastVariants({ variant }), className),
-		...props
-	});
-});
-Toast$1.displayName = Root2.displayName;
-var ToastAction = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Action, {
-	"data-uid": "src/components/ui/toast.tsx:60:3",
-	"data-prohibitions": "[editContent]",
-	ref,
-	className: cn$1("inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive", className),
-	...props
-}));
-ToastAction.displayName = Action.displayName;
-var ToastClose = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Close, {
-	"data-uid": "src/components/ui/toast.tsx:75:3",
-	"data-prohibitions": "[editContent]",
-	ref,
-	className: cn$1("absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600", className),
-	"toast-close": "",
-	...props,
-	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, {
-		"data-uid": "src/components/ui/toast.tsx:84:5",
-		"data-prohibitions": "[editContent]",
-		className: "h-4 w-4"
-	})
-}));
-ToastClose.displayName = Close.displayName;
-var ToastTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Title, {
-	"data-uid": "src/components/ui/toast.tsx:93:3",
-	"data-prohibitions": "[editContent]",
-	ref,
-	className: cn$1("text-sm font-semibold", className),
-	...props
-}));
-ToastTitle.displayName = Title.displayName;
-var ToastDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Description, {
-	"data-uid": "src/components/ui/toast.tsx:101:3",
-	"data-prohibitions": "[editContent]",
-	ref,
-	className: cn$1("text-sm opacity-90", className),
-	...props
-}));
-ToastDescription.displayName = Description.displayName;
-//#endregion
-//#region src/components/ui/toaster.tsx
-function Toaster$2() {
-	const { toasts } = useToast();
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(ToastProvider, {
-		"data-uid": "src/components/ui/toaster.tsx:16:5",
-		"data-prohibitions": "[editContent]",
-		children: [toasts.map(function({ id, title, description, action, ...props }) {
-			return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Toast$1, {
-				"data-uid": "src/components/ui/toaster.tsx:19:11",
-				"data-prohibitions": "[editContent]",
-				...props,
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/ui/toaster.tsx:20:13",
-						"data-prohibitions": "[editContent]",
-						className: "grid gap-1",
-						children: [title && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastTitle, {
-							"data-uid": "src/components/ui/toaster.tsx:21:25",
-							"data-prohibitions": "[editContent]",
-							children: title
-						}), description && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastDescription, {
-							"data-uid": "src/components/ui/toaster.tsx:22:31",
-							"data-prohibitions": "[editContent]",
-							children: description
-						})]
-					}),
-					action,
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastClose, {
-						"data-uid": "src/components/ui/toaster.tsx:25:13",
-						"data-prohibitions": "[editContent]"
-					})
-				]
-			}, id);
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastViewport, {
-			"data-uid": "src/components/ui/toaster.tsx:29:7",
-			"data-prohibitions": "[editContent]"
-		})]
 	});
 }
 //#endregion
@@ -23519,50 +25371,35 @@ var Toaster = ({ ...props }) => {
 };
 //#endregion
 //#region src/App.tsx
+var router = createBrowserRouter([{
+	path: "/",
+	element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Layout, {
+		"data-uid": "src/App.tsx:10:14",
+		"data-prohibitions": "[editContent]"
+	}),
+	children: [{
+		index: true,
+		element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Index, {
+			"data-uid": "src/App.tsx:14:18",
+			"data-prohibitions": "[editContent]"
+		})
+	}, {
+		path: "*",
+		element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(NotFound, {
+			"data-uid": "src/App.tsx:18:18",
+			"data-prohibitions": "[editContent]"
+		})
+	}]
+}]);
 function App() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(BrowserRouter, {
-		"data-uid": "src/App.tsx:10:5",
-		"data-prohibitions": "[]",
-		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Routes, {
-				"data-uid": "src/App.tsx:11:7",
-				"data-prohibitions": "[]",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Route, {
-					"data-uid": "src/App.tsx:12:9",
-					"data-prohibitions": "[]",
-					element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Layout, {
-						"data-uid": "src/App.tsx:12:25",
-						"data-prohibitions": "[editContent]"
-					}),
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
-						"data-uid": "src/App.tsx:13:11",
-						"data-prohibitions": "[editContent]",
-						path: "/",
-						element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Index, {
-							"data-uid": "src/App.tsx:13:36",
-							"data-prohibitions": "[editContent]"
-						})
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
-						"data-uid": "src/App.tsx:14:11",
-						"data-prohibitions": "[editContent]",
-						path: "*",
-						element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(NotFound, {
-							"data-uid": "src/App.tsx:14:36",
-							"data-prohibitions": "[editContent]"
-						})
-					})]
-				})
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Toaster$2, {
-				"data-uid": "src/App.tsx:17:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Toaster, {
-				"data-uid": "src/App.tsx:18:7",
-				"data-prohibitions": "[editContent]"
-			})
-		]
-	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(RouterProvider2, {
+		"data-uid": "src/App.tsx:27:7",
+		"data-prohibitions": "[editContent]",
+		router
+	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Toaster, {
+		"data-uid": "src/App.tsx:28:7",
+		"data-prohibitions": "[editContent]"
+	})] });
 }
 //#endregion
 //#region src/main.tsx
@@ -23572,4 +25409,4 @@ function App() {
 }));
 //#endregion
 
-//# sourceMappingURL=index-DPQaq8Nq.js.map
+//# sourceMappingURL=index-DOcH-qBd.js.map

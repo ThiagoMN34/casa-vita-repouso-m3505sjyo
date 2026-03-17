@@ -1,58 +1,56 @@
-import { Card, CardContent } from '@/components/ui/card'
-import thiagoImg from '@/assets/foto_thiago-c3243.png'
-import luisImg from '@/assets/foto_luis-8c5cf.png'
+import { Card } from '@/components/ui/card'
 
 const team = [
   {
-    name: 'Thiago Pereira',
-    role: 'Sócio Diretor',
+    name: 'Thiago',
+    role: 'Diretor',
+    image: 'https://img.usecurling.com/ppl/large?gender=male&seed=thiago',
     description:
-      'Administrador de Empresas, atua na gestão da Casa Vita focando no bem-estar dos residentes e na excelência do atendimento, garantindo um ambiente acolhedor e eficiente.',
-    image: thiagoImg,
+      'Com vasta experiência na gestão de moradias assistidas, Thiago dedica-se a proporcionar o melhor ambiente, conforto e atendimento acolhedor para todos os residentes da Casa Vita.',
   },
   {
-    name: 'Luis Pereira',
-    role: 'Sócio Diretor',
+    name: 'Luis',
+    role: 'Diretor Clínico',
+    image: 'https://img.usecurling.com/ppl/large?gender=male&seed=luis',
     description:
-      'Médico e responsável técnico pela Casa Vita, garantindo que todos os padrões de saúde e cuidados sejam rigorosamente seguidos com humanização e segurança.',
-    image: luisImg,
+      'Responsável por garantir que todas as necessidades de saúde e bem-estar sejam atendidas com excelência, coordenando nossos Cuidados 24h com muito carinho e empatia.',
   },
 ]
 
 export function Team() {
   return (
-    <section id="equipe" className="py-20 bg-primary/5">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nossa Liderança</h2>
-          <p className="text-lg text-muted-foreground">
-            Uma gestão familiar e profissional dedicada a oferecer o mais alto padrão de qualidade
-            em cuidados para idosos.
+    <section id="team" className="py-24 sm:py-32 bg-white">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-2xl text-center mb-16">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Nossa Equipe
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Conheça os profissionais dedicados que fazem da Casa Vita um verdadeiro lar para quem
+            você ama.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
-          {team.map((member, index) => (
+        <div className="mx-auto max-w-4xl grid grid-cols-1 gap-10 sm:grid-cols-2">
+          {team.map((member) => (
             <Card
-              key={index}
-              className="rounded-2xl overflow-hidden border-none shadow-lg bg-white"
+              key={member.name}
+              className="overflow-hidden border-none shadow-lg rounded-3xl hover:shadow-2xl transition-all duration-300 group"
             >
-              <CardContent className="p-0 flex flex-col sm:flex-row h-full">
-                <div className="sm:w-2/5 p-6 flex justify-center items-center bg-primary/5">
-                  <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-md">
-                    <img
-                      src={member.image}
-                      alt={member.name}
-                      className="w-full h-full object-cover object-center"
-                    />
-                  </div>
+              <div className="aspect-[4/5] relative overflow-hidden">
+                <img
+                  src={member.image}
+                  alt={member.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/30 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100"></div>
+                <div className="absolute bottom-0 left-0 right-0 p-8 transform transition-transform duration-300 translate-y-4 group-hover:translate-y-0">
+                  <h3 className="text-3xl font-bold text-white mb-1">{member.name}</h3>
+                  <p className="text-[#B4D330] font-semibold mb-4 text-lg">{member.role}</p>
+                  <p className="text-gray-200 text-sm leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+                    {member.description}
+                  </p>
                 </div>
-                <div className="sm:w-3/5 p-8 flex flex-col justify-center">
-                  <h3 className="text-2xl font-bold text-foreground mb-1">{member.name}</h3>
-                  <p className="text-primary font-medium mb-4">{member.role}</p>
-                  <p className="text-muted-foreground leading-relaxed">{member.description}</p>
-                </div>
-              </CardContent>
+              </div>
             </Card>
           ))}
         </div>

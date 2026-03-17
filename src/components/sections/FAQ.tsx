@@ -9,59 +9,60 @@ const faqs = [
   {
     question: 'Quais são os horários de visita?',
     answer:
-      'As visitas na Casa Vita são abertas diariamente das 10h às 17h. Acreditamos que o convívio com a família é essencial para o bem-estar e a alegria dos nossos residentes.',
+      'As visitas são abertas diariamente, das 10h às 17h. Acreditamos que a presença e o carinho da família são fundamentais para o bem-estar e a alegria dos nossos residentes.',
   },
   {
-    question: 'Quais serviços estão inclusos na mensalidade?',
+    question: 'O serviço de Cuidados 24h está incluído?',
     answer:
-      'Nossa mensalidade inclui hospedagem, alimentação balanceada com acompanhamento nutricional, cuidados 24h por nossa equipe especializada, lavanderia, além de atividades de recreação e estímulo cognitivo.',
+      'Sim, todos os nossos residentes contam com Cuidados 24h. Nossa equipe multidisciplinar está sempre presente para garantir acompanhamento contínuo e assistência imediata.',
   },
   {
-    question: 'A Casa Vita aceita convênios médicos?',
+    question: 'Como funciona a alimentação na Casa Vita?',
     answer:
-      'Trabalhamos de forma particular, mas auxiliamos os familiares com os trâmites necessários para solicitar o sistema de reembolso junto aos convênios médicos dos residentes, de acordo com o plano de saúde.',
+      'Oferecemos 6 refeições diárias balanceadas e saborosas, elaboradas por nossa equipe de nutrição. O cardápio é adaptado de acordo com as restrições médicas e preferências de cada idoso.',
   },
   {
-    question: 'Como funciona o processo de adaptação?',
+    question: 'Quais atividades são oferecidas aos residentes?',
     answer:
-      'O processo de adaptação é feito de forma gradual e humanizada. Nossa equipe multidisciplinar acompanha de perto os primeiros dias, integrando o residente às atividades e aos demais moradores para que ele se sinta verdadeiramente em casa.',
+      'Promovemos uma programação rica que inclui atividades de estímulo cognitivo, fisioterapia preventiva, musicoterapia, oficinas de artes e momentos de lazer ao ar livre.',
   },
   {
-    question: 'Existe a opção de hospedagem temporária?',
+    question: 'É possível agendar uma visita para conhecer o espaço?',
     answer:
-      'Sim! Oferecemos opções de hospedagem tanto permanente quanto temporária, ideal para situações de pós-operatório, reabilitação ou quando a família precisa viajar e necessita de um local seguro para o idoso.',
+      'Com certeza! Adoramos receber visitantes. Você pode agendar uma visita facilmente através do nosso WhatsApp, escolhendo o melhor dia e horário para vir nos conhecer.',
   },
 ]
 
 export function FAQ() {
   return (
-    <section id="faq" className="py-20 bg-white">
-      <div className="container mx-auto px-4 md:px-6 max-w-4xl">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+    <section id="faq" className="bg-white py-24 sm:py-32">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Perguntas Frequentes
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Tire suas dúvidas sobre o funcionamento e os serviços oferecidos pela Casa Vita.
+          <p className="mt-4 text-lg text-gray-600">
+            Tire suas dúvidas sobre a rotina e os serviços da Casa Vita.
           </p>
         </div>
-
-        <Accordion type="single" collapsible className="w-full space-y-4">
-          {faqs.map((faq, index) => (
-            <AccordionItem
-              key={index}
-              value={`item-${index}`}
-              className="border border-border rounded-xl px-6 bg-primary/5 data-[state=open]:bg-white data-[state=open]:border-primary/20 transition-colors"
-            >
-              <AccordionTrigger className="text-left font-semibold text-lg hover:no-underline py-6">
-                {faq.question}
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground text-base leading-relaxed pb-6">
-                {faq.answer}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-lg border border-gray-100">
+          <Accordion type="single" collapsible className="w-full">
+            {faqs.map((faq, index) => (
+              <AccordionItem
+                key={index}
+                value={`item-${index}`}
+                className="border-b border-gray-100 last:border-0"
+              >
+                <AccordionTrigger className="text-left text-lg font-medium text-gray-900 hover:text-[#B4D330] py-5 transition-colors">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-base text-gray-600 pb-5 leading-relaxed">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
       </div>
     </section>
   )
