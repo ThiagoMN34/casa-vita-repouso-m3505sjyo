@@ -22433,7 +22433,7 @@ function Header$1() {
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
 						"data-uid": "src/components/Header.tsx:56:11",
 						"data-prohibitions": "[]",
-						href: "https://wa.me/5511999999999",
+						href: "https://wa.me/5511973651777",
 						target: "_blank",
 						rel: "noopener noreferrer",
 						onClick: trackWhatsAppClick,
@@ -22460,7 +22460,7 @@ function Header$1() {
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				"data-uid": "src/components/Header.tsx:74:11",
 				"data-prohibitions": "[editContent]",
-				className: "fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10",
+				className: "fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 rounded-l-3xl",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					"data-uid": "src/components/Header.tsx:75:13",
 					"data-prohibitions": "[]",
@@ -22528,7 +22528,7 @@ function Header$1() {
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
 								"data-uid": "src/components/Header.tsx:104:19",
 								"data-prohibitions": "[]",
-								href: "https://wa.me/5511999999999",
+								href: "https://wa.me/5511973651777",
 								target: "_blank",
 								rel: "noopener noreferrer",
 								onClick: () => {
@@ -22711,36 +22711,49 @@ function Footer() {
 												"data-uid": "src/components/Footer.tsx:71:21",
 												"data-prohibitions": "[editContent]"
 											}),
-											"São Paulo - SP"
+											"São Paulo - SP, 04104-000"
 										]
 									})]
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
 									"data-uid": "src/components/Footer.tsx:75:17",
 									"data-prohibitions": "[]",
-									className: "flex items-center gap-3",
+									className: "flex items-start gap-3",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
 										"data-uid": "src/components/Footer.tsx:76:19",
 										"data-prohibitions": "[editContent]",
-										className: "h-5 w-5 text-[#B4D330] shrink-0"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										className: "h-5 w-5 text-[#B4D330] shrink-0 mt-0.5"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										"data-uid": "src/components/Footer.tsx:77:19",
 										"data-prohibitions": "[]",
-										href: "tel:+5511999999999",
-										className: "text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors",
-										children: "(11) 99999-9999"
+										className: "flex flex-col gap-1",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+											"data-uid": "src/components/Footer.tsx:78:21",
+											"data-prohibitions": "[]",
+											href: "tel:+551132536311",
+											className: "text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors",
+											children: "(11) 3253-6311"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+											"data-uid": "src/components/Footer.tsx:84:21",
+											"data-prohibitions": "[]",
+											href: "https://wa.me/5511973651777",
+											target: "_blank",
+											rel: "noopener noreferrer",
+											className: "text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors",
+											children: "(11) 97365-1777 (WhatsApp)"
+										})]
 									})]
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
-									"data-uid": "src/components/Footer.tsx:84:17",
+									"data-uid": "src/components/Footer.tsx:94:17",
 									"data-prohibitions": "[]",
 									className: "flex items-center gap-3",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Mail, {
-										"data-uid": "src/components/Footer.tsx:85:19",
+										"data-uid": "src/components/Footer.tsx:95:19",
 										"data-prohibitions": "[editContent]",
 										className: "h-5 w-5 text-[#B4D330] shrink-0"
 									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-										"data-uid": "src/components/Footer.tsx:86:19",
+										"data-uid": "src/components/Footer.tsx:96:19",
 										"data-prohibitions": "[]",
 										href: "mailto:contato@casavita.com.br",
 										className: "text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors",
@@ -22752,11 +22765,11 @@ function Footer() {
 					})]
 				})]
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				"data-uid": "src/components/Footer.tsx:97:9",
+				"data-uid": "src/components/Footer.tsx:107:9",
 				"data-prohibitions": "[editContent]",
 				className: "mt-16 border-t border-gray-100 pt-8 sm:mt-20 lg:mt-24",
 				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-					"data-uid": "src/components/Footer.tsx:98:11",
+					"data-uid": "src/components/Footer.tsx:108:11",
 					"data-prohibitions": "[editContent]",
 					className: "text-xs leading-5 text-gray-500 text-center",
 					children: [
@@ -22775,7 +22788,7 @@ function FloatingWhatsApp() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
 		"data-uid": "src/components/FloatingWhatsApp.tsx:6:5",
 		"data-prohibitions": "[]",
-		href: "https://wa.me/5511999999999",
+		href: "https://wa.me/5511973651777",
 		target: "_blank",
 		rel: "noopener noreferrer",
 		onClick: trackWhatsAppClick,
@@ -22872,7 +22885,7 @@ function Hero() {
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
 								"data-uid": "src/components/sections/Hero.tsx:20:15",
 								"data-prohibitions": "[]",
-								href: "https://wa.me/5511999999999",
+								href: "https://wa.me/5511973651777",
 								target: "_blank",
 								rel: "noopener noreferrer",
 								onClick: trackWhatsAppClick,
@@ -22912,11 +22925,15 @@ function Hero() {
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
 							"data-uid": "src/components/sections/Hero.tsx:44:15",
 							"data-prohibitions": "[editContent]",
-							src: "https://img.usecurling.com/p/800/600?q=happy%20seniors%20smiling",
+							src: "/poster.jpg",
+							onError: (e) => {
+								e.currentTarget.onerror = null;
+								e.currentTarget.src = "https://img.usecurling.com/p/800/600?q=joyful%20seniors";
+							},
 							alt: "Idosos felizes e sorridentes na Casa Vita",
 							className: "w-full h-[500px] object-cover"
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							"data-uid": "src/components/sections/Hero.tsx:49:15",
+							"data-uid": "src/components/sections/Hero.tsx:53:15",
 							"data-prohibitions": "[editContent]",
 							className: "absolute inset-0 rounded-3xl ring-1 ring-inset ring-gray-900/10"
 						})]
@@ -23195,83 +23212,89 @@ function Services() {
 var team = [{
 	name: "Thiago",
 	role: "Diretor",
-	image: "https://img.usecurling.com/ppl/large?gender=male&seed=thiago",
+	image: "/thiago.jpg",
+	fallback: "https://img.usecurling.com/ppl/large?gender=male&seed=thiago",
 	description: "Com vasta experiência na gestão de moradias assistidas, Thiago dedica-se a proporcionar o melhor ambiente, conforto e atendimento acolhedor para todos os residentes da Casa Vita."
 }, {
 	name: "Luis",
 	role: "Diretor Clínico",
-	image: "https://img.usecurling.com/ppl/large?gender=male&seed=luis",
+	image: "/luis.jpg",
+	fallback: "https://img.usecurling.com/ppl/large?gender=male&seed=luis",
 	description: "Responsável por garantir que todas as necessidades de saúde e bem-estar sejam atendidas com excelência, coordenando nossos Cuidados 24h com muito carinho e empatia."
 }];
 function Team() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/Team.tsx:22:5",
+		"data-uid": "src/components/sections/Team.tsx:24:5",
 		"data-prohibitions": "[editContent]",
 		id: "team",
 		className: "py-24 sm:py-32 bg-white",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/Team.tsx:23:7",
+			"data-uid": "src/components/sections/Team.tsx:25:7",
 			"data-prohibitions": "[editContent]",
 			className: "container mx-auto px-4 sm:px-6 lg:px-8",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/Team.tsx:24:9",
+				"data-uid": "src/components/sections/Team.tsx:26:9",
 				"data-prohibitions": "[]",
 				className: "mx-auto max-w-2xl text-center mb-16",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-					"data-uid": "src/components/sections/Team.tsx:25:11",
+					"data-uid": "src/components/sections/Team.tsx:27:11",
 					"data-prohibitions": "[]",
 					className: "text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl",
 					children: "Nossa Equipe"
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					"data-uid": "src/components/sections/Team.tsx:28:11",
+					"data-uid": "src/components/sections/Team.tsx:30:11",
 					"data-prohibitions": "[]",
 					className: "mt-4 text-lg text-gray-600",
 					children: "Conheça os profissionais dedicados que fazem da Casa Vita um verdadeiro lar para quem você ama."
 				})]
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				"data-uid": "src/components/sections/Team.tsx:33:9",
+				"data-uid": "src/components/sections/Team.tsx:35:9",
 				"data-prohibitions": "[editContent]",
 				className: "mx-auto max-w-4xl grid grid-cols-1 gap-10 sm:grid-cols-2",
 				children: team.map((member) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card, {
-					"data-uid": "src/components/sections/Team.tsx:35:13",
+					"data-uid": "src/components/sections/Team.tsx:37:13",
 					"data-prohibitions": "[editContent]",
 					className: "overflow-hidden border-none shadow-lg rounded-3xl hover:shadow-2xl transition-all duration-300 group",
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/sections/Team.tsx:39:15",
+						"data-uid": "src/components/sections/Team.tsx:41:15",
 						"data-prohibitions": "[editContent]",
-						className: "aspect-[4/5] relative overflow-hidden",
+						className: "aspect-[4/5] relative overflow-hidden rounded-3xl",
 						children: [
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-								"data-uid": "src/components/sections/Team.tsx:40:17",
+								"data-uid": "src/components/sections/Team.tsx:42:17",
 								"data-prohibitions": "[editContent]",
 								src: member.image,
+								onError: (e) => {
+									e.currentTarget.onerror = null;
+									e.currentTarget.src = member.fallback;
+								},
 								alt: member.name,
 								className: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								"data-uid": "src/components/sections/Team.tsx:45:17",
+								"data-uid": "src/components/sections/Team.tsx:51:17",
 								"data-prohibitions": "[]",
 								className: "absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/30 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100"
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								"data-uid": "src/components/sections/Team.tsx:46:17",
+								"data-uid": "src/components/sections/Team.tsx:52:17",
 								"data-prohibitions": "[editContent]",
 								className: "absolute bottom-0 left-0 right-0 p-8 transform transition-transform duration-300 translate-y-4 group-hover:translate-y-0",
 								children: [
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-										"data-uid": "src/components/sections/Team.tsx:47:19",
+										"data-uid": "src/components/sections/Team.tsx:53:19",
 										"data-prohibitions": "[editContent]",
 										className: "text-3xl font-bold text-white mb-1",
 										children: member.name
 									}),
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-										"data-uid": "src/components/sections/Team.tsx:48:19",
+										"data-uid": "src/components/sections/Team.tsx:54:19",
 										"data-prohibitions": "[editContent]",
 										className: "text-[#B4D330] font-semibold mb-4 text-lg",
 										children: member.role
 									}),
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-										"data-uid": "src/components/sections/Team.tsx:49:19",
+										"data-uid": "src/components/sections/Team.tsx:55:19",
 										"data-prohibitions": "[editContent]",
 										className: "text-gray-200 text-sm leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100",
 										children: member.description
@@ -24210,7 +24233,7 @@ function FAQ() {
 		"data-uid": "src/components/sections/FAQ.tsx:38:5",
 		"data-prohibitions": "[editContent]",
 		id: "faq",
-		className: "bg-white py-24 sm:py-32",
+		className: "bg-gray-50/50 py-24 sm:py-32",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 			"data-uid": "src/components/sections/FAQ.tsx:39:7",
 			"data-prohibitions": "[editContent]",
@@ -24268,7 +24291,7 @@ function CTA() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
 		"data-uid": "src/components/sections/CTA.tsx:7:5",
 		"data-prohibitions": "[]",
-		className: "bg-[#B4D330] py-16 sm:py-24 relative overflow-hidden",
+		className: "bg-[#B4D330] py-16 sm:py-24 relative overflow-hidden rounded-t-[3rem]",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 			"data-uid": "src/components/sections/CTA.tsx:8:7",
 			"data-prohibitions": "[]",
@@ -24301,7 +24324,7 @@ function CTA() {
 						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
 							"data-uid": "src/components/sections/CTA.tsx:19:13",
 							"data-prohibitions": "[]",
-							href: "https://wa.me/5511999999999",
+							href: "https://wa.me/5511973651777",
 							target: "_blank",
 							rel: "noopener noreferrer",
 							onClick: trackWhatsAppClick,
@@ -25409,4 +25432,4 @@ function App() {
 }));
 //#endregion
 
-//# sourceMappingURL=index-DOcH-qBd.js.map
+//# sourceMappingURL=index-CJSjekTU.js.map

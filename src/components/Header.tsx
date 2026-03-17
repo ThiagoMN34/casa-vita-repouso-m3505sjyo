@@ -54,7 +54,7 @@ export function Header() {
         </div>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
           <a
-            href="https://wa.me/5511999999999"
+            href="https://wa.me/5511973651777"
             target="_blank"
             rel="noopener noreferrer"
             onClick={trackWhatsAppClick}
@@ -71,7 +71,7 @@ export function Header() {
             className="fixed inset-0 z-50 bg-gray-900/80 backdrop-blur-sm"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
+          <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 rounded-l-3xl">
             <div className="flex items-center justify-between">
               <a href="#" className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
                 <span className="sr-only">Casa Vita</span>
@@ -102,7 +102,7 @@ export function Header() {
                 </div>
                 <div className="py-6">
                   <a
-                    href="https://wa.me/5511999999999"
+                    href="https://wa.me/5511973651777"
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => {

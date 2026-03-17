@@ -69,17 +69,27 @@ export function Footer() {
                   <span className="text-sm leading-6 text-gray-600">
                     Rua Correia Dias, 134 - Paraíso
                     <br />
-                    São Paulo - SP
+                    São Paulo - SP, 04104-000
                   </span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-[#B4D330] shrink-0" />
-                  <a
-                    href="tel:+5511999999999"
-                    className="text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors"
-                  >
-                    (11) 99999-9999
-                  </a>
+                <li className="flex items-start gap-3">
+                  <Phone className="h-5 w-5 text-[#B4D330] shrink-0 mt-0.5" />
+                  <div className="flex flex-col gap-1">
+                    <a
+                      href="tel:+551132536311"
+                      className="text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors"
+                    >
+                      (11) 3253-6311
+                    </a>
+                    <a
+                      href="https://wa.me/5511973651777"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm leading-6 text-gray-600 hover:text-[#B4D330] transition-colors"
+                    >
+                      (11) 97365-1777 (WhatsApp)
+                    </a>
+                  </div>
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail className="h-5 w-5 text-[#B4D330] shrink-0" />

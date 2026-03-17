@@ -4,7 +4,7 @@ import { trackWhatsAppClick } from '@/lib/tracking'
 export function FloatingWhatsApp() {
   return (
     <a
-      href="https://wa.me/5511999999999"
+      href="https://wa.me/5511973651777"
       target="_blank"
       rel="noopener noreferrer"
       onClick={trackWhatsAppClick}

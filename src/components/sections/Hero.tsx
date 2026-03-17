@@ -18,7 +18,7 @@ export function Hero() {
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-4 sm:gap-6">
               <a
-                href="https://wa.me/5511999999999"
+                href="https://wa.me/5511973651777"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={trackWhatsAppClick}
@@ -42,7 +42,11 @@ export function Hero() {
             <div className="absolute -top-4 -right-4 w-72 h-72 bg-[#B4D330]/20 rounded-full blur-3xl -z-10 transition-all duration-500 group-hover:bg-[#B4D330]/30" />
             <div className="relative rounded-3xl overflow-hidden shadow-2xl transition-transform duration-500 hover:scale-[1.02]">
               <img
-                src="https://img.usecurling.com/p/800/600?q=happy%20seniors%20smiling"
+                src="/poster.jpg"
+                onError={(e) => {
+                  e.currentTarget.onerror = null
+                  e.currentTarget.src = 'https://img.usecurling.com/p/800/600?q=joyful%20seniors'
+                }}
                 alt="Idosos felizes e sorridentes na Casa Vita"
                 className="w-full h-[500px] object-cover"
               />

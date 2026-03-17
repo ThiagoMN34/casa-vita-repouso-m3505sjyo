@@ -4,7 +4,7 @@ import { MessageCircle } from 'lucide-react'
 
 export function CTA() {
   return (
-    <section className="bg-[#B4D330] py-16 sm:py-24 relative overflow-hidden">
+    <section className="bg-[#B4D330] py-16 sm:py-24 relative overflow-hidden rounded-t-[3rem]">
       <div className="absolute inset-0 opacity-10 bg-[url('https://img.usecurling.com/p/800/600?q=pattern')] bg-cover mix-blend-overlay"></div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="mx-auto max-w-3xl text-center">
@@ -17,7 +17,7 @@ export function CTA() {
           </p>
           <div className="mt-10 flex items-center justify-center">
             <a
-              href="https://wa.me/5511999999999"
+              href="https://wa.me/5511973651777"
               target="_blank"
               rel="noopener noreferrer"
               onClick={trackWhatsAppClick}

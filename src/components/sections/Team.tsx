@@ -4,14 +4,16 @@ const team = [
   {
     name: 'Thiago',
     role: 'Diretor',
-    image: 'https://img.usecurling.com/ppl/large?gender=male&seed=thiago',
+    image: '/thiago.jpg',
+    fallback: 'https://img.usecurling.com/ppl/large?gender=male&seed=thiago',
     description:
       'Com vasta experiência na gestão de moradias assistidas, Thiago dedica-se a proporcionar o melhor ambiente, conforto e atendimento acolhedor para todos os residentes da Casa Vita.',
   },
   {
     name: 'Luis',
     role: 'Diretor Clínico',
-    image: 'https://img.usecurling.com/ppl/large?gender=male&seed=luis',
+    image: '/luis.jpg',
+    fallback: 'https://img.usecurling.com/ppl/large?gender=male&seed=luis',
     description:
       'Responsável por garantir que todas as necessidades de saúde e bem-estar sejam atendidas com excelência, coordenando nossos Cuidados 24h com muito carinho e empatia.',
   },
@@ -36,9 +38,13 @@ export function Team() {
               key={member.name}
               className="overflow-hidden border-none shadow-lg rounded-3xl hover:shadow-2xl transition-all duration-300 group"
             >
-              <div className="aspect-[4/5] relative overflow-hidden">
+              <div className="aspect-[4/5] relative overflow-hidden rounded-3xl">
                 <img
                   src={member.image}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null
+                    e.currentTarget.src = member.fallback
+                  }}
                   alt={member.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
