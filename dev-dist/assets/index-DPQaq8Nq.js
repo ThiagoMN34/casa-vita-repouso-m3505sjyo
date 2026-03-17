@@ -17274,32 +17274,306 @@ function useViewTransitionState(to, { relative } = {}) {
 	return matchPath(path.pathname, nextPath) != null || matchPath(path.pathname, currentPath) != null;
 }
 //#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-compose-refs@1.1.2_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-compose-refs/dist/index.mjs
-var import_client = require_client();
-function setRef(ref, value) {
-	if (typeof ref === "function") return ref(value);
-	else if (ref !== null && ref !== void 0) ref.current = value;
-}
-function composeRefs(...refs) {
-	return (node) => {
-		let hasCleanup = false;
-		const cleanups = refs.map((ref) => {
-			const cleanup = setRef(ref, node);
-			if (!hasCleanup && typeof cleanup == "function") hasCleanup = true;
-			return cleanup;
-		});
-		if (hasCleanup) return () => {
-			for (let i = 0; i < cleanups.length; i++) {
-				const cleanup = cleanups[i];
-				if (typeof cleanup == "function") cleanup();
-				else setRef(refs[i], null);
-			}
-		};
-	};
-}
-function useComposedRefs(...refs) {
-	return import_react.useCallback(composeRefs(...refs), refs);
-}
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var mergeClasses = (...classes) => classes.filter((className, index, array) => {
+	return Boolean(className) && className.trim() !== "" && array.indexOf(className) === index;
+}).join(" ").trim();
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/toKebabCase.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/toCamelCase.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var toCamelCase = (string) => string.replace(/^([A-Z])|[\s-_]+(\w)/g, (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase());
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/toPascalCase.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var toPascalCase = (string) => {
+	const camelCase = toCamelCase(string);
+	return camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
+};
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/defaultAttributes.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var defaultAttributes = {
+	xmlns: "http://www.w3.org/2000/svg",
+	width: 24,
+	height: 24,
+	viewBox: "0 0 24 24",
+	fill: "none",
+	stroke: "currentColor",
+	strokeWidth: 2,
+	strokeLinecap: "round",
+	strokeLinejoin: "round"
+};
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/hasA11yProp.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var hasA11yProp = (props) => {
+	for (const prop in props) if (prop.startsWith("aria-") || prop === "role" || prop === "title") return true;
+	return false;
+};
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/Icon.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Icon = (0, import_react.forwardRef)(({ color = "currentColor", size = 24, strokeWidth = 2, absoluteStrokeWidth, className = "", children, iconNode, ...rest }, ref) => (0, import_react.createElement)("svg", {
+	ref,
+	...defaultAttributes,
+	width: size,
+	height: size,
+	stroke: color,
+	strokeWidth: absoluteStrokeWidth ? Number(strokeWidth) * 24 / Number(size) : strokeWidth,
+	className: mergeClasses("lucide", className),
+	...!children && !hasA11yProp(rest) && { "aria-hidden": "true" },
+	...rest
+}, [...iconNode.map(([tag, attrs]) => (0, import_react.createElement)(tag, attrs)), ...Array.isArray(children) ? children : [children]]));
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/createLucideIcon.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var createLucideIcon = (iconName, iconNode) => {
+	const Component = (0, import_react.forwardRef)(({ className, ...props }, ref) => (0, import_react.createElement)(Icon, {
+		ref,
+		iconNode,
+		className: mergeClasses(`lucide-${toKebabCase(toPascalCase(iconName))}`, `lucide-${iconName}`, className),
+		...props
+	}));
+	Component.displayName = toPascalCase(iconName);
+	return Component;
+};
+var Activity = createLucideIcon("activity", [["path", {
+	d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",
+	key: "169zse"
+}]]);
+var ArrowRight = createLucideIcon("arrow-right", [["path", {
+	d: "M5 12h14",
+	key: "1ays0h"
+}], ["path", {
+	d: "m12 5 7 7-7 7",
+	key: "xquz4c"
+}]]);
+var Calendar = createLucideIcon("calendar", [
+	["path", {
+		d: "M8 2v4",
+		key: "1cmpym"
+	}],
+	["path", {
+		d: "M16 2v4",
+		key: "4m81vk"
+	}],
+	["rect", {
+		width: "18",
+		height: "18",
+		x: "3",
+		y: "4",
+		rx: "2",
+		key: "1hopcy"
+	}],
+	["path", {
+		d: "M3 10h18",
+		key: "8toen8"
+	}]
+]);
+var Check = createLucideIcon("check", [["path", {
+	d: "M20 6 9 17l-5-5",
+	key: "1gmf2c"
+}]]);
+var ChevronDown = createLucideIcon("chevron-down", [["path", {
+	d: "m6 9 6 6 6-6",
+	key: "qrunsl"
+}]]);
+var Facebook = createLucideIcon("facebook", [["path", {
+	d: "M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z",
+	key: "1jg4f8"
+}]]);
+var HeartPulse = createLucideIcon("heart-pulse", [["path", {
+	d: "M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5",
+	key: "mvr1a0"
+}], ["path", {
+	d: "M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27",
+	key: "auskq0"
+}]]);
+var Heart = createLucideIcon("heart", [["path", {
+	d: "M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5",
+	key: "mvr1a0"
+}]]);
+var House = createLucideIcon("house", [["path", {
+	d: "M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8",
+	key: "5wwlr5"
+}], ["path", {
+	d: "M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
+	key: "r6nss1"
+}]]);
+var Instagram = createLucideIcon("instagram", [
+	["rect", {
+		width: "20",
+		height: "20",
+		x: "2",
+		y: "2",
+		rx: "5",
+		ry: "5",
+		key: "2e1cvw"
+	}],
+	["path", {
+		d: "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z",
+		key: "9exkf1"
+	}],
+	["line", {
+		x1: "17.5",
+		x2: "17.51",
+		y1: "6.5",
+		y2: "6.5",
+		key: "r4j83e"
+	}]
+]);
+var Mail = createLucideIcon("mail", [["path", {
+	d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7",
+	key: "132q7q"
+}], ["rect", {
+	x: "2",
+	y: "4",
+	width: "20",
+	height: "16",
+	rx: "2",
+	key: "izxlao"
+}]]);
+var MapPin = createLucideIcon("map-pin", [["path", {
+	d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
+	key: "1r0f0z"
+}], ["circle", {
+	cx: "12",
+	cy: "10",
+	r: "3",
+	key: "ilqhr7"
+}]]);
+var Menu = createLucideIcon("menu", [
+	["path", {
+		d: "M4 5h16",
+		key: "1tepv9"
+	}],
+	["path", {
+		d: "M4 12h16",
+		key: "1lakjw"
+	}],
+	["path", {
+		d: "M4 19h16",
+		key: "1djgab"
+	}]
+]);
+var MessageCircle = createLucideIcon("message-circle", [["path", {
+	d: "M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719",
+	key: "1sd12s"
+}]]);
+var Phone = createLucideIcon("phone", [["path", {
+	d: "M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384",
+	key: "9njp5v"
+}]]);
+var Stethoscope = createLucideIcon("stethoscope", [
+	["path", {
+		d: "M11 2v2",
+		key: "1539x4"
+	}],
+	["path", {
+		d: "M5 2v2",
+		key: "1yf1q8"
+	}],
+	["path", {
+		d: "M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1",
+		key: "rb5t3r"
+	}],
+	["path", {
+		d: "M8 15a6 6 0 0 0 12 0v-3",
+		key: "x18d4x"
+	}],
+	["circle", {
+		cx: "20",
+		cy: "10",
+		r: "2",
+		key: "ts1r5v"
+	}]
+]);
+var Users = createLucideIcon("users", [
+	["path", {
+		d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2",
+		key: "1yyitq"
+	}],
+	["path", {
+		d: "M16 3.128a4 4 0 0 1 0 7.744",
+		key: "16gr8j"
+	}],
+	["path", {
+		d: "M22 21v-2a4 4 0 0 0-3-3.87",
+		key: "kshegd"
+	}],
+	["circle", {
+		cx: "9",
+		cy: "7",
+		r: "4",
+		key: "nufk8"
+	}]
+]);
+var Utensils = createLucideIcon("utensils", [
+	["path", {
+		d: "M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2",
+		key: "cjf0a3"
+	}],
+	["path", {
+		d: "M7 2v20",
+		key: "1473qp"
+	}],
+	["path", {
+		d: "M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7",
+		key: "j28e5"
+	}]
+]);
+var X = createLucideIcon("x", [["path", {
+	d: "M18 6 6 18",
+	key: "1bl5f8"
+}], ["path", {
+	d: "m6 6 12 12",
+	key: "d8bk6v"
+}]]);
 //#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/react@19.2.4/node_modules/react/cjs/react-jsx-runtime.development.js
 /**
@@ -17500,102 +17774,494 @@ var require_react_jsx_runtime_development = /* @__PURE__ */ __commonJSMin(((expo
 	})();
 }));
 //#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-slot@1.2.4_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-slot/dist/index.mjs
-var import_jsx_runtime = (/* @__PURE__ */ __commonJSMin(((exports, module) => {
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/react@19.2.4/node_modules/react/jsx-runtime.js
+var require_jsx_runtime = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = require_react_jsx_runtime_development();
-})))();
-var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-var use = import_react[" use ".trim().toString()];
-function isPromiseLike(value) {
-	return typeof value === "object" && value !== null && "then" in value;
-}
-function isLazyComponent(element) {
-	return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
-}
-/* @__NO_SIDE_EFFECTS__ */
-function createSlot$1(ownerName) {
-	const SlotClone = /* @__PURE__ */ createSlotClone$1(ownerName);
-	const Slot2 = import_react.forwardRef((props, forwardedRef) => {
-		let { children, ...slotProps } = props;
-		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
-		const childrenArray = import_react.Children.toArray(children);
-		const slottable = childrenArray.find(isSlottable$1);
-		if (slottable) {
-			const newElement = slottable.props.children;
-			const newChildren = childrenArray.map((child) => {
-				if (child === slottable) {
-					if (import_react.Children.count(newElement) > 1) return import_react.Children.only(null);
-					return import_react.isValidElement(newElement) ? newElement.props.children : null;
-				} else return child;
-			});
-			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
-				...slotProps,
-				ref: forwardedRef,
-				children: import_react.isValidElement(newElement) ? import_react.cloneElement(newElement, void 0, newChildren) : null
-			});
-		}
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
-			...slotProps,
-			ref: forwardedRef,
-			children
-		});
-	});
-	Slot2.displayName = `${ownerName}.Slot`;
-	return Slot2;
-}
-var Slot = /* @__PURE__ */ createSlot$1("Slot");
-/* @__NO_SIDE_EFFECTS__ */
-function createSlotClone$1(ownerName) {
-	const SlotClone = import_react.forwardRef((props, forwardedRef) => {
-		let { children, ...slotProps } = props;
-		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
-		if (import_react.isValidElement(children)) {
-			const childrenRef = getElementRef$2(children);
-			const props2 = mergeProps$1(slotProps, children.props);
-			if (children.type !== import_react.Fragment) props2.ref = forwardedRef ? composeRefs(forwardedRef, childrenRef) : childrenRef;
-			return import_react.cloneElement(children, props2);
-		}
-		return import_react.Children.count(children) > 1 ? import_react.Children.only(null) : null;
-	});
-	SlotClone.displayName = `${ownerName}.SlotClone`;
-	return SlotClone;
-}
-var SLOTTABLE_IDENTIFIER$1 = Symbol("radix.slottable");
-function isSlottable$1(child) {
-	return import_react.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER$1;
-}
-function mergeProps$1(slotProps, childProps) {
-	const overrideProps = { ...childProps };
-	for (const propName in childProps) {
-		const slotPropValue = slotProps[propName];
-		const childPropValue = childProps[propName];
-		if (/^on[A-Z]/.test(propName)) {
-			if (slotPropValue && childPropValue) overrideProps[propName] = (...args) => {
-				const result = childPropValue(...args);
-				slotPropValue(...args);
-				return result;
-			};
-			else if (slotPropValue) overrideProps[propName] = slotPropValue;
-		} else if (propName === "style") overrideProps[propName] = {
-			...slotPropValue,
-			...childPropValue
+}));
+//#endregion
+//#region src/components/Header.tsx
+var import_client = require_client();
+var import_jsx_runtime = require_jsx_runtime();
+function Header$1() {
+	const [isScrolled, setIsScrolled] = (0, import_react.useState)(false);
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = (0, import_react.useState)(false);
+	(0, import_react.useEffect)(() => {
+		const handleScroll = () => {
+			setIsScrolled(window.scrollY > 20);
 		};
-		else if (propName === "className") overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
-	}
-	return {
-		...slotProps,
-		...overrideProps
-	};
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
+	const navLinks = [
+		{
+			name: "Início",
+			href: "#"
+		},
+		{
+			name: "Sobre Nós",
+			href: "#sobre"
+		},
+		{
+			name: "Serviços",
+			href: "#servicos"
+		},
+		{
+			name: "Equipe",
+			href: "#equipe"
+		},
+		{
+			name: "Perguntas Frequentes",
+			href: "#faq"
+		}
+	];
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", {
+		"data-uid": "src/components/Header.tsx:25:5",
+		"data-prohibitions": "[editContent]",
+		className: `fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm py-2" : "bg-white py-4"}`,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			"data-uid": "src/components/Header.tsx:30:7",
+			"data-prohibitions": "[editContent]",
+			className: "container mx-auto px-4 md:px-6",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/Header.tsx:31:9",
+				"data-prohibitions": "[editContent]",
+				className: "flex items-center justify-between",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+						"data-uid": "src/components/Header.tsx:32:11",
+						"data-prohibitions": "[]",
+						href: "#",
+						className: "flex items-center gap-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+							"data-uid": "src/components/Header.tsx:33:13",
+							"data-prohibitions": "[editContent]",
+							src: "https://img.usecurling.com/i?q=leaf&shape=lineal-color&color=green",
+							alt: "Casa Vita Logo",
+							className: "h-10 w-10 object-contain"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							"data-uid": "src/components/Header.tsx:38:13",
+							"data-prohibitions": "[]",
+							className: "text-xl font-bold text-primary",
+							children: "Casa Vita"
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("nav", {
+						"data-uid": "src/components/Header.tsx:42:11",
+						"data-prohibitions": "[editContent]",
+						className: "hidden lg:flex items-center gap-8",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
+							"data-uid": "src/components/Header.tsx:43:13",
+							"data-prohibitions": "[editContent]",
+							className: "flex items-center gap-6",
+							children: navLinks.map((link) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+								"data-uid": "src/components/Header.tsx:45:17",
+								"data-prohibitions": "[editContent]",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+									"data-uid": "src/components/Header.tsx:46:19",
+									"data-prohibitions": "[editContent]",
+									href: link.href,
+									className: "text-sm font-medium text-muted-foreground hover:text-primary transition-colors",
+									children: link.name
+								})
+							}, link.name))
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							"data-uid": "src/components/Header.tsx:55:13",
+							"data-prohibitions": "[]",
+							className: "flex items-center gap-4 text-sm",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								"data-uid": "src/components/Header.tsx:56:15",
+								"data-prohibitions": "[]",
+								className: "flex items-center gap-2 text-muted-foreground",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
+									"data-uid": "src/components/Header.tsx:57:17",
+									"data-prohibitions": "[editContent]",
+									className: "h-4 w-4 text-primary"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									"data-uid": "src/components/Header.tsx:58:17",
+									"data-prohibitions": "[]",
+									children: "(11) 5081-5421"
+								})]
+							})
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+						"data-uid": "src/components/Header.tsx:64:11",
+						"data-prohibitions": "[editContent]",
+						className: "lg:hidden p-2 text-muted-foreground hover:text-primary transition-colors",
+						onClick: () => setIsMobileMenuOpen(!isMobileMenuOpen),
+						children: isMobileMenuOpen ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, {
+							"data-uid": "src/components/Header.tsx:68:33",
+							"data-prohibitions": "[editContent]",
+							className: "h-6 w-6"
+						}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Menu, {
+							"data-uid": "src/components/Header.tsx:68:61",
+							"data-prohibitions": "[editContent]",
+							className: "h-6 w-6"
+						})
+					})
+				]
+			})
+		}), isMobileMenuOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/Header.tsx:75:9",
+			"data-prohibitions": "[editContent]",
+			className: "lg:hidden absolute top-full left-0 w-full bg-white border-b border-border py-4 px-4 shadow-lg animate-fade-in-down",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
+				"data-uid": "src/components/Header.tsx:76:11",
+				"data-prohibitions": "[editContent]",
+				className: "flex flex-col gap-4",
+				children: navLinks.map((link) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+					"data-uid": "src/components/Header.tsx:78:15",
+					"data-prohibitions": "[editContent]",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+						"data-uid": "src/components/Header.tsx:79:17",
+						"data-prohibitions": "[editContent]",
+						href: link.href,
+						className: "block text-base font-medium text-foreground hover:text-primary transition-colors",
+						onClick: () => setIsMobileMenuOpen(false),
+						children: link.name
+					})
+				}, link.name))
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/Header.tsx:89:11",
+				"data-prohibitions": "[]",
+				className: "mt-6 pt-6 border-t border-border flex flex-col gap-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/Header.tsx:90:13",
+					"data-prohibitions": "[]",
+					className: "flex items-center gap-2 text-muted-foreground",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
+						"data-uid": "src/components/Header.tsx:91:15",
+						"data-prohibitions": "[editContent]",
+						className: "h-5 w-5 text-primary"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						"data-uid": "src/components/Header.tsx:92:15",
+						"data-prohibitions": "[]",
+						children: "(11) 5081-5421"
+					})]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/Header.tsx:94:13",
+					"data-prohibitions": "[]",
+					className: "flex items-start gap-2 text-muted-foreground",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MapPin, {
+						"data-uid": "src/components/Header.tsx:95:15",
+						"data-prohibitions": "[editContent]",
+						className: "h-5 w-5 text-primary shrink-0"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						"data-uid": "src/components/Header.tsx:96:15",
+						"data-prohibitions": "[]",
+						className: "text-sm",
+						children: "Rua Doutor Diogo de Faria, 753 - Vila Clementino, São Paulo - SP"
+					})]
+				})]
+			})]
+		})]
+	});
 }
-function getElementRef$2(element) {
-	let getter = Object.getOwnPropertyDescriptor(element.props, "ref")?.get;
-	let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
-	if (mayWarn) return element.ref;
-	getter = Object.getOwnPropertyDescriptor(element, "ref")?.get;
-	mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
-	if (mayWarn) return element.props.ref;
-	return element.props.ref || element.ref;
+//#endregion
+//#region src/components/Footer.tsx
+function Footer() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("footer", {
+		"data-uid": "src/components/Footer.tsx:5:5",
+		"data-prohibitions": "[editContent]",
+		className: "bg-primary/5 pt-16 pb-8 border-t border-primary/10",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/Footer.tsx:6:7",
+			"data-prohibitions": "[editContent]",
+			className: "container mx-auto px-4 md:px-6",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/Footer.tsx:7:9",
+				"data-prohibitions": "[editContent]",
+				className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/Footer.tsx:9:11",
+						"data-prohibitions": "[]",
+						className: "flex flex-col gap-4",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+								"data-uid": "src/components/Footer.tsx:10:13",
+								"data-prohibitions": "[]",
+								href: "#",
+								className: "flex items-center gap-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+									"data-uid": "src/components/Footer.tsx:11:15",
+									"data-prohibitions": "[editContent]",
+									src: "https://img.usecurling.com/i?q=leaf&shape=lineal-color&color=green",
+									alt: "Casa Vita Logo",
+									className: "h-10 w-10 object-contain"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									"data-uid": "src/components/Footer.tsx:16:15",
+									"data-prohibitions": "[]",
+									className: "text-xl font-bold text-primary",
+									children: "Casa Vita"
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								"data-uid": "src/components/Footer.tsx:18:13",
+								"data-prohibitions": "[]",
+								className: "text-muted-foreground text-sm leading-relaxed",
+								children: "Um ambiente acolhedor, com infraestrutura moderna e equipe especializada para garantir qualidade de vida, segurança e bem-estar aos nossos residentes."
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								"data-uid": "src/components/Footer.tsx:22:13",
+								"data-prohibitions": "[]",
+								className: "flex gap-4 mt-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+									"data-uid": "src/components/Footer.tsx:23:15",
+									"data-prohibitions": "[]",
+									href: "#",
+									className: "h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Instagram, {
+										"data-uid": "src/components/Footer.tsx:27:17",
+										"data-prohibitions": "[editContent]",
+										className: "h-5 w-5"
+									})
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+									"data-uid": "src/components/Footer.tsx:29:15",
+									"data-prohibitions": "[]",
+									href: "#",
+									className: "h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-colors",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Facebook, {
+										"data-uid": "src/components/Footer.tsx:33:17",
+										"data-prohibitions": "[editContent]",
+										className: "h-5 w-5"
+									})
+								})]
+							})
+						]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/Footer.tsx:39:11",
+						"data-prohibitions": "[]",
+						className: "flex flex-col gap-4",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							"data-uid": "src/components/Footer.tsx:40:13",
+							"data-prohibitions": "[]",
+							className: "font-semibold text-lg text-foreground",
+							children: "Links Úteis"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+							"data-uid": "src/components/Footer.tsx:41:13",
+							"data-prohibitions": "[]",
+							className: "flex flex-col gap-2",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:42:15",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:43:17",
+										"data-prohibitions": "[]",
+										href: "#",
+										className: "text-muted-foreground hover:text-primary transition-colors text-sm",
+										children: "Início"
+									})
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:50:15",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:51:17",
+										"data-prohibitions": "[]",
+										href: "#sobre",
+										className: "text-muted-foreground hover:text-primary transition-colors text-sm",
+										children: "Sobre Nós"
+									})
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:58:15",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:59:17",
+										"data-prohibitions": "[]",
+										href: "#servicos",
+										className: "text-muted-foreground hover:text-primary transition-colors text-sm",
+										children: "Serviços"
+									})
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:66:15",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:67:17",
+										"data-prohibitions": "[]",
+										href: "#equipe",
+										className: "text-muted-foreground hover:text-primary transition-colors text-sm",
+										children: "Nossa Equipe"
+									})
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:74:15",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:75:17",
+										"data-prohibitions": "[]",
+										href: "#faq",
+										className: "text-muted-foreground hover:text-primary transition-colors text-sm",
+										children: "Perguntas Frequentes"
+									})
+								})
+							]
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/Footer.tsx:86:11",
+						"data-prohibitions": "[]",
+						className: "flex flex-col gap-4",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							"data-uid": "src/components/Footer.tsx:87:13",
+							"data-prohibitions": "[]",
+							className: "font-semibold text-lg text-foreground",
+							children: "Serviços"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+							"data-uid": "src/components/Footer.tsx:88:13",
+							"data-prohibitions": "[]",
+							className: "flex flex-col gap-2",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:89:15",
+									"data-prohibitions": "[]",
+									className: "text-muted-foreground text-sm",
+									children: "Hospedagem Permanente"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:90:15",
+									"data-prohibitions": "[]",
+									className: "text-muted-foreground text-sm",
+									children: "Hospedagem Temporária"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:91:15",
+									"data-prohibitions": "[]",
+									className: "text-muted-foreground text-sm",
+									children: "Cuidados 24h"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:92:15",
+									"data-prohibitions": "[]",
+									className: "text-muted-foreground text-sm",
+									children: "Reabilitação Motora"
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:93:15",
+									"data-prohibitions": "[]",
+									className: "text-muted-foreground text-sm",
+									children: "Acompanhamento Médico"
+								})
+							]
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/Footer.tsx:98:11",
+						"data-prohibitions": "[]",
+						className: "flex flex-col gap-4",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							"data-uid": "src/components/Footer.tsx:99:13",
+							"data-prohibitions": "[]",
+							className: "font-semibold text-lg text-foreground",
+							children: "Contato"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+							"data-uid": "src/components/Footer.tsx:100:13",
+							"data-prohibitions": "[]",
+							className: "flex flex-col gap-4",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
+									"data-uid": "src/components/Footer.tsx:101:15",
+									"data-prohibitions": "[]",
+									className: "flex items-start gap-3 text-muted-foreground",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MapPin, {
+										"data-uid": "src/components/Footer.tsx:102:17",
+										"data-prohibitions": "[editContent]",
+										className: "h-5 w-5 text-primary shrink-0 mt-0.5"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+										"data-uid": "src/components/Footer.tsx:103:17",
+										"data-prohibitions": "[]",
+										className: "text-sm",
+										children: [
+											"Rua Doutor Diogo de Faria, 753",
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
+												"data-uid": "src/components/Footer.tsx:105:19",
+												"data-prohibitions": "[editContent]"
+											}),
+											"Vila Clementino, São Paulo - SP",
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
+												"data-uid": "src/components/Footer.tsx:107:19",
+												"data-prohibitions": "[editContent]"
+											}),
+											"CEP: 04037-002"
+										]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
+									"data-uid": "src/components/Footer.tsx:111:15",
+									"data-prohibitions": "[]",
+									className: "flex items-center gap-3 text-muted-foreground",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
+										"data-uid": "src/components/Footer.tsx:112:17",
+										"data-prohibitions": "[editContent]",
+										className: "h-5 w-5 text-primary shrink-0"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+										"data-uid": "src/components/Footer.tsx:113:17",
+										"data-prohibitions": "[]",
+										className: "text-sm",
+										children: [
+											"(11) 5081-5421",
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
+												"data-uid": "src/components/Footer.tsx:115:19",
+												"data-prohibitions": "[editContent]"
+											}),
+											"(11) 98118-2882"
+										]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
+									"data-uid": "src/components/Footer.tsx:119:15",
+									"data-prohibitions": "[]",
+									className: "flex items-center gap-3 text-muted-foreground",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Mail, {
+										"data-uid": "src/components/Footer.tsx:120:17",
+										"data-prohibitions": "[editContent]",
+										className: "h-5 w-5 text-primary shrink-0"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										"data-uid": "src/components/Footer.tsx:121:17",
+										"data-prohibitions": "[]",
+										className: "text-sm",
+										children: "contato@casavita.com.br"
+									})]
+								})
+							]
+						})]
+					})
+				]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				"data-uid": "src/components/Footer.tsx:127:9",
+				"data-prohibitions": "[editContent]",
+				className: "pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+					"data-uid": "src/components/Footer.tsx:128:11",
+					"data-prohibitions": "[editContent]",
+					className: "text-sm text-muted-foreground text-center md:text-left",
+					children: [
+						"© ",
+						(/* @__PURE__ */ new Date()).getFullYear(),
+						" Casa Vita Repouso. Todos os direitos reservados."
+					]
+				})
+			})]
+		})
+	});
 }
+//#endregion
+//#region src/lib/tracking.ts
+var trackConversion = (eventName, data) => {
+	if (typeof window !== "undefined" && window.gtag) window.gtag("event", eventName, data);
+	console.log(`Conversion tracked: ${eventName}`, data);
+};
+var trackWhatsAppClick = () => {
+	trackConversion("conversion", {
+		send_to: "AW-CONVERSION_ID/whatsapp_click",
+		value: 1,
+		currency: "BRL"
+	});
+};
 //#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs
 function r(e) {
@@ -17611,59 +18277,6 @@ function clsx() {
 	for (var e, t, f = 0, n = "", o = arguments.length; f < o; f++) (e = arguments[f]) && (t = r(e)) && (n && (n += " "), n += t);
 	return n;
 }
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/class-variance-authority@0.7.1/node_modules/class-variance-authority/dist/index.mjs
-/**
-* Copyright 2022 Joe Bell. All rights reserved.
-*
-* This file is licensed to you under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with the
-* License. You may obtain a copy of the License at
-*
-*   http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-* WARRANTIES OR REPRESENTATIONS OF ANY KIND, either express or implied. See the
-* License for the specific language governing permissions and limitations under
-* the License.
-*/ var falsyToString = (value) => typeof value === "boolean" ? `${value}` : value === 0 ? "0" : value;
-var cx = clsx;
-var cva = (base, config) => (props) => {
-	var _config_compoundVariants;
-	if ((config === null || config === void 0 ? void 0 : config.variants) == null) return cx(base, props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
-	const { variants, defaultVariants } = config;
-	const getVariantClassNames = Object.keys(variants).map((variant) => {
-		const variantProp = props === null || props === void 0 ? void 0 : props[variant];
-		const defaultVariantProp = defaultVariants === null || defaultVariants === void 0 ? void 0 : defaultVariants[variant];
-		if (variantProp === null) return null;
-		const variantKey = falsyToString(variantProp) || falsyToString(defaultVariantProp);
-		return variants[variant][variantKey];
-	});
-	const propsWithoutUndefined = props && Object.entries(props).reduce((acc, param) => {
-		let [key, value] = param;
-		if (value === void 0) return acc;
-		acc[key] = value;
-		return acc;
-	}, {});
-	return cx(base, getVariantClassNames, config === null || config === void 0 ? void 0 : (_config_compoundVariants = config.compoundVariants) === null || _config_compoundVariants === void 0 ? void 0 : _config_compoundVariants.reduce((acc, param) => {
-		let { class: cvClass, className: cvClassName, ...compoundVariantOptions } = param;
-		return Object.entries(compoundVariantOptions).every((param) => {
-			let [key, value] = param;
-			return Array.isArray(value) ? value.includes({
-				...defaultVariants,
-				...propsWithoutUndefined
-			}[key]) : {
-				...defaultVariants,
-				...propsWithoutUndefined
-			}[key] === value;
-		}) ? [
-			...acc,
-			cvClass,
-			cvClassName
-		] : acc;
-	}, []), props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
-};
 //#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/tailwind-merge@2.6.1/node_modules/tailwind-merge/dist/bundle-mjs.mjs
 var CLASS_PART_SEPARATOR = "-";
@@ -19086,6 +19699,244 @@ function cn$1(...inputs) {
 	return twMerge(clsx(inputs));
 }
 //#endregion
+//#region src/components/FloatingWhatsApp.tsx
+function FloatingWhatsApp() {
+	const [isVisible, setIsVisible] = (0, import_react.useState)(false);
+	(0, import_react.useEffect)(() => {
+		const handleScroll = () => {
+			setIsVisible(window.scrollY > 300);
+		};
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
+	const handleClick = () => {
+		trackWhatsAppClick();
+		window.open("https://wa.me/5511981182882", "_blank");
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+		"data-uid": "src/components/FloatingWhatsApp.tsx:24:5",
+		"data-prohibitions": "[editContent]",
+		onClick: handleClick,
+		className: cn$1("fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 px-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105", isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0 pointer-events-none"),
+		"aria-label": "Falar no WhatsApp",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
+			"data-uid": "src/components/FloatingWhatsApp.tsx:32:7",
+			"data-prohibitions": "[editContent]",
+			className: "h-6 w-6"
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+			"data-uid": "src/components/FloatingWhatsApp.tsx:33:7",
+			"data-prohibitions": "[]",
+			className: "font-semibold hidden sm:inline-block",
+			children: "Fale Conosco"
+		})]
+	});
+}
+//#endregion
+//#region src/components/Layout.tsx
+function Layout() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		"data-uid": "src/components/Layout.tsx:8:5",
+		"data-prohibitions": "[]",
+		className: "min-h-screen font-sans antialiased text-slate-900 bg-slate-50 flex flex-col",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Header$1, {
+				"data-uid": "src/components/Layout.tsx:9:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("main", {
+				"data-uid": "src/components/Layout.tsx:10:7",
+				"data-prohibitions": "[]",
+				className: "flex-grow",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {
+					"data-uid": "src/components/Layout.tsx:11:9",
+					"data-prohibitions": "[editContent]"
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Footer, {
+				"data-uid": "src/components/Layout.tsx:13:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FloatingWhatsApp, {
+				"data-uid": "src/components/Layout.tsx:14:7",
+				"data-prohibitions": "[editContent]"
+			})
+		]
+	});
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-compose-refs@1.1.2_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-compose-refs/dist/index.mjs
+function setRef(ref, value) {
+	if (typeof ref === "function") return ref(value);
+	else if (ref !== null && ref !== void 0) ref.current = value;
+}
+function composeRefs(...refs) {
+	return (node) => {
+		let hasCleanup = false;
+		const cleanups = refs.map((ref) => {
+			const cleanup = setRef(ref, node);
+			if (!hasCleanup && typeof cleanup == "function") hasCleanup = true;
+			return cleanup;
+		});
+		if (hasCleanup) return () => {
+			for (let i = 0; i < cleanups.length; i++) {
+				const cleanup = cleanups[i];
+				if (typeof cleanup == "function") cleanup();
+				else setRef(refs[i], null);
+			}
+		};
+	};
+}
+function useComposedRefs(...refs) {
+	return import_react.useCallback(composeRefs(...refs), refs);
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-slot@1.2.4_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-slot/dist/index.mjs
+var REACT_LAZY_TYPE = Symbol.for("react.lazy");
+var use = import_react[" use ".trim().toString()];
+function isPromiseLike(value) {
+	return typeof value === "object" && value !== null && "then" in value;
+}
+function isLazyComponent(element) {
+	return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
+}
+/* @__NO_SIDE_EFFECTS__ */
+function createSlot$1(ownerName) {
+	const SlotClone = /* @__PURE__ */ createSlotClone$1(ownerName);
+	const Slot2 = import_react.forwardRef((props, forwardedRef) => {
+		let { children, ...slotProps } = props;
+		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
+		const childrenArray = import_react.Children.toArray(children);
+		const slottable = childrenArray.find(isSlottable$1);
+		if (slottable) {
+			const newElement = slottable.props.children;
+			const newChildren = childrenArray.map((child) => {
+				if (child === slottable) {
+					if (import_react.Children.count(newElement) > 1) return import_react.Children.only(null);
+					return import_react.isValidElement(newElement) ? newElement.props.children : null;
+				} else return child;
+			});
+			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
+				...slotProps,
+				ref: forwardedRef,
+				children: import_react.isValidElement(newElement) ? import_react.cloneElement(newElement, void 0, newChildren) : null
+			});
+		}
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
+			...slotProps,
+			ref: forwardedRef,
+			children
+		});
+	});
+	Slot2.displayName = `${ownerName}.Slot`;
+	return Slot2;
+}
+var Slot = /* @__PURE__ */ createSlot$1("Slot");
+/* @__NO_SIDE_EFFECTS__ */
+function createSlotClone$1(ownerName) {
+	const SlotClone = import_react.forwardRef((props, forwardedRef) => {
+		let { children, ...slotProps } = props;
+		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
+		if (import_react.isValidElement(children)) {
+			const childrenRef = getElementRef$2(children);
+			const props2 = mergeProps$1(slotProps, children.props);
+			if (children.type !== import_react.Fragment) props2.ref = forwardedRef ? composeRefs(forwardedRef, childrenRef) : childrenRef;
+			return import_react.cloneElement(children, props2);
+		}
+		return import_react.Children.count(children) > 1 ? import_react.Children.only(null) : null;
+	});
+	SlotClone.displayName = `${ownerName}.SlotClone`;
+	return SlotClone;
+}
+var SLOTTABLE_IDENTIFIER$1 = Symbol("radix.slottable");
+function isSlottable$1(child) {
+	return import_react.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER$1;
+}
+function mergeProps$1(slotProps, childProps) {
+	const overrideProps = { ...childProps };
+	for (const propName in childProps) {
+		const slotPropValue = slotProps[propName];
+		const childPropValue = childProps[propName];
+		if (/^on[A-Z]/.test(propName)) {
+			if (slotPropValue && childPropValue) overrideProps[propName] = (...args) => {
+				const result = childPropValue(...args);
+				slotPropValue(...args);
+				return result;
+			};
+			else if (slotPropValue) overrideProps[propName] = slotPropValue;
+		} else if (propName === "style") overrideProps[propName] = {
+			...slotPropValue,
+			...childPropValue
+		};
+		else if (propName === "className") overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
+	}
+	return {
+		...slotProps,
+		...overrideProps
+	};
+}
+function getElementRef$2(element) {
+	let getter = Object.getOwnPropertyDescriptor(element.props, "ref")?.get;
+	let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+	if (mayWarn) return element.ref;
+	getter = Object.getOwnPropertyDescriptor(element, "ref")?.get;
+	mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+	if (mayWarn) return element.props.ref;
+	return element.props.ref || element.ref;
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/class-variance-authority@0.7.1/node_modules/class-variance-authority/dist/index.mjs
+/**
+* Copyright 2022 Joe Bell. All rights reserved.
+*
+* This file is licensed to you under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with the
+* License. You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+* WARRANTIES OR REPRESENTATIONS OF ANY KIND, either express or implied. See the
+* License for the specific language governing permissions and limitations under
+* the License.
+*/ var falsyToString = (value) => typeof value === "boolean" ? `${value}` : value === 0 ? "0" : value;
+var cx = clsx;
+var cva = (base, config) => (props) => {
+	var _config_compoundVariants;
+	if ((config === null || config === void 0 ? void 0 : config.variants) == null) return cx(base, props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
+	const { variants, defaultVariants } = config;
+	const getVariantClassNames = Object.keys(variants).map((variant) => {
+		const variantProp = props === null || props === void 0 ? void 0 : props[variant];
+		const defaultVariantProp = defaultVariants === null || defaultVariants === void 0 ? void 0 : defaultVariants[variant];
+		if (variantProp === null) return null;
+		const variantKey = falsyToString(variantProp) || falsyToString(defaultVariantProp);
+		return variants[variant][variantKey];
+	});
+	const propsWithoutUndefined = props && Object.entries(props).reduce((acc, param) => {
+		let [key, value] = param;
+		if (value === void 0) return acc;
+		acc[key] = value;
+		return acc;
+	}, {});
+	return cx(base, getVariantClassNames, config === null || config === void 0 ? void 0 : (_config_compoundVariants = config.compoundVariants) === null || _config_compoundVariants === void 0 ? void 0 : _config_compoundVariants.reduce((acc, param) => {
+		let { class: cvClass, className: cvClassName, ...compoundVariantOptions } = param;
+		return Object.entries(compoundVariantOptions).every((param) => {
+			let [key, value] = param;
+			return Array.isArray(value) ? value.includes({
+				...defaultVariants,
+				...propsWithoutUndefined
+			}[key]) : {
+				...defaultVariants,
+				...propsWithoutUndefined
+			}[key] === value;
+		}) ? [
+			...acc,
+			cvClass,
+			cvClassName
+		] : acc;
+	}, []), props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
+};
+//#endregion
 //#region src/components/ui/button.tsx
 var buttonVariants = cva("inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", {
 	variants: {
@@ -19124,1057 +19975,455 @@ var Button = import_react.forwardRef(({ className, variant, size, asChild = fals
 });
 Button.displayName = "Button";
 //#endregion
-//#region src/lib/tracking.ts
-var trackWhatsAppClick = () => {
-	if (typeof window !== "undefined" && window.gtag) window.gtag("event", "conversion", { send_to: "AW-CONVERSION_ID/CONVERSION_LABEL" });
-	console.log("WhatsApp Conversion Tracked!");
-};
+//#region src/assets/poster-b2fef.jpg
+var poster_b2fef_default = "/assets/poster-b2fef-CKGigr5J.jpg";
 //#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var mergeClasses = (...classes) => classes.filter((className, index, array) => {
-	return Boolean(className) && className.trim() !== "" && array.indexOf(className) === index;
-}).join(" ").trim();
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/toKebabCase.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/toCamelCase.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var toCamelCase = (string) => string.replace(/^([A-Z])|[\s-_]+(\w)/g, (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase());
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/toPascalCase.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var toPascalCase = (string) => {
-	const camelCase = toCamelCase(string);
-	return camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
-};
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/defaultAttributes.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var defaultAttributes = {
-	xmlns: "http://www.w3.org/2000/svg",
-	width: 24,
-	height: 24,
-	viewBox: "0 0 24 24",
-	fill: "none",
-	stroke: "currentColor",
-	strokeWidth: 2,
-	strokeLinecap: "round",
-	strokeLinejoin: "round"
-};
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/hasA11yProp.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var hasA11yProp = (props) => {
-	for (const prop in props) if (prop.startsWith("aria-") || prop === "role" || prop === "title") return true;
-	return false;
-};
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/Icon.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Icon = (0, import_react.forwardRef)(({ color = "currentColor", size = 24, strokeWidth = 2, absoluteStrokeWidth, className = "", children, iconNode, ...rest }, ref) => (0, import_react.createElement)("svg", {
-	ref,
-	...defaultAttributes,
-	width: size,
-	height: size,
-	stroke: color,
-	strokeWidth: absoluteStrokeWidth ? Number(strokeWidth) * 24 / Number(size) : strokeWidth,
-	className: mergeClasses("lucide", className),
-	...!children && !hasA11yProp(rest) && { "aria-hidden": "true" },
-	...rest
-}, [...iconNode.map(([tag, attrs]) => (0, import_react.createElement)(tag, attrs)), ...Array.isArray(children) ? children : [children]]));
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/createLucideIcon.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var createLucideIcon = (iconName, iconNode) => {
-	const Component = (0, import_react.forwardRef)(({ className, ...props }, ref) => (0, import_react.createElement)(Icon, {
-		ref,
-		iconNode,
-		className: mergeClasses(`lucide-${toKebabCase(toPascalCase(iconName))}`, `lucide-${iconName}`, className),
-		...props
-	}));
-	Component.displayName = toPascalCase(iconName);
-	return Component;
-};
-var Activity = createLucideIcon("activity", [["path", {
-	d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",
-	key: "169zse"
-}]]);
-var ChevronDown = createLucideIcon("chevron-down", [["path", {
-	d: "m6 9 6 6 6-6",
-	key: "qrunsl"
-}]]);
-var Coffee = createLucideIcon("coffee", [
-	["path", {
-		d: "M10 2v2",
-		key: "7u0qdc"
-	}],
-	["path", {
-		d: "M14 2v2",
-		key: "6buw04"
-	}],
-	["path", {
-		d: "M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1",
-		key: "pwadti"
-	}],
-	["path", {
-		d: "M6 2v2",
-		key: "colzsn"
-	}]
-]);
-var HeartPulse = createLucideIcon("heart-pulse", [["path", {
-	d: "M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5",
-	key: "mvr1a0"
-}], ["path", {
-	d: "M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27",
-	key: "auskq0"
-}]]);
-var Heart = createLucideIcon("heart", [["path", {
-	d: "M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5",
-	key: "mvr1a0"
-}]]);
-var Mail = createLucideIcon("mail", [["path", {
-	d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7",
-	key: "132q7q"
-}], ["rect", {
-	x: "2",
-	y: "4",
-	width: "20",
-	height: "16",
-	rx: "2",
-	key: "izxlao"
-}]]);
-var MapPin = createLucideIcon("map-pin", [["path", {
-	d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
-	key: "1r0f0z"
-}], ["circle", {
-	cx: "12",
-	cy: "10",
-	r: "3",
-	key: "ilqhr7"
-}]]);
-var Menu = createLucideIcon("menu", [
-	["path", {
-		d: "M4 5h16",
-		key: "1tepv9"
-	}],
-	["path", {
-		d: "M4 12h16",
-		key: "1lakjw"
-	}],
-	["path", {
-		d: "M4 19h16",
-		key: "1djgab"
-	}]
-]);
-var MessageCircle = createLucideIcon("message-circle", [["path", {
-	d: "M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719",
-	key: "1sd12s"
-}]]);
-var Phone = createLucideIcon("phone", [["path", {
-	d: "M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384",
-	key: "9njp5v"
-}]]);
-var UserCheck = createLucideIcon("user-check", [
-	["path", {
-		d: "m16 11 2 2 4-4",
-		key: "9rsbq5"
-	}],
-	["path", {
-		d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2",
-		key: "1yyitq"
-	}],
-	["circle", {
-		cx: "9",
-		cy: "7",
-		r: "4",
-		key: "nufk8"
-	}]
-]);
-var X = createLucideIcon("x", [["path", {
-	d: "M18 6 6 18",
-	key: "1bl5f8"
-}], ["path", {
-	d: "m6 6 12 12",
-	key: "d8bk6v"
-}]]);
-//#endregion
-//#region src/components/Header.tsx
-function Header$1() {
-	const [isScrolled, setIsScrolled] = (0, import_react.useState)(false);
-	const [isMobileMenuOpen, setIsMobileMenuOpen] = (0, import_react.useState)(false);
-	(0, import_react.useEffect)(() => {
-		const handleScroll = () => {
-			setIsScrolled(window.scrollY > 10);
-		};
-		window.addEventListener("scroll", handleScroll);
-		return () => window.removeEventListener("scroll", handleScroll);
-	}, []);
-	const handleWhatsApp = () => {
+//#region src/components/sections/Hero.tsx
+function Hero() {
+	const handleWhatsAppClick = () => {
 		trackWhatsAppClick();
-		window.open("https://wa.me/551137684392", "_blank");
+		window.open("https://wa.me/5511981182882", "_blank");
 	};
-	const navLinks = [
-		{
-			name: "Sobre",
-			href: "#sobre"
-		},
-		{
-			name: "Serviços",
-			href: "#servicos"
-		},
-		{
-			name: "Estrutura",
-			href: "#estrutura"
-		},
-		{
-			name: "Equipe",
-			href: "#equipe"
-		},
-		{
-			name: "FAQ",
-			href: "#faq"
-		}
-	];
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", {
-		"data-uid": "src/components/Header.tsx:32:5",
-		"data-prohibitions": "[editContent]",
-		className: `fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm py-3" : "bg-transparent py-5"}`,
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
+		"data-uid": "src/components/sections/Hero.tsx:13:5",
+		"data-prohibitions": "[]",
+		className: "relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-primary/5 pt-20",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/Header.tsx:35:7",
-			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4 flex items-center justify-between",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
-					"data-uid": "src/components/Header.tsx:36:9",
-					"data-prohibitions": "[]",
-					href: "#",
-					className: "flex items-center gap-2 text-emerald-700",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Heart, {
-						"data-uid": "src/components/Header.tsx:37:11",
-						"data-prohibitions": "[editContent]",
-						className: "w-8 h-8 fill-emerald-600"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-						"data-uid": "src/components/Header.tsx:38:11",
-						"data-prohibitions": "[]",
-						className: "text-2xl font-bold tracking-tight",
-						children: "Casa Vita"
-					})]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("nav", {
-					"data-uid": "src/components/Header.tsx:42:9",
-					"data-prohibitions": "[editContent]",
-					className: "hidden lg:flex items-center gap-8",
-					children: navLinks.map((link) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-						"data-uid": "src/components/Header.tsx:44:13",
-						"data-prohibitions": "[editContent]",
-						href: link.href,
-						className: "text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors",
-						children: link.name
-					}, link.name))
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/Header.tsx:54:9",
-					"data-prohibitions": "[editContent]",
-					className: "hidden lg:flex items-center gap-4",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/Header.tsx:55:11",
-						"data-prohibitions": "[editContent]",
-						className: "text-right mr-4",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							"data-uid": "src/components/Header.tsx:56:13",
-							"data-prohibitions": "[editContent]",
-							className: `text-xs ${isScrolled ? "text-slate-500" : "text-slate-600"}`,
-							children: "Unidade 2"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							"data-uid": "src/components/Header.tsx:59:13",
-							"data-prohibitions": "[editContent]",
-							className: `text-sm font-bold ${isScrolled ? "text-slate-800" : "text-slate-900"}`,
-							children: "(11) 3768-4392"
-						})]
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-						"data-uid": "src/components/Header.tsx:63:11",
-						"data-prohibitions": "[]",
-						onClick: handleWhatsApp,
-						className: "bg-green-600 hover:bg-green-700 text-white rounded-full px-6 shadow-md transition-transform hover:scale-105",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
-							"data-uid": "src/components/Header.tsx:67:13",
-							"data-prohibitions": "[editContent]",
-							className: "mr-2 h-4 w-4"
-						}), "WhatsApp"]
-					})]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-					"data-uid": "src/components/Header.tsx:73:9",
-					"data-prohibitions": "[editContent]",
-					className: "lg:hidden p-2 text-slate-800",
-					onClick: () => setIsMobileMenuOpen(!isMobileMenuOpen),
-					children: isMobileMenuOpen ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, {
-						"data-uid": "src/components/Header.tsx:77:31",
-						"data-prohibitions": "[editContent]",
-						className: "w-6 h-6"
-					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Menu, {
-						"data-uid": "src/components/Header.tsx:77:59",
-						"data-prohibitions": "[editContent]",
-						className: "w-6 h-6"
-					})
-				})
-			]
-		}), isMobileMenuOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/Header.tsx:83:9",
-			"data-prohibitions": "[editContent]",
-			className: "lg:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-slate-100 py-4 px-4 flex flex-col gap-4 animate-fade-in-down",
-			children: [navLinks.map((link) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-				"data-uid": "src/components/Header.tsx:85:13",
+			"data-uid": "src/components/sections/Hero.tsx:14:7",
+			"data-prohibitions": "[]",
+			className: "absolute inset-0 z-0",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+				"data-uid": "src/components/sections/Hero.tsx:15:9",
 				"data-prohibitions": "[editContent]",
-				href: link.href,
-				className: "text-lg font-medium text-slate-700 py-2 border-b border-slate-50",
-				onClick: () => setIsMobileMenuOpen(false),
-				children: link.name
-			}, link.name)), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/Header.tsx:94:11",
+				src: poster_b2fef_default,
+				alt: "Cuidados com carinho na Casa Vita",
+				className: "w-full h-full object-cover object-center opacity-30 md:opacity-100"
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				"data-uid": "src/components/sections/Hero.tsx:20:9",
 				"data-prohibitions": "[]",
-				className: "pt-4 pb-2",
+				className: "absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-transparent md:w-3/4 lg:w-2/3 xl:w-1/2"
+			})]
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			"data-uid": "src/components/sections/Hero.tsx:23:7",
+			"data-prohibitions": "[]",
+			className: "container relative z-10 mx-auto px-4 md:px-6",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/sections/Hero.tsx:24:9",
+				"data-prohibitions": "[]",
+				className: "max-w-2xl animate-fade-in-up",
 				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-						"data-uid": "src/components/Header.tsx:95:13",
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/sections/Hero.tsx:25:11",
 						"data-prohibitions": "[]",
-						className: "text-sm text-slate-500 mb-1",
-						children: "Central de Atendimento"
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-						"data-uid": "src/components/Header.tsx:96:13",
-						"data-prohibitions": "[]",
-						className: "text-lg font-bold text-slate-800 mb-4",
-						children: "(11) 3768-4392"
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-						"data-uid": "src/components/Header.tsx:97:13",
-						"data-prohibitions": "[]",
-						onClick: handleWhatsApp,
-						className: "w-full bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md h-12 text-lg",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
-							"data-uid": "src/components/Header.tsx:101:15",
+						className: "inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Heart, {
+							"data-uid": "src/components/sections/Hero.tsx:26:13",
 							"data-prohibitions": "[editContent]",
-							className: "mr-2 h-5 w-5"
-						}), "Chamar no WhatsApp"]
+							className: "h-4 w-4 fill-primary"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							"data-uid": "src/components/sections/Hero.tsx:27:13",
+							"data-prohibitions": "[]",
+							className: "text-sm font-semibold",
+							children: "Cuidado e Acolhimento"
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h1", {
+						"data-uid": "src/components/sections/Hero.tsx:30:11",
+						"data-prohibitions": "[]",
+						className: "text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-6",
+						children: ["O lar perfeito para quem você ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							"data-uid": "src/components/sections/Hero.tsx:31:43",
+							"data-prohibitions": "[]",
+							className: "text-primary",
+							children: "mais ama."
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						"data-uid": "src/components/sections/Hero.tsx:34:11",
+						"data-prohibitions": "[]",
+						className: "text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed",
+						children: "Na Casa Vita, oferecemos um ambiente moderno, seguro e cheio de vida. Nossa equipe especializada proporciona cuidados 24h com muito respeito, carinho e dedicação profissional."
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/sections/Hero.tsx:40:11",
+						"data-prohibitions": "[]",
+						className: "flex flex-col sm:flex-row gap-4",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							"data-uid": "src/components/sections/Hero.tsx:41:13",
+							"data-prohibitions": "[]",
+							size: "lg",
+							className: "rounded-2xl text-base px-8 h-14 bg-primary hover:bg-primary/90",
+							onClick: handleWhatsAppClick,
+							children: ["Falar com um Especialista", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, {
+								"data-uid": "src/components/sections/Hero.tsx:47:15",
+								"data-prohibitions": "[editContent]",
+								className: "ml-2 h-5 w-5"
+							})]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+							"data-uid": "src/components/sections/Hero.tsx:49:13",
+							"data-prohibitions": "[]",
+							size: "lg",
+							variant: "outline",
+							className: "rounded-2xl text-base px-8 h-14 border-primary text-primary hover:bg-primary/5 bg-white/50 backdrop-blur-sm",
+							onClick: () => document.getElementById("servicos")?.scrollIntoView({ behavior: "smooth" }),
+							children: "Conhecer Nossos Serviços"
+						})]
 					})
 				]
-			})]
+			})
 		})]
 	});
 }
 //#endregion
-//#region src/assets/ancs-f63c8.png
-var ancs_f63c8_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAF8AAAA1CAYAAAAnIzfJAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OTMwM0E3NkM5RjcxMTFFNjg5RTdCNzM4RTIyOTgwRkUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OTMwM0E3NkQ5RjcxMTFFNjg5RTdCNzM4RTIyOTgwRkUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5MzAzQTc2QTlGNzExMUU2ODlFN0I3MzhFMjI5ODBGRSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo5MzAzQTc2QjlGNzExMUU2ODlFN0I3MzhFMjI5ODBGRSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PqRoGnUAAAqPSURBVHja7JpbSJXbFseXVqYWpBHpIUPtgtLFjCD1ITUK2pGoQeWpILWo9kEwowi6gApdzq4HTbBOV/WhzApySZRBmdZDLqi2dgEt8EIGWpTLSGtr1Jm/hWOf2XfUlu0s1+6b8LGW85tzjDH/4zLHGEu3T58+WYbzePHiRdDLly+DZs6cWenMOjVqxowZY7e4wHAf7gLevHkzJTMz86az65qamsItLjLcLeYwwTfBN4cJ/s8yRg4HId6/f+9TV1eX2NzcHNPa2hre1tb22aUZFhZmycvLaxw3blyTv79/jZ+fX21oaGipp6en3QT/L4B+7dq1nPr6+sSQkJBSHx+f5sDAwKqOjo4g3tvt9sCnT5/GdnV1BanvjkcpKJZ3ZWVlBeyJiIg4rNLLShP8QYyampqUy5cv50ybNq102bJly/V3EyZMaOr9tLS0tFhqa2tTtm3blqqUlICiZB3feebMmVOo/mxmrrGx8Yup5pdqhu813H5EkUVoOX/+/CUVPkovXLiQ4cyeixcvuvV6QxDKsNlsW/Aced/e3m559uyZZTC0fkrLJ9SsWrVq+atXrwCvYzB7VWhqiomJycLaq6qqMlEE876+vpaAgIAa9VhdJex8d8vHcgE/KSlp+begpyraWOI/dLmAd+zY4WummgNYrroov9o6jx49WrBu3bpPaWlp7bdv307hst20adNcLl/CEMowLX8IRmVlZcqxY8cKvL29LR4eHhZ3d3d7fn7+n5ZeUlJyyZWyn2FbZKl4nsXFrM+plNMHY/nw4YOlu7vb8ubNGx/9fUJCQqor5f7DFvzRo0fbyYiI5TI3f/78UtrFKrxYOjs7LVFRUYX6HoCnCHPm3jHDzhfS0ePHj/8OoPHx8alUtMzTs797926iCj12lfUUfg1tq9VasGTJkq0/2kt+KPgURISS/t5fUuPjx4+O96SW3wowWhXp6enBP7Xl8+PH48eP+81Opk+fbvHy8vosrERHR2dHRkbmDpaWjODgYEtcXFw2tcJPDT6/PvHz30BrGhoaknt6eoKM6aryhCK8ge86+AO1Dt69exc7derUms2bN881Y76T3qHiexAe0NdF6efnV4MibDZbssr7w42tA+mY0o4gBVUWnz1cMiKXAJ/P7OzshTTjaK7R2dT7OkavoPUswNMhpQADdPGS4TJGWlxohIeHF/JINsQj7efy8nJHoy0wMLBJWXgVqSpp53AuuFwKfH0ArJ7TV1RUxND7z8nJWWgWWeYwwTfBN4drxvzY2NgiZ9fNmDGjypXAd6mW8t9tmOCb4JvgD8loaGhw/CAyZcqUmr8riG1tbUG9rY5BVdBfle3s3bv30pkzZ7KcAX7nzp03WS9KcFZhJ06cyHGWvk6bfc7yun79eoozfJyhwzPk2c7Dhw9jq6urE3kSEhJyx44daxft06GcOHFiE5+zZ892lPUbN27cKnvfvn3rQw8/ODi4hk/WirUAWGdnp6Nfw7xaU6vT5Rcso/ewHnlyc3ML9u/fvxBZoBMZGWkVWfmEn8gpfKCnW6rIxneRnbVyHt17hYYu/3dJNc+ePZu5evXq7Bs3biRbrdaMtWvXZokFRUVFlT548CAWYc+dO+cLKAiIsLwDFCyVOcAA2Ly8vLnFxcWZd+7cSVy8eHEha9esWeOgz9+sDwsLq+Q98yhclwdAAO7kyZM5GRkZqbp3ioKgWVJS4iseCD3A9/b27nj06FEMYKenp/8u4Ko9OSiTMyGjyAp/1oABoHNu5P8u4GNJCL97927H/9yUlZVtAQyEEWBYA2B4BmsjIiKsCI+ixCL37NmznEPExcV9Yj2HgCYK0i2WceDAgYX8zeEB2SgTIAI64Im3MJjDklEi+8VjT506FSzWKqET/szBi7/Xr1/fqPY5wog602HOxVr4oyjlzXbowVu8dcjBVwBugeG+ffsuyRxCihuL+4rFYeFYGX8vWrSoSLdWI20JC/rA2vEeFDuQe0MPsMXTmNu1a5fDwxRYVUZl9UVDn0cWOYdRVrwB4OPj4w//lZAzKPCxvL4sB4UgCEJhZXLzK7AL8QjeA7y4u5EutLAm9uMlXV1d48RDJNYCBOEMUPR7Rh+EKEKIXHzwAzgFVIyuJJQi3ijzyEXoE0/gDEKvr0seRSmvmtOLSQLh62vAH5GVleXUQlwYK9IB7FWCG4JGR0eXhIaG2tRcc0tLS+jKlSt/Y66np8cLIVnL4ZXgHUJDpbluAI9ymMdbAgIC6mWd2n9OgdTR3d3tqe6WbNZPnjy5TgeOdWKds2bNqho1atQf0FQhzKqU5hsTE1OC3NBOTk7eibzQU3zqoKW8o1nuI+SGTlpa2r/kbNCGn5ubm+O8yApdNdoISa9fv/4H5+HdYD3hm+T5WAxWD3MsgwwHhZhllFnhmuCbwwR/WI3P2gtkFXqOPdT9EL0NIDWEq/Z2vgY3d2NGQ4HkRL6fkZSU1G7sb1CcsH+gvo+81/sq5OekpIPtATGkUHOm/8Ja+Du7py8+yCfptN5f0ueclc+RalLM3L9//xdSMHJ5ihq84NatW/9ko0qrWvX0jjRNVbcZpFuS5gEk6Rrpl0o5q6XPcuXKlV/5ThpHfkw6ynvekcerrMiRZnp4ePwxb968ayEhIdXq+3sRmCKuvb3dn7RQDgtNDAU52EPvhjXsQWb4IbNR6StWrPht69atqdQlvGcP5+X8sgf64AAtMIEH8pCuUrQdOnSo+Pnz55zFkdtzLnAg3WS/9KLq6uoi7Xa7P+cT+YQXWSH8RkyaNClHFUNZlOYVFRXJLAL87du33+E7+W1+fv5/li5degwhYMgnhK9evforYCNwUVHRv2kbYMXkwQhw8ODBYgWmrby8fDM8AEqtO8B7KaIQDsVxGPhzaOqDDRs2NCLs+PHjW9nLAXlHdc2//JHz8w45oYsMT548iVB1haeSoRBD0BUg8ipgvcQ4KKyYlz3k8EeOHDkKP2Srr6+P1OVRhlZ77969X6RGoXYw8kT5KAi6KAylIx+pOHM8rMUARhJCpK+C9lgs7kUlKK2C3iLrzwKLzexlrTTBdO+QORpv4n79uTTKxiKMvRLpAYmrQ5MKV++UylAHL9V768aeC3swMKpuelL0cWgQomDZIxU1crOes7FeLyp5KOY4l7QgjDyRWfpEMoy8wHPAfj5EUAiEcB1jWwAhEY54ijL6o9NXQ0zv36DwvirEwfwAQ9uAUr+vFobegjh9+rSjPYLcvd71f3ucbRf0x7Ov/hG8aEnoa0dizbgf1oVlST+bg2MhuBLgQVBZ9mdg4KYAJ+sNlmiVHzb6u4x0a2MN/RvdkowDfsgkAOnKYg8xWc4ALd1TucwJA5yDtXg1loi36nu+BDg8bTZbAp/CEwUMtB/88Aoe4cXeESoOWqXfkZiYeJheB9pZsGCBoy/DRgTkIBLzdUF6ezAlGhBuxGT6MiiAC5a4TrzFlblYec96eBn7N/Rm4Cdy6DSxXOjRT2GSUAl/ZCOuEs+JyyiJ+0q3Mt4xBwDIq86aizK4f/Q9zIl8eu9I+lC9xugLnZSUlJ18px+l80R2MUb2KdnKpdckvLioh6zIIhTJjw5Yv8RRs7T6jhUul5bu/ub43/ivAAMAFTUmkTDdyFUAAAAASUVORK5CYII=";
-//#endregion
-//#region src/components/Footer.tsx
-function Footer() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("footer", {
-		"data-uid": "src/components/Footer.tsx:6:5",
-		"data-prohibitions": "[editContent]",
-		className: "bg-slate-900 text-slate-300 py-16",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/Footer.tsx:7:7",
-			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/Footer.tsx:8:9",
-				"data-prohibitions": "[]",
-				className: "grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/Footer.tsx:9:11",
-						"data-prohibitions": "[]",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								"data-uid": "src/components/Footer.tsx:10:13",
-								"data-prohibitions": "[]",
-								className: "flex items-center gap-2 text-white mb-6",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Heart, {
-									"data-uid": "src/components/Footer.tsx:11:15",
-									"data-prohibitions": "[editContent]",
-									className: "w-8 h-8 fill-emerald-500 text-emerald-500"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									"data-uid": "src/components/Footer.tsx:12:15",
-									"data-prohibitions": "[]",
-									className: "text-2xl font-bold tracking-tight",
-									children: "Casa Vita"
-								})]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-								"data-uid": "src/components/Footer.tsx:14:13",
-								"data-prohibitions": "[]",
-								className: "text-slate-400 mb-6 leading-relaxed",
-								children: "Dedicados a proporcionar a melhor qualidade de vida para quem você ama, com estrutura moderna e equipe qualificada."
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								"data-uid": "src/components/Footer.tsx:18:13",
-								"data-prohibitions": "[]",
-								className: "bg-white/10 p-4 rounded-xl inline-block",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-									"data-uid": "src/components/Footer.tsx:19:15",
-									"data-prohibitions": "[editContent]",
-									src: ancs_f63c8_default,
-									alt: "Agência Nacional de Vigilância Sanitária",
-									className: "h-12 object-contain filter invert opacity-80"
-								})
-							})
-						]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/Footer.tsx:27:11",
-						"data-prohibitions": "[]",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-							"data-uid": "src/components/Footer.tsx:28:13",
-							"data-prohibitions": "[]",
-							className: "text-lg font-semibold text-white mb-6",
-							children: "Unidade 2"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
-							"data-uid": "src/components/Footer.tsx:29:13",
-							"data-prohibitions": "[]",
-							className: "space-y-4",
-							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
-									"data-uid": "src/components/Footer.tsx:30:15",
-									"data-prohibitions": "[]",
-									className: "flex items-start gap-3",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MapPin, {
-										"data-uid": "src/components/Footer.tsx:31:17",
-										"data-prohibitions": "[editContent]",
-										className: "w-5 h-5 text-emerald-500 shrink-0 mt-0.5"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-										"data-uid": "src/components/Footer.tsx:32:17",
-										"data-prohibitions": "[]",
-										children: [
-											"Rua Heitor Penteado, 193",
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
-												"data-uid": "src/components/Footer.tsx:34:19",
-												"data-prohibitions": "[editContent]"
-											}),
-											"Sumarezinho, São Paulo - SP",
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
-												"data-uid": "src/components/Footer.tsx:36:19",
-												"data-prohibitions": "[editContent]"
-											}),
-											"05437-000"
-										]
-									})]
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
-									"data-uid": "src/components/Footer.tsx:40:15",
-									"data-prohibitions": "[]",
-									className: "flex items-center gap-3",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
-										"data-uid": "src/components/Footer.tsx:41:17",
-										"data-prohibitions": "[editContent]",
-										className: "w-5 h-5 text-emerald-500 shrink-0"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										"data-uid": "src/components/Footer.tsx:42:17",
-										"data-prohibitions": "[]",
-										children: "(11) 3768-4392"
-									})]
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
-									"data-uid": "src/components/Footer.tsx:44:15",
-									"data-prohibitions": "[]",
-									className: "flex items-center gap-3",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Mail, {
-										"data-uid": "src/components/Footer.tsx:45:17",
-										"data-prohibitions": "[editContent]",
-										className: "w-5 h-5 text-emerald-500 shrink-0"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										"data-uid": "src/components/Footer.tsx:46:17",
-										"data-prohibitions": "[]",
-										children: "contato@casavita.com.br"
-									})]
-								})
-							]
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/Footer.tsx:51:11",
-						"data-prohibitions": "[]",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-							"data-uid": "src/components/Footer.tsx:52:13",
-							"data-prohibitions": "[]",
-							className: "text-lg font-semibold text-white mb-6",
-							children: "Links Úteis"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
-							"data-uid": "src/components/Footer.tsx:53:13",
-							"data-prohibitions": "[]",
-							className: "space-y-3",
-							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:54:15",
-									"data-prohibitions": "[]",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-										"data-uid": "src/components/Footer.tsx:55:17",
-										"data-prohibitions": "[]",
-										href: "#sobre",
-										className: "hover:text-emerald-400 transition-colors",
-										children: "Sobre Nós"
-									})
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:59:15",
-									"data-prohibitions": "[]",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-										"data-uid": "src/components/Footer.tsx:60:17",
-										"data-prohibitions": "[]",
-										href: "#servicos",
-										className: "hover:text-emerald-400 transition-colors",
-										children: "Nossos Serviços"
-									})
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:64:15",
-									"data-prohibitions": "[]",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-										"data-uid": "src/components/Footer.tsx:65:17",
-										"data-prohibitions": "[]",
-										href: "#estrutura",
-										className: "hover:text-emerald-400 transition-colors",
-										children: "Estrutura"
-									})
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:69:15",
-									"data-prohibitions": "[]",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-										"data-uid": "src/components/Footer.tsx:70:17",
-										"data-prohibitions": "[]",
-										href: "#equipe",
-										className: "hover:text-emerald-400 transition-colors",
-										children: "Nossa Equipe"
-									})
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
-									"data-uid": "src/components/Footer.tsx:74:15",
-									"data-prohibitions": "[]",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-										"data-uid": "src/components/Footer.tsx:75:17",
-										"data-prohibitions": "[]",
-										href: "#faq",
-										className: "hover:text-emerald-400 transition-colors",
-										children: "Perguntas Frequentes"
-									})
-								})
-							]
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/Footer.tsx:82:11",
-						"data-prohibitions": "[]",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-								"data-uid": "src/components/Footer.tsx:83:13",
-								"data-prohibitions": "[]",
-								className: "text-lg font-semibold text-white mb-6",
-								children: "Horário de Visitas"
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-								"data-uid": "src/components/Footer.tsx:84:13",
-								"data-prohibitions": "[]",
-								className: "text-slate-400 mb-4",
-								children: [
-									"Aberto todos os dias",
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
-										"data-uid": "src/components/Footer.tsx:86:15",
-										"data-prohibitions": "[editContent]"
-									}),
-									"das 10h às 17h."
-								]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-								"data-uid": "src/components/Footer.tsx:89:13",
-								"data-prohibitions": "[]",
-								className: "text-sm text-slate-500",
-								children: "* Para visitas fora do horário comercial, favor entrar em contato antecipadamente."
-							})
-						]
-					})
-				]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/Footer.tsx:94:9",
-				"data-prohibitions": "[editContent]",
-				className: "pt-8 border-t border-slate-800 text-center text-sm text-slate-500 flex flex-col md:flex-row justify-between items-center gap-4",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-					"data-uid": "src/components/Footer.tsx:95:11",
-					"data-prohibitions": "[editContent]",
-					children: [
-						"© ",
-						(/* @__PURE__ */ new Date()).getFullYear(),
-						" Casa Vita Repouso. Todos os direitos reservados."
-					]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					"data-uid": "src/components/Footer.tsx:96:11",
-					"data-prohibitions": "[]",
-					children: "Responsável Técnico: Dra. Ana Lúcia - CRM-SP 123456"
-				})]
-			})]
-		})
-	});
-}
-//#endregion
-//#region src/components/FloatingWhatsApp.tsx
-function FloatingWhatsApp() {
-	const handleWhatsApp = () => {
-		trackWhatsAppClick();
-		window.open("https://wa.me/551137684392", "_blank");
-	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-		"data-uid": "src/components/FloatingWhatsApp.tsx:11:5",
-		"data-prohibitions": "[]",
-		onClick: handleWhatsApp,
-		className: "fixed bottom-6 right-6 z-50 flex items-center justify-center w-16 h-16 bg-green-500 text-white rounded-full shadow-2xl hover:bg-green-600 hover:scale-110 transition-all duration-300 animate-fade-in-up",
-		"aria-label": "Fale conosco pelo WhatsApp",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
-			"data-uid": "src/components/FloatingWhatsApp.tsx:16:7",
-			"data-prohibitions": "[editContent]",
-			className: "w-8 h-8"
-		})
-	});
-}
-//#endregion
-//#region src/components/Layout.tsx
-function Layout() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		"data-uid": "src/components/Layout.tsx:8:5",
-		"data-prohibitions": "[]",
-		className: "min-h-screen font-sans antialiased text-slate-900 bg-slate-50 flex flex-col",
-		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Header$1, {
-				"data-uid": "src/components/Layout.tsx:9:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("main", {
-				"data-uid": "src/components/Layout.tsx:10:7",
-				"data-prohibitions": "[]",
-				className: "flex-grow",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {
-					"data-uid": "src/components/Layout.tsx:11:9",
-					"data-prohibitions": "[editContent]"
-				})
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Footer, {
-				"data-uid": "src/components/Layout.tsx:13:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FloatingWhatsApp, {
-				"data-uid": "src/components/Layout.tsx:14:7",
-				"data-prohibitions": "[editContent]"
-			})
-		]
-	});
-}
-//#endregion
-//#region src/components/sections/Hero.tsx
-function Hero() {
-	const handleWhatsApp = () => {
-		trackWhatsAppClick();
-		window.open("https://wa.me/551137684392", "_blank");
-	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/Hero.tsx:12:5",
-		"data-prohibitions": "[]",
-		className: "relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden bg-emerald-50/50",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			"data-uid": "src/components/sections/Hero.tsx:13:7",
-			"data-prohibitions": "[]",
-			className: "container px-4 mx-auto relative z-10",
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/Hero.tsx:14:9",
-				"data-prohibitions": "[]",
-				className: "flex flex-col lg:flex-row items-center gap-12",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/sections/Hero.tsx:15:11",
-					"data-prohibitions": "[]",
-					className: "lg:w-1/2 text-center lg:text-left",
-					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h1", {
-							"data-uid": "src/components/sections/Hero.tsx:16:13",
-							"data-prohibitions": "[]",
-							className: "text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.15] mb-6 tracking-tight",
-							children: [
-								"Cuidado, conforto e ",
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									"data-uid": "src/components/sections/Hero.tsx:17:35",
-									"data-prohibitions": "[]",
-									className: "text-emerald-600",
-									children: "alegria de viver"
-								}),
-								" todos os dias."
-							]
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							"data-uid": "src/components/sections/Hero.tsx:20:13",
-							"data-prohibitions": "[]",
-							className: "text-lg md:text-xl text-slate-600 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed",
-							children: "Na Casa Vita, oferecemos um ambiente acolhedor e profissional para a melhor idade. Uma verdadeira extensão do seu lar, com assistência humanizada 24 horas."
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							"data-uid": "src/components/sections/Hero.tsx:24:13",
-							"data-prohibitions": "[]",
-							className: "flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-								"data-uid": "src/components/sections/Hero.tsx:25:15",
-								"data-prohibitions": "[]",
-								onClick: handleWhatsApp,
-								size: "lg",
-								className: "bg-green-600 hover:bg-green-700 text-white rounded-full px-8 h-14 text-lg w-full sm:w-auto shadow-xl shadow-green-600/20 transition-all hover:scale-105",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
-									"data-uid": "src/components/sections/Hero.tsx:30:17",
-									"data-prohibitions": "[editContent]",
-									className: "mr-2 h-6 w-6"
-								}), "Fale Conosco"]
-							})
-						})
-					]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/sections/Hero.tsx:35:11",
-					"data-prohibitions": "[]",
-					className: "lg:w-1/2 relative",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-						"data-uid": "src/components/sections/Hero.tsx:36:13",
-						"data-prohibitions": "[]",
-						className: "absolute inset-0 bg-emerald-200 rounded-[3rem] rotate-3 scale-105 opacity-50 blur-lg"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-						"data-uid": "src/components/sections/Hero.tsx:37:13",
-						"data-prohibitions": "[editContent]",
-						src: "https://img.usecurling.com/p/800/600?q=happy%20elderly%20smiling",
-						alt: "Idosos felizes e bem cuidados",
-						className: "relative rounded-[2.5rem] shadow-2xl object-cover w-full h-[400px] lg:h-[500px] border-8 border-white"
-					})]
-				})]
-			})
-		})
-	});
-}
-//#endregion
-//#region src/assets/video-section-820b3.jpg
-var video_section_820b3_default = "/assets/video-section-820b3-BrXiGUIQ.jpg";
-//#endregion
 //#region src/components/sections/About.tsx
 function About() {
+	const benefits = [
+		"Ambiente seguro e monitorado",
+		"Equipe multidisciplinar qualificada",
+		"Atendimento humanizado",
+		"Infraestrutura acessível",
+		"Atividades recreativas diárias",
+		"Alimentação balanceada"
+	];
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/About.tsx:5:5",
-		"data-prohibitions": "[]",
+		"data-uid": "src/components/sections/About.tsx:14:5",
+		"data-prohibitions": "[editContent]",
 		id: "sobre",
-		className: "py-24 bg-white",
+		className: "py-20 bg-white overflow-hidden",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			"data-uid": "src/components/sections/About.tsx:6:7",
-			"data-prohibitions": "[]",
-			className: "container mx-auto px-4",
+			"data-uid": "src/components/sections/About.tsx:15:7",
+			"data-prohibitions": "[editContent]",
+			className: "container mx-auto px-4 md:px-6",
 			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/About.tsx:7:9",
-				"data-prohibitions": "[]",
-				className: "flex flex-col lg:flex-row-reverse items-center gap-16",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/sections/About.tsx:8:11",
+				"data-uid": "src/components/sections/About.tsx:16:9",
+				"data-prohibitions": "[editContent]",
+				className: "flex flex-col lg:flex-row items-center gap-12 lg:gap-20",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					"data-uid": "src/components/sections/About.tsx:17:11",
 					"data-prohibitions": "[]",
-					className: "lg:w-1/2",
+					className: "w-full lg:w-1/2",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/sections/About.tsx:18:13",
+						"data-prohibitions": "[]",
+						className: "relative rounded-[2rem] overflow-hidden aspect-[4/3] shadow-2xl",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+							"data-uid": "src/components/sections/About.tsx:19:15",
+							"data-prohibitions": "[editContent]",
+							src: "https://img.usecurling.com/p/800/600?q=senior%20care&color=blue",
+							alt: "Ambiente Casa Vita",
+							className: "w-full h-full object-cover"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							"data-uid": "src/components/sections/About.tsx:24:15",
+							"data-prohibitions": "[]",
+							className: "absolute inset-0 bg-primary/10 mix-blend-multiply"
+						})]
+					})
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/sections/About.tsx:28:11",
+					"data-prohibitions": "[editContent]",
+					className: "w-full lg:w-1/2 space-y-6",
 					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-							"data-uid": "src/components/sections/About.tsx:9:13",
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h2", {
+							"data-uid": "src/components/sections/About.tsx:29:13",
 							"data-prohibitions": "[]",
-							className: "text-3xl lg:text-4xl font-bold text-slate-900 mb-6 leading-tight",
-							children: "Uma estrutura pensada para o bem-estar e convívio"
+							className: "text-3xl md:text-4xl font-bold text-foreground",
+							children: [
+								"Muito mais que uma casa de repouso,",
+								" ",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									"data-uid": "src/components/sections/About.tsx:31:15",
+									"data-prohibitions": "[]",
+									className: "text-primary",
+									children: "uma verdadeira família."
+								})
+							]
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							"data-uid": "src/components/sections/About.tsx:12:13",
+							"data-uid": "src/components/sections/About.tsx:33:13",
 							"data-prohibitions": "[]",
-							className: "text-slate-600 text-lg mb-6 leading-relaxed",
-							children: "A Casa Vita Repouso foi idealizada para oferecer não apenas cuidados médicos de excelência, mas qualidade de vida, convivência social e alegria para nossos residentes."
+							className: "text-lg text-muted-foreground leading-relaxed",
+							children: "A Casa Vita nasceu do desejo de proporcionar um envelhecimento com dignidade, respeito e muita alegria. Nossas instalações foram projetadas pensando exclusivamente na segurança e no conforto da terceira idade."
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							"data-uid": "src/components/sections/About.tsx:17:13",
+							"data-uid": "src/components/sections/About.tsx:38:13",
 							"data-prohibitions": "[]",
-							className: "text-slate-600 text-lg leading-relaxed",
-							children: "Nossa unidade conta com ambientes amplos, bem iluminados e adaptados para garantir total segurança e mobilidade. Um verdadeiro lar, cercado de verde e tranquilidade, bem no coração de São Paulo."
+							className: "text-lg text-muted-foreground leading-relaxed",
+							children: "Entendemos que cada residente tem sua história, suas preferências e suas necessidades. Por isso, nosso atendimento é personalizado e focado no bem-estar integral físico e emocional."
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
+							"data-uid": "src/components/sections/About.tsx:44:13",
+							"data-prohibitions": "[editContent]",
+							className: "grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8",
+							children: benefits.map((benefit, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
+								"data-uid": "src/components/sections/About.tsx:46:17",
+								"data-prohibitions": "[editContent]",
+								className: "flex items-center gap-3",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									"data-uid": "src/components/sections/About.tsx:47:19",
+									"data-prohibitions": "[]",
+									className: "h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center shrink-0",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Check, {
+										"data-uid": "src/components/sections/About.tsx:48:21",
+										"data-prohibitions": "[editContent]",
+										className: "h-4 w-4 text-primary"
+									})
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									"data-uid": "src/components/sections/About.tsx:50:19",
+									"data-prohibitions": "[editContent]",
+									className: "text-foreground font-medium",
+									children: benefit
+								})]
+							}, index))
 						})
 					]
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/sections/About.tsx:23:11",
-					"data-prohibitions": "[]",
-					className: "lg:w-1/2 relative",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-						"data-uid": "src/components/sections/About.tsx:24:13",
-						"data-prohibitions": "[]",
-						className: "absolute -inset-4 bg-emerald-50 rounded-[3rem] -z-10 transform -rotate-2"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-						"data-uid": "src/components/sections/About.tsx:25:13",
-						"data-prohibitions": "[editContent]",
-						src: video_section_820b3_default,
-						alt: "Fachada arborizada da Casa Vita",
-						className: "rounded-[2.5rem] shadow-xl w-full h-[400px] object-cover"
-					})]
 				})]
 			})
 		})
 	});
 }
 //#endregion
+//#region src/components/ui/card.tsx
+var Card = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	"data-uid": "src/components/ui/card.tsx:8:5",
+	"data-prohibitions": "[editContent]",
+	ref,
+	className: cn$1("rounded-lg border bg-card text-card-foreground shadow-sm", className),
+	...props
+}));
+Card.displayName = "Card";
+var CardHeader = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	"data-uid": "src/components/ui/card.tsx:19:5",
+	"data-prohibitions": "[editContent]",
+	ref,
+	className: cn$1("flex flex-col space-y-1.5 p-6", className),
+	...props
+}));
+CardHeader.displayName = "CardHeader";
+var CardTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	"data-uid": "src/components/ui/card.tsx:26:5",
+	"data-prohibitions": "[editContent]",
+	ref,
+	className: cn$1("text-2xl font-semibold leading-none tracking-tight", className),
+	...props
+}));
+CardTitle.displayName = "CardTitle";
+var CardDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	"data-uid": "src/components/ui/card.tsx:37:5",
+	"data-prohibitions": "[editContent]",
+	ref,
+	className: cn$1("text-sm text-muted-foreground", className),
+	...props
+}));
+CardDescription.displayName = "CardDescription";
+var CardContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	"data-uid": "src/components/ui/card.tsx:44:5",
+	"data-prohibitions": "[editContent]",
+	ref,
+	className: cn$1("p-6 pt-0", className),
+	...props
+}));
+CardContent.displayName = "CardContent";
+var CardFooter = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+	"data-uid": "src/components/ui/card.tsx:51:5",
+	"data-prohibitions": "[editContent]",
+	ref,
+	className: cn$1("flex items-center p-6 pt-0", className),
+	...props
+}));
+CardFooter.displayName = "CardFooter";
+//#endregion
 //#region src/components/sections/Services.tsx
+var services = [
+	{
+		title: "Cuidados 24h",
+		description: "Equipe de cuidadores e técnicos de enfermagem disponíveis 24 horas por dia, 7 dias por semana, garantindo assistência contínua.",
+		icon: HeartPulse
+	},
+	{
+		title: "Acompanhamento Médico",
+		description: "Visitas médicas regulares e acompanhamento rigoroso da saúde de cada residente para prevenir e tratar qualquer condição.",
+		icon: Stethoscope
+	},
+	{
+		title: "Hospedagem Permanente",
+		description: "Um verdadeiro lar com conforto, segurança e uma infraestrutura adaptada para as necessidades da terceira idade.",
+		icon: House
+	},
+	{
+		title: "Nutrição Especializada",
+		description: "Cardápios balanceados elaborados por nutricionistas, respeitando as restrições e preferências alimentares.",
+		icon: Utensils
+	},
+	{
+		title: "Fisioterapia e Reabilitação",
+		description: "Sessões focadas na manutenção e recuperação da capacidade motora, promovendo maior autonomia e qualidade de vida.",
+		icon: Activity
+	},
+	{
+		title: "Convívio Social",
+		description: "Atividades recreativas, oficinas de memória e eventos que estimulam a socialização e o bem-estar mental e emocional.",
+		icon: Users
+	}
+];
 function Services() {
-	const services = [
-		{
-			icon: HeartPulse,
-			title: "Enfermagem 24h",
-			desc: "Equipe de saúde dedicada em tempo integral para assistência contínua."
-		},
-		{
-			icon: UserCheck,
-			title: "Acompanhamento Médico",
-			desc: "Visitas médicas regulares focadas em cuidado preventivo e humanizado."
-		},
-		{
-			icon: Coffee,
-			title: "Nutrição Balanceada",
-			desc: "6 refeições diárias elaboradas e supervisionadas por nutricionistas."
-		},
-		{
-			icon: Activity,
-			title: "Fisioterapia",
-			desc: "Atividades motoras para manter e recuperar a mobilidade e vitalidade."
-		}
-	];
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/Services.tsx:28:5",
+		"data-uid": "src/components/sections/Services.tsx:45:5",
 		"data-prohibitions": "[editContent]",
 		id: "servicos",
-		className: "py-24 bg-emerald-50/50",
+		className: "py-20 bg-white",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/Services.tsx:29:7",
+			"data-uid": "src/components/sections/Services.tsx:46:7",
 			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4 text-center",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-					"data-uid": "src/components/sections/Services.tsx:30:9",
-					"data-prohibitions": "[]",
-					className: "text-3xl lg:text-4xl font-bold text-slate-900 mb-4",
-					children: "Nossos Serviços"
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					"data-uid": "src/components/sections/Services.tsx:31:9",
-					"data-prohibitions": "[]",
-					className: "text-slate-600 text-lg mb-16 max-w-2xl mx-auto",
-					children: "Cuidado integral e acolhedor, atendendo todas as necessidades físicas e emocionais dos nossos residentes para uma vida plena."
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					"data-uid": "src/components/sections/Services.tsx:35:9",
-					"data-prohibitions": "[editContent]",
-					className: "grid md:grid-cols-2 lg:grid-cols-4 gap-8",
-					children: services.map((s, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/sections/Services.tsx:37:13",
-						"data-prohibitions": "[editContent]",
-						className: "bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-emerald-50",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								"data-uid": "src/components/sections/Services.tsx:41:15",
-								"data-prohibitions": "[]",
-								className: "w-16 h-16 bg-emerald-100 text-emerald-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(s.icon, {
-									"data-uid": "src/components/sections/Services.tsx:42:17",
-									"data-prohibitions": "[editContent]",
-									className: "w-8 h-8"
-								})
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-								"data-uid": "src/components/sections/Services.tsx:44:15",
-								"data-prohibitions": "[editContent]",
-								className: "text-xl font-bold text-slate-900 mb-3",
-								children: s.title
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-								"data-uid": "src/components/sections/Services.tsx:45:15",
-								"data-prohibitions": "[editContent]",
-								className: "text-slate-600 leading-relaxed",
-								children: s.desc
-							})
-						]
-					}, i))
-				})
-			]
-		})
-	});
-}
-//#endregion
-//#region src/assets/barra_unidade2-dda45.jpg
-var barra_unidade2_dda45_default = "/assets/barra_unidade2-dda45-CsAoTHIT.jpg";
-//#endregion
-//#region src/components/sections/Gallery.tsx
-function Gallery() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/Gallery.tsx:5:5",
-		"data-prohibitions": "[]",
-		id: "estrutura",
-		className: "py-24 bg-white",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/Gallery.tsx:6:7",
-			"data-prohibitions": "[]",
-			className: "container mx-auto px-4",
+			className: "container mx-auto px-4 md:px-6",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/Gallery.tsx:7:9",
+				"data-uid": "src/components/sections/Services.tsx:47:9",
 				"data-prohibitions": "[]",
-				className: "text-center mb-16",
+				className: "text-center max-w-3xl mx-auto mb-16",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-					"data-uid": "src/components/sections/Gallery.tsx:8:11",
+					"data-uid": "src/components/sections/Services.tsx:48:11",
 					"data-prohibitions": "[]",
-					className: "text-3xl lg:text-4xl font-bold text-slate-900 mb-4",
-					children: "Nossa Estrutura"
+					className: "text-3xl md:text-4xl font-bold text-foreground mb-4",
+					children: "Nossos Serviços"
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					"data-uid": "src/components/sections/Gallery.tsx:9:11",
+					"data-uid": "src/components/sections/Services.tsx:49:11",
 					"data-prohibitions": "[]",
-					className: "text-slate-600 text-lg max-w-2xl mx-auto",
-					children: "Conheça as instalações da Casa Vita. Ambientes limpos, organizados, iluminados e totalmente adaptados para o conforto e segurança dos residentes."
+					className: "text-lg text-muted-foreground",
+					children: "Oferecemos uma estrutura completa de atendimento multidisciplinar, pensada em cada detalhe para promover saúde e alegria."
 				})]
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				"data-uid": "src/components/sections/Gallery.tsx:14:9",
-				"data-prohibitions": "[]",
-				className: "rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-slate-50",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-					"data-uid": "src/components/sections/Gallery.tsx:15:11",
+				"data-uid": "src/components/sections/Services.tsx:55:9",
+				"data-prohibitions": "[editContent]",
+				className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8",
+				children: services.map((service, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
+					"data-uid": "src/components/sections/Services.tsx:57:13",
 					"data-prohibitions": "[editContent]",
-					src: barra_unidade2_dda45_default,
-					alt: "Ambientes internos e externos da Casa Vita Unidade 2",
-					className: "w-full h-auto object-cover"
-				})
+					className: "rounded-2xl border-none shadow-lg hover:shadow-xl transition-shadow bg-primary/5",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
+						"data-uid": "src/components/sections/Services.tsx:61:15",
+						"data-prohibitions": "[editContent]",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							"data-uid": "src/components/sections/Services.tsx:62:17",
+							"data-prohibitions": "[]",
+							className: "h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(service.icon, {
+								"data-uid": "src/components/sections/Services.tsx:63:19",
+								"data-prohibitions": "[editContent]",
+								className: "h-7 w-7 text-primary"
+							})
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
+							"data-uid": "src/components/sections/Services.tsx:65:17",
+							"data-prohibitions": "[editContent]",
+							className: "text-xl",
+							children: service.title
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
+						"data-uid": "src/components/sections/Services.tsx:67:15",
+						"data-prohibitions": "[editContent]",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, {
+							"data-uid": "src/components/sections/Services.tsx:68:17",
+							"data-prohibitions": "[editContent]",
+							className: "text-base leading-relaxed",
+							children: service.description
+						})
+					})]
+				}, index))
 			})]
 		})
 	});
 }
 //#endregion
 //#region src/components/sections/Team.tsx
+var team = [{
+	name: "Thiago Pereira",
+	role: "Sócio Diretor",
+	description: "Administrador de Empresas, atua na gestão da Casa Vita focando no bem-estar dos residentes e na excelência do atendimento, garantindo um ambiente acolhedor e eficiente.",
+	image: "/assets/foto_thiago-c3243-CeAbnlLX.png"
+}, {
+	name: "Luis Pereira",
+	role: "Sócio Diretor",
+	description: "Médico e responsável técnico pela Casa Vita, garantindo que todos os padrões de saúde e cuidados sejam rigorosamente seguidos com humanização e segurança.",
+	image: "/assets/foto_luis-8c5cf-CNb7-zCF.png"
+}];
 function Team() {
-	const team = [
-		{
-			name: "Dra. Ana Lúcia",
-			role: "Diretora Médica",
-			desc: "Especialista em Geriatria com mais de 15 anos de experiência em cuidados com idosos.",
-			img: "https://img.usecurling.com/ppl/medium?gender=female&seed=15"
-		},
-		{
-			name: "Carlos Mendes",
-			role: "Enfermeiro Chefe",
-			desc: "Lidera nossa equipe de enfermagem garantindo atendimento humanizado e seguro 24 horas.",
-			img: "https://img.usecurling.com/ppl/medium?gender=male&seed=42"
-		},
-		{
-			name: "Mariana Costa",
-			role: "Fisioterapeuta",
-			desc: "Focada na reabilitação e manutenção da capacidade motora e autonomia dos nossos residentes.",
-			img: "https://img.usecurling.com/ppl/medium?gender=female&seed=23"
-		},
-		{
-			name: "Roberto Almeida",
-			role: "Nutricionista",
-			desc: "Responsável por elaborar cardápios saudáveis, saborosos e perfeitamente adaptados a cada necessidade.",
-			img: "https://img.usecurling.com/ppl/medium?gender=male&seed=8"
-		}
-	];
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/Team.tsx:30:5",
+		"data-uid": "src/components/sections/Team.tsx:24:5",
 		"data-prohibitions": "[editContent]",
 		id: "equipe",
-		className: "py-24 bg-emerald-50/50",
+		className: "py-20 bg-primary/5",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/Team.tsx:31:7",
+			"data-uid": "src/components/sections/Team.tsx:25:7",
 			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4",
+			className: "container mx-auto px-4 md:px-6",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/Team.tsx:32:9",
+				"data-uid": "src/components/sections/Team.tsx:26:9",
 				"data-prohibitions": "[]",
-				className: "text-center mb-16",
+				className: "text-center max-w-3xl mx-auto mb-16",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-					"data-uid": "src/components/sections/Team.tsx:33:11",
+					"data-uid": "src/components/sections/Team.tsx:27:11",
 					"data-prohibitions": "[]",
-					className: "text-3xl lg:text-4xl font-bold text-slate-900 mb-4",
-					children: "Nossa Equipe"
+					className: "text-3xl md:text-4xl font-bold text-foreground mb-4",
+					children: "Nossa Liderança"
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					"data-uid": "src/components/sections/Team.tsx:34:11",
+					"data-uid": "src/components/sections/Team.tsx:28:11",
 					"data-prohibitions": "[]",
-					className: "text-slate-600 text-lg max-w-2xl mx-auto",
-					children: "Profissionais altamente qualificados e apaixonados pelo que fazem. Cuidamos de quem você ama com carinho, técnica e muito respeito."
+					className: "text-lg text-muted-foreground",
+					children: "Uma gestão familiar e profissional dedicada a oferecer o mais alto padrão de qualidade em cuidados para idosos."
 				})]
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				"data-uid": "src/components/sections/Team.tsx:39:9",
+				"data-uid": "src/components/sections/Team.tsx:34:9",
 				"data-prohibitions": "[editContent]",
-				className: "grid md:grid-cols-2 lg:grid-cols-4 gap-8",
-				children: team.map((member, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/sections/Team.tsx:41:13",
+				className: "grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto",
+				children: team.map((member, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Card, {
+					"data-uid": "src/components/sections/Team.tsx:36:13",
 					"data-prohibitions": "[editContent]",
-					className: "bg-white rounded-[2rem] p-8 text-center shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-emerald-50",
-					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-							"data-uid": "src/components/sections/Team.tsx:45:15",
+					className: "rounded-2xl overflow-hidden border-none shadow-lg bg-white",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardContent, {
+						"data-uid": "src/components/sections/Team.tsx:40:15",
+						"data-prohibitions": "[editContent]",
+						className: "p-0 flex flex-col sm:flex-row h-full",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							"data-uid": "src/components/sections/Team.tsx:41:17",
+							"data-prohibitions": "[]",
+							className: "sm:w-2/5 p-6 flex justify-center items-center bg-primary/5",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								"data-uid": "src/components/sections/Team.tsx:42:19",
+								"data-prohibitions": "[]",
+								className: "w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-md",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+									"data-uid": "src/components/sections/Team.tsx:43:21",
+									"data-prohibitions": "[editContent]",
+									src: member.image,
+									alt: member.name,
+									className: "w-full h-full object-cover object-center"
+								})
+							})
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							"data-uid": "src/components/sections/Team.tsx:50:17",
 							"data-prohibitions": "[editContent]",
-							src: member.img,
-							alt: member.name,
-							className: "w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-emerald-100"
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
-							"data-uid": "src/components/sections/Team.tsx:50:15",
-							"data-prohibitions": "[editContent]",
-							className: "text-xl font-bold text-slate-900 mb-1",
-							children: member.name
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							"data-uid": "src/components/sections/Team.tsx:51:15",
-							"data-prohibitions": "[editContent]",
-							className: "text-emerald-600 font-medium mb-4",
-							children: member.role
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							"data-uid": "src/components/sections/Team.tsx:52:15",
-							"data-prohibitions": "[editContent]",
-							className: "text-slate-500 text-sm leading-relaxed",
-							children: member.desc
-						})
-					]
-				}, i))
+							className: "sm:w-3/5 p-8 flex flex-col justify-center",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+									"data-uid": "src/components/sections/Team.tsx:51:19",
+									"data-prohibitions": "[editContent]",
+									className: "text-2xl font-bold text-foreground mb-1",
+									children: member.name
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+									"data-uid": "src/components/sections/Team.tsx:52:19",
+									"data-prohibitions": "[editContent]",
+									className: "text-primary font-medium mb-4",
+									children: member.role
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+									"data-uid": "src/components/sections/Team.tsx:53:19",
+									"data-prohibitions": "[editContent]",
+									className: "text-muted-foreground leading-relaxed",
+									children: member.description
+								})
+							]
+						})]
+					})
+				}, index))
 			})]
 		})
 	});
@@ -21022,74 +21271,138 @@ var AccordionContent = import_react.forwardRef(({ className, children, ...props 
 AccordionContent.displayName = Content2.displayName;
 //#endregion
 //#region src/components/sections/FAQ.tsx
+var faqs = [
+	{
+		question: "Quais são os horários de visita?",
+		answer: "As visitas na Casa Vita são abertas diariamente das 10h às 17h. Acreditamos que o convívio com a família é essencial para o bem-estar e a alegria dos nossos residentes."
+	},
+	{
+		question: "Quais serviços estão inclusos na mensalidade?",
+		answer: "Nossa mensalidade inclui hospedagem, alimentação balanceada com acompanhamento nutricional, cuidados 24h por nossa equipe especializada, lavanderia, além de atividades de recreação e estímulo cognitivo."
+	},
+	{
+		question: "A Casa Vita aceita convênios médicos?",
+		answer: "Trabalhamos de forma particular, mas auxiliamos os familiares com os trâmites necessários para solicitar o sistema de reembolso junto aos convênios médicos dos residentes, de acordo com o plano de saúde."
+	},
+	{
+		question: "Como funciona o processo de adaptação?",
+		answer: "O processo de adaptação é feito de forma gradual e humanizada. Nossa equipe multidisciplinar acompanha de perto os primeiros dias, integrando o residente às atividades e aos demais moradores para que ele se sinta verdadeiramente em casa."
+	},
+	{
+		question: "Existe a opção de hospedagem temporária?",
+		answer: "Sim! Oferecemos opções de hospedagem tanto permanente quanto temporária, ideal para situações de pós-operatório, reabilitação ou quando a família precisa viajar e necessita de um local seguro para o idoso."
+	}
+];
 function FAQ() {
-	const faqs = [
-		{
-			question: "Quais são os horários de visita?",
-			answer: "As visitas são abertas diariamente das 10h às 17h. Acreditamos que o contato frequente e afetuoso com a família é fundamental para o bem-estar físico e emocional dos residentes."
-		},
-		{
-			question: "O que está incluso na mensalidade?",
-			answer: "Nossa mensalidade contempla a hospedagem completa, 6 refeições diárias balanceadas, acompanhamento médico periódico, assistência de enfermagem 24 horas, fisioterapia preventiva, suporte nutricional e serviço de lavanderia."
-		},
-		{
-			question: "A Casa Vita aceita idosos com Alzheimer ou outras demências?",
-			answer: "Sim, nossa equipe multidisciplinar é amplamente capacitada para acolher, respeitar e cuidar de idosos com Alzheimer e outras condições cognitivas, garantindo um ambiente seguro e estímulos adequados."
-		},
-		{
-			question: "Como funciona o período de adaptação?",
-			answer: "Temos um protocolo especial e cuidadoso de acolhimento. Nos primeiros dias, acompanhamos de perto o residente, incentivando a participação nas rotinas e mantendo a família sempre informada sobre cada avanço."
-		},
-		{
-			question: "O idoso pode levar seus móveis ou pertences pessoais?",
-			answer: "Com certeza! Incentivamos que os quartos sejam decorados com objetos afetivos, fotos e pequenos móveis (mediante avaliação de espaço) para que o ambiente fique realmente com 'cara de casa'."
-		}
-	];
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
 		"data-uid": "src/components/sections/FAQ.tsx:38:5",
 		"data-prohibitions": "[editContent]",
 		id: "faq",
-		className: "py-24 bg-white",
+		className: "py-20 bg-white",
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 			"data-uid": "src/components/sections/FAQ.tsx:39:7",
 			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4 max-w-3xl",
+			className: "container mx-auto px-4 md:px-6 max-w-4xl",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 				"data-uid": "src/components/sections/FAQ.tsx:40:9",
 				"data-prohibitions": "[]",
-				className: "text-center mb-16",
+				className: "text-center mb-12",
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
 					"data-uid": "src/components/sections/FAQ.tsx:41:11",
 					"data-prohibitions": "[]",
-					className: "text-3xl lg:text-4xl font-bold text-slate-900 mb-4",
+					className: "text-3xl md:text-4xl font-bold text-foreground mb-4",
 					children: "Perguntas Frequentes"
 				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 					"data-uid": "src/components/sections/FAQ.tsx:44:11",
 					"data-prohibitions": "[]",
-					className: "text-slate-600 text-lg",
-					children: "Tire suas principais dúvidas sobre o funcionamento e o cuidado na Casa Vita."
+					className: "text-lg text-muted-foreground",
+					children: "Tire suas dúvidas sobre o funcionamento e os serviços oferecidos pela Casa Vita."
 				})]
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Accordion, {
-				"data-uid": "src/components/sections/FAQ.tsx:48:9",
+				"data-uid": "src/components/sections/FAQ.tsx:49:9",
 				"data-prohibitions": "[editContent]",
 				type: "single",
 				collapsible: true,
 				className: "w-full space-y-4",
 				children: faqs.map((faq, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AccordionItem, {
-					"data-uid": "src/components/sections/FAQ.tsx:50:13",
+					"data-uid": "src/components/sections/FAQ.tsx:51:13",
 					"data-prohibitions": "[editContent]",
 					value: `item-${index}`,
-					className: "border border-emerald-100 rounded-2xl px-6 bg-emerald-50/30 data-[state=open]:bg-white data-[state=open]:shadow-md transition-all",
+					className: "border border-border rounded-xl px-6 bg-primary/5 data-[state=open]:bg-white data-[state=open]:border-primary/20 transition-colors",
 					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionTrigger, {
-						"data-uid": "src/components/sections/FAQ.tsx:55:15",
+						"data-uid": "src/components/sections/FAQ.tsx:56:15",
 						"data-prohibitions": "[editContent]",
-						className: "text-left text-lg font-semibold text-slate-800 hover:text-emerald-600 hover:no-underline py-4",
+						className: "text-left font-semibold text-lg hover:no-underline py-6",
 						children: faq.question
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionContent, {
-						"data-uid": "src/components/sections/FAQ.tsx:58:15",
+						"data-uid": "src/components/sections/FAQ.tsx:59:15",
 						"data-prohibitions": "[editContent]",
-						className: "text-slate-600 text-base leading-relaxed pb-6 pt-2",
+						className: "text-muted-foreground text-base leading-relaxed pb-6",
 						children: faq.answer
+					})]
+				}, index))
+			})]
+		})
+	});
+}
+//#endregion
+//#region src/components/sections/Gallery.tsx
+function Gallery() {
+	const images = [
+		"https://img.usecurling.com/p/600/400?q=senior%20activities&color=orange",
+		"https://img.usecurling.com/p/600/400?q=nursing%20home%20garden",
+		"https://img.usecurling.com/p/600/400?q=elderly%20care%20room",
+		"https://img.usecurling.com/p/600/400?q=senior%20dining&color=green",
+		"https://img.usecurling.com/p/600/400?q=physical%20therapy%20elderly",
+		"https://img.usecurling.com/p/600/400?q=happy%20senior%20people&color=blue"
+	];
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
+		"data-uid": "src/components/sections/Gallery.tsx:12:5",
+		"data-prohibitions": "[editContent]",
+		className: "py-20 bg-primary/5",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/sections/Gallery.tsx:13:7",
+			"data-prohibitions": "[editContent]",
+			className: "container mx-auto px-4 md:px-6",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/sections/Gallery.tsx:14:9",
+				"data-prohibitions": "[]",
+				className: "text-center max-w-3xl mx-auto mb-16",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+					"data-uid": "src/components/sections/Gallery.tsx:15:11",
+					"data-prohibitions": "[]",
+					className: "text-3xl md:text-4xl font-bold text-foreground mb-4",
+					children: "Nossos Ambientes"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					"data-uid": "src/components/sections/Gallery.tsx:16:11",
+					"data-prohibitions": "[]",
+					className: "text-lg text-muted-foreground",
+					children: "Conheça um pouco das nossas instalações, preparadas com carinho para oferecer o máximo de conforto."
+				})]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				"data-uid": "src/components/sections/Gallery.tsx:22:9",
+				"data-prohibitions": "[editContent]",
+				className: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6",
+				children: images.map((src, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/sections/Gallery.tsx:24:13",
+					"data-prohibitions": "[]",
+					className: "group relative rounded-2xl overflow-hidden aspect-[4/3] bg-white shadow-sm hover:shadow-xl transition-all duration-300",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+						"data-uid": "src/components/sections/Gallery.tsx:28:15",
+						"data-prohibitions": "[editContent]",
+						src,
+						alt: `Galeria Casa Vita ${index + 1}`,
+						className: "w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						"data-uid": "src/components/sections/Gallery.tsx:33:15",
+						"data-prohibitions": "[]",
+						className: "absolute inset-0 bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							"data-uid": "src/components/sections/Gallery.tsx:34:17",
+							"data-prohibitions": "[]",
+							className: "text-white font-medium px-4 py-2 border-2 border-white rounded-full",
+							children: "Ver Ampliado"
+						})
 					})]
 				}, index))
 			})]
@@ -21099,48 +21412,69 @@ function FAQ() {
 //#endregion
 //#region src/components/sections/CTA.tsx
 function CTA() {
-	const handleWhatsApp = () => {
-		trackWhatsAppClick();
-		window.open("https://wa.me/551137684392", "_blank");
-	};
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
-		"data-uid": "src/components/sections/CTA.tsx:12:5",
+		"data-uid": "src/components/sections/CTA.tsx:7:5",
 		"data-prohibitions": "[]",
-		className: "py-24 bg-emerald-600 text-white relative overflow-hidden",
+		className: "py-24 bg-white relative overflow-hidden",
 		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			"data-uid": "src/components/sections/CTA.tsx:13:7",
+			"data-uid": "src/components/sections/CTA.tsx:8:7",
 			"data-prohibitions": "[]",
-			className: "absolute inset-0 bg-[url('https://img.usecurling.com/p/1200/400?q=leaves%20pattern&color=green')] opacity-10 mix-blend-overlay object-cover w-full h-full"
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/CTA.tsx:14:7",
+			className: "absolute inset-0 bg-primary/5"
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			"data-uid": "src/components/sections/CTA.tsx:10:7",
 			"data-prohibitions": "[]",
-			className: "container mx-auto px-4 text-center relative z-10",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-					"data-uid": "src/components/sections/CTA.tsx:15:9",
-					"data-prohibitions": "[]",
-					className: "text-3xl md:text-4xl lg:text-5xl font-bold mb-6 tracking-tight",
-					children: "Pronto para oferecer o melhor para quem você ama?"
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					"data-uid": "src/components/sections/CTA.tsx:18:9",
-					"data-prohibitions": "[]",
-					className: "text-emerald-50 text-xl mb-10 max-w-2xl mx-auto font-light",
-					children: "Entre em contato agora mesmo e agende uma visita. Nossa equipe está sempre pronta para ouvir você e tirar todas as suas dúvidas."
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-					"data-uid": "src/components/sections/CTA.tsx:22:9",
-					"data-prohibitions": "[]",
-					onClick: handleWhatsApp,
-					size: "lg",
-					className: "bg-white text-emerald-600 hover:bg-emerald-50 rounded-full px-10 h-16 text-lg shadow-2xl hover:scale-105 transition-transform",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
-						"data-uid": "src/components/sections/CTA.tsx:27:11",
-						"data-prohibitions": "[editContent]",
-						className: "mr-3 h-6 w-6"
-					}), "Falar pelo WhatsApp"]
-				})
-			]
+			className: "container relative z-10 mx-auto px-4 md:px-6",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/sections/CTA.tsx:11:9",
+				"data-prohibitions": "[]",
+				className: "max-w-4xl mx-auto bg-primary rounded-[3rem] p-10 md:p-16 text-center text-primary-foreground shadow-2xl",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+						"data-uid": "src/components/sections/CTA.tsx:12:11",
+						"data-prohibitions": "[]",
+						className: "text-3xl md:text-5xl font-bold mb-6",
+						children: "Venha conhecer a Casa Vita"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						"data-uid": "src/components/sections/CTA.tsx:13:11",
+						"data-prohibitions": "[]",
+						className: "text-lg md:text-xl text-primary-foreground/90 mb-10 max-w-2xl mx-auto leading-relaxed",
+						children: "Agende uma visita e descubra por que somos a escolha número um das famílias que buscam excelência em cuidados e qualidade de vida."
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/sections/CTA.tsx:18:11",
+						"data-prohibitions": "[]",
+						className: "flex flex-col sm:flex-row items-center justify-center gap-4",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							"data-uid": "src/components/sections/CTA.tsx:19:13",
+							"data-prohibitions": "[]",
+							size: "lg",
+							className: "w-full sm:w-auto rounded-full bg-white text-primary hover:bg-white/90 h-14 px-8 text-base font-semibold",
+							onClick: () => {
+								trackWhatsAppClick();
+								window.open("https://wa.me/5511981182882", "_blank");
+							},
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
+								"data-uid": "src/components/sections/CTA.tsx:27:15",
+								"data-prohibitions": "[editContent]",
+								className: "mr-2 h-5 w-5"
+							}), "Agendar via WhatsApp"]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+							"data-uid": "src/components/sections/CTA.tsx:31:13",
+							"data-prohibitions": "[]",
+							size: "lg",
+							variant: "outline",
+							className: "w-full sm:w-auto rounded-full border-white text-white hover:bg-white/10 h-14 px-8 text-base font-semibold bg-transparent",
+							onClick: () => document.getElementById("sobre")?.scrollIntoView({ behavior: "smooth" }),
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Calendar, {
+								"data-uid": "src/components/sections/CTA.tsx:39:15",
+								"data-prohibitions": "[editContent]",
+								className: "mr-2 h-5 w-5"
+							}), "Saber Mais"]
+						})]
+					})
+				]
+			})
 		})]
 	});
 }
@@ -21150,7 +21484,7 @@ function Index() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		"data-uid": "src/pages/Index.tsx:11:5",
 		"data-prohibitions": "[]",
-		className: "flex flex-col min-h-screen w-full bg-slate-50",
+		className: "flex flex-col min-h-screen",
 		children: [
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Hero, {
 				"data-uid": "src/pages/Index.tsx:12:7",
@@ -21164,11 +21498,11 @@ function Index() {
 				"data-uid": "src/pages/Index.tsx:14:7",
 				"data-prohibitions": "[editContent]"
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Gallery, {
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Team, {
 				"data-uid": "src/pages/Index.tsx:15:7",
 				"data-prohibitions": "[editContent]"
 			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Team, {
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Gallery, {
 				"data-uid": "src/pages/Index.tsx:16:7",
 				"data-prohibitions": "[editContent]"
 			}),
@@ -23238,4 +23572,4 @@ function App() {
 }));
 //#endregion
 
-//# sourceMappingURL=index-B-qXst-0.js.map
+//# sourceMappingURL=index-DPQaq8Nq.js.map

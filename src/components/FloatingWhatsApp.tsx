@@ -1,19 +1,36 @@
-import { trackWhatsAppClick } from '@/lib/tracking'
 import { MessageCircle } from 'lucide-react'
+import { trackWhatsAppClick } from '@/lib/tracking'
+import { cn } from '@/lib/utils'
+import { useState, useEffect } from 'react'
 
 export function FloatingWhatsApp() {
-  const handleWhatsApp = () => {
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsVisible(window.scrollY > 300)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const handleClick = () => {
     trackWhatsAppClick()
-    window.open('https://wa.me/551137684392', '_blank')
+    window.open('https://wa.me/5511981182882', '_blank')
   }
 
   return (
     <button
-      onClick={handleWhatsApp}
-      className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-16 h-16 bg-green-500 text-white rounded-full shadow-2xl hover:bg-green-600 hover:scale-110 transition-all duration-300 animate-fade-in-up"
-      aria-label="Fale conosco pelo WhatsApp"
+      onClick={handleClick}
+      className={cn(
+        'fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-[#25D366] hover:bg-[#20bd5a] text-white py-3 px-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105',
+        isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none',
+      )}
+      aria-label="Falar no WhatsApp"
     >
-      <MessageCircle className="w-8 h-8" />
+      <MessageCircle className="h-6 w-6" />
+      <span className="font-semibold hidden sm:inline-block">Fale Conosco</span>
     </button>
   )
 }

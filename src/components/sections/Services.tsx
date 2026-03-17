@@ -1,49 +1,75 @@
-import { HeartPulse, Coffee, UserCheck, Activity } from 'lucide-react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { HeartPulse, Stethoscope, Home, Utensils, Activity, Users } from 'lucide-react'
+
+const services = [
+  {
+    title: 'Cuidados 24h',
+    description:
+      'Equipe de cuidadores e técnicos de enfermagem disponíveis 24 horas por dia, 7 dias por semana, garantindo assistência contínua.',
+    icon: HeartPulse,
+  },
+  {
+    title: 'Acompanhamento Médico',
+    description:
+      'Visitas médicas regulares e acompanhamento rigoroso da saúde de cada residente para prevenir e tratar qualquer condição.',
+    icon: Stethoscope,
+  },
+  {
+    title: 'Hospedagem Permanente',
+    description:
+      'Um verdadeiro lar com conforto, segurança e uma infraestrutura adaptada para as necessidades da terceira idade.',
+    icon: Home,
+  },
+  {
+    title: 'Nutrição Especializada',
+    description:
+      'Cardápios balanceados elaborados por nutricionistas, respeitando as restrições e preferências alimentares.',
+    icon: Utensils,
+  },
+  {
+    title: 'Fisioterapia e Reabilitação',
+    description:
+      'Sessões focadas na manutenção e recuperação da capacidade motora, promovendo maior autonomia e qualidade de vida.',
+    icon: Activity,
+  },
+  {
+    title: 'Convívio Social',
+    description:
+      'Atividades recreativas, oficinas de memória e eventos que estimulam a socialização e o bem-estar mental e emocional.',
+    icon: Users,
+  },
+]
 
 export function Services() {
-  const services = [
-    {
-      icon: HeartPulse,
-      title: 'Enfermagem 24h',
-      desc: 'Equipe de saúde dedicada em tempo integral para assistência contínua.',
-    },
-    {
-      icon: UserCheck,
-      title: 'Acompanhamento Médico',
-      desc: 'Visitas médicas regulares focadas em cuidado preventivo e humanizado.',
-    },
-    {
-      icon: Coffee,
-      title: 'Nutrição Balanceada',
-      desc: '6 refeições diárias elaboradas e supervisionadas por nutricionistas.',
-    },
-    {
-      icon: Activity,
-      title: 'Fisioterapia',
-      desc: 'Atividades motoras para manter e recuperar a mobilidade e vitalidade.',
-    },
-  ]
-
   return (
-    <section id="servicos" className="py-24 bg-emerald-50/50">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Nossos Serviços</h2>
-        <p className="text-slate-600 text-lg mb-16 max-w-2xl mx-auto">
-          Cuidado integral e acolhedor, atendendo todas as necessidades físicas e emocionais dos
-          nossos residentes para uma vida plena.
-        </p>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {services.map((s, i) => (
-            <div
-              key={i}
-              className="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-emerald-50"
+    <section id="servicos" className="py-20 bg-white">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nossos Serviços</h2>
+          <p className="text-lg text-muted-foreground">
+            Oferecemos uma estrutura completa de atendimento multidisciplinar, pensada em cada
+            detalhe para promover saúde e alegria.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {services.map((service, index) => (
+            <Card
+              key={index}
+              className="rounded-2xl border-none shadow-lg hover:shadow-xl transition-shadow bg-primary/5"
             >
-              <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6">
-                <s.icon className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">{s.title}</h3>
-              <p className="text-slate-600 leading-relaxed">{s.desc}</p>
-            </div>
+              <CardHeader>
+                <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+                  <service.icon className="h-7 w-7 text-primary" />
+                </div>
+                <CardTitle className="text-xl">{service.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base leading-relaxed">
+                  {service.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>

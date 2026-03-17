@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { trackWhatsAppClick } from '@/lib/tracking'
-import { MessageCircle, Menu, X, Heart } from 'lucide-react'
+import { Menu, X, Phone, MapPin } from 'lucide-react'
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -9,98 +7,96 @@ export function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
+      setIsScrolled(window.scrollY > 20)
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const handleWhatsApp = () => {
-    trackWhatsAppClick()
-    window.open('https://wa.me/551137684392', '_blank')
-  }
-
   const navLinks = [
-    { name: 'Sobre', href: '#sobre' },
+    { name: 'Início', href: '#' },
+    { name: 'Sobre Nós', href: '#sobre' },
     { name: 'Serviços', href: '#servicos' },
-    { name: 'Estrutura', href: '#estrutura' },
     { name: 'Equipe', href: '#equipe' },
-    { name: 'FAQ', href: '#faq' },
+    { name: 'Perguntas Frequentes', href: '#faq' },
   ]
 
   return (
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm py-2' : 'bg-white py-4'
+      }`}
     >
-      <div className="container mx-auto px-4 flex items-center justify-between">
-        <a href="#" className="flex items-center gap-2 text-emerald-700">
-          <Heart className="w-8 h-8 fill-emerald-600" />
-          <span className="text-2xl font-bold tracking-tight">Casa Vita</span>
-        </a>
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex items-center justify-between">
+          <a href="#" className="flex items-center gap-2">
+            <img
+              src="https://img.usecurling.com/i?q=leaf&shape=lineal-color&color=green"
+              alt="Casa Vita Logo"
+              className="h-10 w-10 object-contain"
+            />
+            <span className="text-xl font-bold text-primary">Casa Vita</span>
+          </a>
 
-        {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors"
-            >
-              {link.name}
-            </a>
-          ))}
-        </nav>
+          {/* Desktop Nav */}
+          <nav className="hidden lg:flex items-center gap-8">
+            <ul className="flex items-center gap-6">
+              {navLinks.map((link) => (
+                <li key={link.name}>
+                  <a
+                    href={link.href}
+                    className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Phone className="h-4 w-4 text-primary" />
+                <span>(11) 5081-5421</span>
+              </div>
+            </div>
+          </nav>
 
-        <div className="hidden lg:flex items-center gap-4">
-          <div className="text-right mr-4">
-            <p className={`text-xs ${isScrolled ? 'text-slate-500' : 'text-slate-600'}`}>
-              Unidade 2
-            </p>
-            <p className={`text-sm font-bold ${isScrolled ? 'text-slate-800' : 'text-slate-900'}`}>
-              (11) 3768-4392
-            </p>
-          </div>
-          <Button
-            onClick={handleWhatsApp}
-            className="bg-green-600 hover:bg-green-700 text-white rounded-full px-6 shadow-md transition-transform hover:scale-105"
+          {/* Mobile Menu Toggle */}
+          <button
+            className="lg:hidden p-2 text-muted-foreground hover:text-primary transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            <MessageCircle className="mr-2 h-4 w-4" />
-            WhatsApp
-          </Button>
+            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
-
-        {/* Mobile Toggle */}
-        <button
-          className="lg:hidden p-2 text-slate-800"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Nav */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-slate-100 py-4 px-4 flex flex-col gap-4 animate-fade-in-down">
-          {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="text-lg font-medium text-slate-700 py-2 border-b border-slate-50"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              {link.name}
-            </a>
-          ))}
-          <div className="pt-4 pb-2">
-            <p className="text-sm text-slate-500 mb-1">Central de Atendimento</p>
-            <p className="text-lg font-bold text-slate-800 mb-4">(11) 3768-4392</p>
-            <Button
-              onClick={handleWhatsApp}
-              className="w-full bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md h-12 text-lg"
-            >
-              <MessageCircle className="mr-2 h-5 w-5" />
-              Chamar no WhatsApp
-            </Button>
+        <div className="lg:hidden absolute top-full left-0 w-full bg-white border-b border-border py-4 px-4 shadow-lg animate-fade-in-down">
+          <ul className="flex flex-col gap-4">
+            {navLinks.map((link) => (
+              <li key={link.name}>
+                <a
+                  href={link.href}
+                  className="block text-base font-medium text-foreground hover:text-primary transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-6 pt-6 border-t border-border flex flex-col gap-4">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Phone className="h-5 w-5 text-primary" />
+              <span>(11) 5081-5421</span>
+            </div>
+            <div className="flex items-start gap-2 text-muted-foreground">
+              <MapPin className="h-5 w-5 text-primary shrink-0" />
+              <span className="text-sm">
+                Rua Doutor Diogo de Faria, 753 - Vila Clementino, São Paulo - SP
+              </span>
+            </div>
           </div>
         </div>
       )}

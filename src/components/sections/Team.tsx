@@ -1,56 +1,59 @@
-export function Team() {
-  const team = [
-    {
-      name: 'Dra. Ana Lúcia',
-      role: 'Diretora Médica',
-      desc: 'Especialista em Geriatria com mais de 15 anos de experiência em cuidados com idosos.',
-      img: 'https://img.usecurling.com/ppl/medium?gender=female&seed=15',
-    },
-    {
-      name: 'Carlos Mendes',
-      role: 'Enfermeiro Chefe',
-      desc: 'Lidera nossa equipe de enfermagem garantindo atendimento humanizado e seguro 24 horas.',
-      img: 'https://img.usecurling.com/ppl/medium?gender=male&seed=42',
-    },
-    {
-      name: 'Mariana Costa',
-      role: 'Fisioterapeuta',
-      desc: 'Focada na reabilitação e manutenção da capacidade motora e autonomia dos nossos residentes.',
-      img: 'https://img.usecurling.com/ppl/medium?gender=female&seed=23',
-    },
-    {
-      name: 'Roberto Almeida',
-      role: 'Nutricionista',
-      desc: 'Responsável por elaborar cardápios saudáveis, saborosos e perfeitamente adaptados a cada necessidade.',
-      img: 'https://img.usecurling.com/ppl/medium?gender=male&seed=8',
-    },
-  ]
+import { Card, CardContent } from '@/components/ui/card'
+import thiagoImg from '@/assets/foto_thiago-c3243.png'
+import luisImg from '@/assets/foto_luis-8c5cf.png'
 
+const team = [
+  {
+    name: 'Thiago Pereira',
+    role: 'Sócio Diretor',
+    description:
+      'Administrador de Empresas, atua na gestão da Casa Vita focando no bem-estar dos residentes e na excelência do atendimento, garantindo um ambiente acolhedor e eficiente.',
+    image: thiagoImg,
+  },
+  {
+    name: 'Luis Pereira',
+    role: 'Sócio Diretor',
+    description:
+      'Médico e responsável técnico pela Casa Vita, garantindo que todos os padrões de saúde e cuidados sejam rigorosamente seguidos com humanização e segurança.',
+    image: luisImg,
+  },
+]
+
+export function Team() {
   return (
-    <section id="equipe" className="py-24 bg-emerald-50/50">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Nossa Equipe</h2>
-          <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-            Profissionais altamente qualificados e apaixonados pelo que fazem. Cuidamos de quem você
-            ama com carinho, técnica e muito respeito.
+    <section id="equipe" className="py-20 bg-primary/5">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nossa Liderança</h2>
+          <p className="text-lg text-muted-foreground">
+            Uma gestão familiar e profissional dedicada a oferecer o mais alto padrão de qualidade
+            em cuidados para idosos.
           </p>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {team.map((member, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-[2rem] p-8 text-center shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-emerald-50"
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
+          {team.map((member, index) => (
+            <Card
+              key={index}
+              className="rounded-2xl overflow-hidden border-none shadow-lg bg-white"
             >
-              <img
-                src={member.img}
-                alt={member.name}
-                className="w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-emerald-100"
-              />
-              <h3 className="text-xl font-bold text-slate-900 mb-1">{member.name}</h3>
-              <p className="text-emerald-600 font-medium mb-4">{member.role}</p>
-              <p className="text-slate-500 text-sm leading-relaxed">{member.desc}</p>
-            </div>
+              <CardContent className="p-0 flex flex-col sm:flex-row h-full">
+                <div className="sm:w-2/5 p-6 flex justify-center items-center bg-primary/5">
+                  <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-md">
+                    <img
+                      src={member.image}
+                      alt={member.name}
+                      className="w-full h-full object-cover object-center"
+                    />
+                  </div>
+                </div>
+                <div className="sm:w-3/5 p-8 flex flex-col justify-center">
+                  <h3 className="text-2xl font-bold text-foreground mb-1">{member.name}</h3>
+                  <p className="text-primary font-medium mb-4">{member.role}</p>
+                  <p className="text-muted-foreground leading-relaxed">{member.description}</p>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
