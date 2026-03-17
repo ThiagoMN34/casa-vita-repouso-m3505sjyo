@@ -1,60 +1,33 @@
-import { CheckCircle } from 'lucide-react'
+import videoSectionImg from '@/assets/video-section-820b3.jpg'
 
-export default function About() {
-  const benefits = [
-    'Ambiente totalmente adaptado e seguro',
-    'Alimentação balanceada por nutricionistas',
-    'Atividades cognitivas e recreativas diárias',
-    'Acompanhamento médico contínuo',
-  ]
-
+export function About() {
   return (
-    <section id="about" className="container mx-auto px-4 scroll-mt-32">
-      <div className="grid lg:grid-cols-2 gap-16 items-center">
-        <div className="order-2 lg:order-1 relative">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-secondary/50 rounded-full -z-10 blur-3xl" />
-          <div className="grid grid-cols-2 gap-4 md:gap-6">
-            <img
-              src="https://img.usecurling.com/p/400/500?q=beautiful%20nursing%20home%20garden&dpr=2"
-              alt="Jardim da casa de repouso"
-              className="rounded-[2rem] w-full h-full object-cover shadow-lg translate-y-8 md:translate-y-12"
-            />
-            <img
-              src="https://img.usecurling.com/p/400/500?q=elderly%20having%20tea&dpr=2"
-              alt="Idosos socializando"
-              className="rounded-[2rem] w-full h-full object-cover shadow-lg"
-            />
-          </div>
-        </div>
-
-        <div className="order-1 lg:order-2 space-y-8">
-          <div className="space-y-4">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
-              Muito mais que uma casa de repouso,{' '}
-              <span className="text-primary">uma verdadeira família.</span>
+    <section id="sobre" className="py-24 bg-white">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col lg:flex-row-reverse items-center gap-16">
+          <div className="lg:w-1/2">
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6 leading-tight">
+              Uma estrutura pensada para o bem-estar e convívio
             </h2>
-          </div>
-          <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
-            <p>
-              A Casa Vita nasceu com a missão de transformar o conceito de hospedagem para idosos.
-              Acreditamos que esta fase da vida deve ser vivida com alegria, dignidade e muito
-              carinho.
+            <p className="text-slate-600 text-lg mb-6 leading-relaxed">
+              A Casa Vita Repouso foi idealizada para oferecer não apenas cuidados médicos de
+              excelência, mas qualidade de vida, convivência social e alegria para nossos
+              residentes.
             </p>
-            <p>
-              Nossa estrutura foi cuidadosamente planejada para oferecer segurança total sem perder
-              o aconchego de um lar, estimulando a convivência e a qualidade de vida dos nossos
-              residentes diariamente.
+            <p className="text-slate-600 text-lg leading-relaxed">
+              Nossa unidade conta com ambientes amplos, bem iluminados e adaptados para garantir
+              total segurança e mobilidade. Um verdadeiro lar, cercado de verde e tranquilidade, bem
+              no coração de São Paulo.
             </p>
           </div>
-
-          <ul className="space-y-5 pt-2">
-            {benefits.map((benefit, i) => (
-              <li key={i} className="flex items-center gap-4 bg-secondary/30 p-4 rounded-2xl">
-                <CheckCircle className="h-7 w-7 text-primary shrink-0" />
-                <span className="text-foreground font-medium text-lg">{benefit}</span>
-              </li>
-            ))}
-          </ul>
+          <div className="lg:w-1/2 relative">
+            <div className="absolute -inset-4 bg-emerald-50 rounded-[3rem] -z-10 transform -rotate-2"></div>
+            <img
+              src={videoSectionImg}
+              alt="Fachada arborizada da Casa Vita"
+              className="rounded-[2.5rem] shadow-xl w-full h-[400px] object-cover"
+            />
+          </div>
         </div>
       </div>
     </section>

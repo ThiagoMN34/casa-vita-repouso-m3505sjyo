@@ -1,74 +1,107 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import { Menu, X, Heart } from 'lucide-react'
-import { openWhatsApp } from '@/lib/tracking'
+import { trackWhatsAppClick } from '@/lib/tracking'
+import { MessageCircle, Menu, X, Heart } from 'lucide-react'
 
-export default function Header() {
-  const [isOpen, setIsOpen] = useState(false)
+export function Header() {
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  const links = [
-    { name: 'Início', href: '#home' },
-    { name: 'Sobre Nós', href: '#about' },
-    { name: 'Serviços', href: '#services' },
-    { name: 'Estrutura', href: '#gallery' },
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const handleWhatsApp = () => {
+    trackWhatsAppClick()
+    window.open('https://wa.me/551137684392', '_blank')
+  }
+
+  const navLinks = [
+    { name: 'Sobre', href: '#sobre' },
+    { name: 'Serviços', href: '#servicos' },
+    { name: 'Estrutura', href: '#estrutura' },
+    { name: 'Equipe', href: '#equipe' },
+    { name: 'FAQ', href: '#faq' },
   ]
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b shadow-sm">
-      <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-        <a href="#home" className="flex items-center gap-2 text-primary font-bold text-2xl">
-          <Heart className="h-8 w-8 text-primary" fill="currentColor" />
-          <span>Casa Vita</span>
+    <header
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}
+    >
+      <div className="container mx-auto px-4 flex items-center justify-between">
+        <a href="#" className="flex items-center gap-2 text-emerald-700">
+          <Heart className="w-8 h-8 fill-emerald-600" />
+          <span className="text-2xl font-bold tracking-tight">Casa Vita</span>
         </a>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
-          {links.map((link) => (
+        <nav className="hidden lg:flex items-center gap-8">
+          {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="text-sm font-medium hover:text-primary transition-colors"
+              className="text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors"
             >
               {link.name}
             </a>
           ))}
-          <Button
-            onClick={openWhatsApp}
-            className="rounded-full px-6 bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            Fale Conosco
-          </Button>
         </nav>
 
+        <div className="hidden lg:flex items-center gap-4">
+          <div className="text-right mr-4">
+            <p className={`text-xs ${isScrolled ? 'text-slate-500' : 'text-slate-600'}`}>
+              Unidade 2
+            </p>
+            <p className={`text-sm font-bold ${isScrolled ? 'text-slate-800' : 'text-slate-900'}`}>
+              (11) 3768-4392
+            </p>
+          </div>
+          <Button
+            onClick={handleWhatsApp}
+            className="bg-green-600 hover:bg-green-700 text-white rounded-full px-6 shadow-md transition-transform hover:scale-105"
+          >
+            <MessageCircle className="mr-2 h-4 w-4" />
+            WhatsApp
+          </Button>
+        </div>
+
         {/* Mobile Toggle */}
-        <button className="md:hidden p-2 text-foreground" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        <button
+          className="lg:hidden p-2 text-slate-800"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
 
-      {/* Mobile Nav */}
-      {isOpen && (
-        <div className="md:hidden absolute top-20 left-0 right-0 bg-white border-b p-4 flex flex-col gap-4 shadow-lg animate-in slide-in-from-top-2">
-          {links.map((link) => (
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-slate-100 py-4 px-4 flex flex-col gap-4 animate-fade-in-down">
+          {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.href}
-              className="text-lg font-medium p-3 hover:bg-muted rounded-xl transition-colors"
-              onClick={() => setIsOpen(false)}
+              className="text-lg font-medium text-slate-700 py-2 border-b border-slate-50"
+              onClick={() => setIsMobileMenuOpen(false)}
             >
               {link.name}
             </a>
           ))}
-          <Button
-            onClick={() => {
-              openWhatsApp()
-              setIsOpen(false)
-            }}
-            size="lg"
-            className="w-full rounded-full mt-2"
-          >
-            Fale Conosco
-          </Button>
+          <div className="pt-4 pb-2">
+            <p className="text-sm text-slate-500 mb-1">Central de Atendimento</p>
+            <p className="text-lg font-bold text-slate-800 mb-4">(11) 3768-4392</p>
+            <Button
+              onClick={handleWhatsApp}
+              className="w-full bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md h-12 text-lg"
+            >
+              <MessageCircle className="mr-2 h-5 w-5" />
+              Chamar no WhatsApp
+            </Button>
+          </div>
         </div>
       )}
     </header>

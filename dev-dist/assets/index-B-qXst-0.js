@@ -17274,133 +17274,8 @@ function useViewTransitionState(to, { relative } = {}) {
 	return matchPath(path.pathname, nextPath) != null || matchPath(path.pathname, currentPath) != null;
 }
 //#endregion
-//#region src/hooks/use-toast.ts
-var import_client = require_client();
-var TOAST_LIMIT = 1;
-var TOAST_REMOVE_DELAY = 1e6;
-var count$1 = 0;
-function genId() {
-	count$1 = (count$1 + 1) % Number.MAX_SAFE_INTEGER;
-	return count$1.toString();
-}
-var toastTimeouts = /* @__PURE__ */ new Map();
-var addToRemoveQueue = (toastId) => {
-	if (toastTimeouts.has(toastId)) return;
-	const timeout = setTimeout(() => {
-		toastTimeouts.delete(toastId);
-		dispatch({
-			type: "REMOVE_TOAST",
-			toastId
-		});
-	}, TOAST_REMOVE_DELAY);
-	toastTimeouts.set(toastId, timeout);
-};
-var reducer = (state, action) => {
-	switch (action.type) {
-		case "ADD_TOAST": return {
-			...state,
-			toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT)
-		};
-		case "UPDATE_TOAST": return {
-			...state,
-			toasts: state.toasts.map((t) => t.id === action.toast.id ? {
-				...t,
-				...action.toast
-			} : t)
-		};
-		case "DISMISS_TOAST": {
-			const { toastId } = action;
-			if (toastId) addToRemoveQueue(toastId);
-			else state.toasts.forEach((toast) => {
-				addToRemoveQueue(toast.id);
-			});
-			return {
-				...state,
-				toasts: state.toasts.map((t) => t.id === toastId || toastId === void 0 ? {
-					...t,
-					open: false
-				} : t)
-			};
-		}
-		case "REMOVE_TOAST":
-			if (action.toastId === void 0) return {
-				...state,
-				toasts: []
-			};
-			return {
-				...state,
-				toasts: state.toasts.filter((t) => t.id !== action.toastId)
-			};
-	}
-};
-var listeners = [];
-var memoryState = { toasts: [] };
-function dispatch(action) {
-	memoryState = reducer(memoryState, action);
-	listeners.forEach((listener) => {
-		listener(memoryState);
-	});
-}
-function toast$1({ ...props }) {
-	const id = genId();
-	const update = (props) => dispatch({
-		type: "UPDATE_TOAST",
-		toast: {
-			...props,
-			id
-		}
-	});
-	const dismiss = () => dispatch({
-		type: "DISMISS_TOAST",
-		toastId: id
-	});
-	dispatch({
-		type: "ADD_TOAST",
-		toast: {
-			...props,
-			id,
-			open: true,
-			onOpenChange: (open) => {
-				if (!open) dismiss();
-			}
-		}
-	});
-	return {
-		id,
-		dismiss,
-		update
-	};
-}
-function useToast() {
-	const [state, setState] = import_react.useState(memoryState);
-	import_react.useEffect(() => {
-		listeners.push(setState);
-		return () => {
-			const index = listeners.indexOf(setState);
-			if (index > -1) listeners.splice(index, 1);
-		};
-	}, [state]);
-	return {
-		...state,
-		toast: toast$1,
-		dismiss: (toastId) => dispatch({
-			type: "DISMISS_TOAST",
-			toastId
-		})
-	};
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+primitive@1.1.3/node_modules/@radix-ui/primitive/dist/index.mjs
-var import_react_dom = /* @__PURE__ */ __toESM(require_react_dom(), 1);
-typeof window !== "undefined" && window.document && window.document.createElement;
-function composeEventHandlers(originalEventHandler, ourEventHandler, { checkForDefaultPrevented = true } = {}) {
-	return function handleEvent(event) {
-		originalEventHandler?.(event);
-		if (checkForDefaultPrevented === false || !event.defaultPrevented) return ourEventHandler?.(event);
-	};
-}
-//#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-compose-refs@1.1.2_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-compose-refs/dist/index.mjs
+var import_client = require_client();
 function setRef(ref, value) {
 	if (typeof ref === "function") return ref(value);
 	else if (ref !== null && ref !== void 0) ref.current = value;
@@ -17625,79 +17500,24 @@ var require_react_jsx_runtime_development = /* @__PURE__ */ __commonJSMin(((expo
 	})();
 }));
 //#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-context@1.1.2_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-context/dist/index.mjs
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-slot@1.2.4_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-slot/dist/index.mjs
 var import_jsx_runtime = (/* @__PURE__ */ __commonJSMin(((exports, module) => {
 	module.exports = require_react_jsx_runtime_development();
 })))();
-function createContextScope(scopeName, createContextScopeDeps = []) {
-	let defaultContexts = [];
-	function createContext3(rootComponentName, defaultContext) {
-		const BaseContext = import_react.createContext(defaultContext);
-		const index = defaultContexts.length;
-		defaultContexts = [...defaultContexts, defaultContext];
-		const Provider = (props) => {
-			const { scope, children, ...context } = props;
-			const Context = scope?.[scopeName]?.[index] || BaseContext;
-			const value = import_react.useMemo(() => context, Object.values(context));
-			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Context.Provider, {
-				value,
-				children
-			});
-		};
-		Provider.displayName = rootComponentName + "Provider";
-		function useContext2(consumerName, scope) {
-			const Context = scope?.[scopeName]?.[index] || BaseContext;
-			const context = import_react.useContext(Context);
-			if (context) return context;
-			if (defaultContext !== void 0) return defaultContext;
-			throw new Error(`\`${consumerName}\` must be used within \`${rootComponentName}\``);
-		}
-		return [Provider, useContext2];
-	}
-	const createScope = () => {
-		const scopeContexts = defaultContexts.map((defaultContext) => {
-			return import_react.createContext(defaultContext);
-		});
-		return function useScope(scope) {
-			const contexts = scope?.[scopeName] || scopeContexts;
-			return import_react.useMemo(() => ({ [`__scope${scopeName}`]: {
-				...scope,
-				[scopeName]: contexts
-			} }), [scope, contexts]);
-		};
-	};
-	createScope.scopeName = scopeName;
-	return [createContext3, composeContextScopes(createScope, ...createContextScopeDeps)];
+var REACT_LAZY_TYPE = Symbol.for("react.lazy");
+var use = import_react[" use ".trim().toString()];
+function isPromiseLike(value) {
+	return typeof value === "object" && value !== null && "then" in value;
 }
-function composeContextScopes(...scopes) {
-	const baseScope = scopes[0];
-	if (scopes.length === 1) return baseScope;
-	const createScope = () => {
-		const scopeHooks = scopes.map((createScope2) => ({
-			useScope: createScope2(),
-			scopeName: createScope2.scopeName
-		}));
-		return function useComposedScopes(overrideScopes) {
-			const nextScopes = scopeHooks.reduce((nextScopes2, { useScope, scopeName }) => {
-				const currentScope = useScope(overrideScopes)[`__scope${scopeName}`];
-				return {
-					...nextScopes2,
-					...currentScope
-				};
-			}, {});
-			return import_react.useMemo(() => ({ [`__scope${baseScope.scopeName}`]: nextScopes }), [nextScopes]);
-		};
-	};
-	createScope.scopeName = baseScope.scopeName;
-	return createScope;
+function isLazyComponent(element) {
+	return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
 }
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-slot@1.2.3_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-slot/dist/index.mjs
 /* @__NO_SIDE_EFFECTS__ */
 function createSlot$1(ownerName) {
 	const SlotClone = /* @__PURE__ */ createSlotClone$1(ownerName);
 	const Slot2 = import_react.forwardRef((props, forwardedRef) => {
-		const { children, ...slotProps } = props;
+		let { children, ...slotProps } = props;
+		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
 		const childrenArray = import_react.Children.toArray(children);
 		const slottable = childrenArray.find(isSlottable$1);
 		if (slottable) {
@@ -17723,10 +17543,12 @@ function createSlot$1(ownerName) {
 	Slot2.displayName = `${ownerName}.Slot`;
 	return Slot2;
 }
+var Slot = /* @__PURE__ */ createSlot$1("Slot");
 /* @__NO_SIDE_EFFECTS__ */
 function createSlotClone$1(ownerName) {
 	const SlotClone = import_react.forwardRef((props, forwardedRef) => {
-		const { children, ...slotProps } = props;
+		let { children, ...slotProps } = props;
+		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
 		if (import_react.isValidElement(children)) {
 			const childrenRef = getElementRef$2(children);
 			const props2 = mergeProps$1(slotProps, children.props);
@@ -17739,15 +17561,6 @@ function createSlotClone$1(ownerName) {
 	return SlotClone;
 }
 var SLOTTABLE_IDENTIFIER$1 = Symbol("radix.slottable");
-/* @__NO_SIDE_EFFECTS__ */
-function createSlottable(ownerName) {
-	const Slottable2 = ({ children }) => {
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children });
-	};
-	Slottable2.displayName = `${ownerName}.Slottable`;
-	Slottable2.__radixId = SLOTTABLE_IDENTIFIER$1;
-	return Slottable2;
-}
 function isSlottable$1(child) {
 	return import_react.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER$1;
 }
@@ -17783,1048 +17596,6 @@ function getElementRef$2(element) {
 	if (mayWarn) return element.props.ref;
 	return element.props.ref || element.ref;
 }
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-collection@1.1.7_@types+react-dom@19.2.3_@types+react@19.2.14__@types+r_161926fa2509d0b7370b60b8bb4eb8b0/node_modules/@radix-ui/react-collection/dist/index.mjs
-function createCollection(name) {
-	const PROVIDER_NAME = name + "CollectionProvider";
-	const [createCollectionContext, createCollectionScope] = createContextScope(PROVIDER_NAME);
-	const [CollectionProviderImpl, useCollectionContext] = createCollectionContext(PROVIDER_NAME, {
-		collectionRef: { current: null },
-		itemMap: /* @__PURE__ */ new Map()
-	});
-	const CollectionProvider = (props) => {
-		const { scope, children } = props;
-		const ref = import_react.useRef(null);
-		const itemMap = import_react.useRef(/* @__PURE__ */ new Map()).current;
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollectionProviderImpl, {
-			scope,
-			itemMap,
-			collectionRef: ref,
-			children
-		});
-	};
-	CollectionProvider.displayName = PROVIDER_NAME;
-	const COLLECTION_SLOT_NAME = name + "CollectionSlot";
-	const CollectionSlotImpl = /* @__PURE__ */ createSlot$1(COLLECTION_SLOT_NAME);
-	const CollectionSlot = import_react.forwardRef((props, forwardedRef) => {
-		const { scope, children } = props;
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollectionSlotImpl, {
-			ref: useComposedRefs(forwardedRef, useCollectionContext(COLLECTION_SLOT_NAME, scope).collectionRef),
-			children
-		});
-	});
-	CollectionSlot.displayName = COLLECTION_SLOT_NAME;
-	const ITEM_SLOT_NAME = name + "CollectionItemSlot";
-	const ITEM_DATA_ATTR = "data-radix-collection-item";
-	const CollectionItemSlotImpl = /* @__PURE__ */ createSlot$1(ITEM_SLOT_NAME);
-	const CollectionItemSlot = import_react.forwardRef((props, forwardedRef) => {
-		const { scope, children, ...itemData } = props;
-		const ref = import_react.useRef(null);
-		const composedRefs = useComposedRefs(forwardedRef, ref);
-		const context = useCollectionContext(ITEM_SLOT_NAME, scope);
-		import_react.useEffect(() => {
-			context.itemMap.set(ref, {
-				ref,
-				...itemData
-			});
-			return () => void context.itemMap.delete(ref);
-		});
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollectionItemSlotImpl, {
-			[ITEM_DATA_ATTR]: "",
-			ref: composedRefs,
-			children
-		});
-	});
-	CollectionItemSlot.displayName = ITEM_SLOT_NAME;
-	function useCollection(scope) {
-		const context = useCollectionContext(name + "CollectionConsumer", scope);
-		return import_react.useCallback(() => {
-			const collectionNode = context.collectionRef.current;
-			if (!collectionNode) return [];
-			const orderedNodes = Array.from(collectionNode.querySelectorAll(`[${ITEM_DATA_ATTR}]`));
-			return Array.from(context.itemMap.values()).sort((a, b) => orderedNodes.indexOf(a.ref.current) - orderedNodes.indexOf(b.ref.current));
-		}, [context.collectionRef, context.itemMap]);
-	}
-	return [
-		{
-			Provider: CollectionProvider,
-			Slot: CollectionSlot,
-			ItemSlot: CollectionItemSlot
-		},
-		useCollection,
-		createCollectionScope
-	];
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-primitive@2.1.3_@types+react-dom@19.2.3_@types+react@19.2.14__@types+re_1181ea5061ec9212248424669240e4ec/node_modules/@radix-ui/react-primitive/dist/index.mjs
-var Primitive$1 = [
-	"a",
-	"button",
-	"div",
-	"form",
-	"h2",
-	"h3",
-	"img",
-	"input",
-	"label",
-	"li",
-	"nav",
-	"ol",
-	"p",
-	"select",
-	"span",
-	"svg",
-	"ul"
-].reduce((primitive, node) => {
-	const Slot = /* @__PURE__ */ createSlot$1(`Primitive.${node}`);
-	const Node = import_react.forwardRef((props, forwardedRef) => {
-		const { asChild, ...primitiveProps } = props;
-		const Comp = asChild ? Slot : node;
-		if (typeof window !== "undefined") window[Symbol.for("radix-ui")] = true;
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Comp, {
-			...primitiveProps,
-			ref: forwardedRef
-		});
-	});
-	Node.displayName = `Primitive.${node}`;
-	return {
-		...primitive,
-		[node]: Node
-	};
-}, {});
-function dispatchDiscreteCustomEvent(target, event) {
-	if (target) import_react_dom.flushSync(() => target.dispatchEvent(event));
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-use-callback-ref@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-use-callback-ref/dist/index.mjs
-function useCallbackRef(callback) {
-	const callbackRef = import_react.useRef(callback);
-	import_react.useEffect(() => {
-		callbackRef.current = callback;
-	});
-	return import_react.useMemo(() => (...args) => callbackRef.current?.(...args), []);
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-use-escape-keydown@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-use-escape-keydown/dist/index.mjs
-function useEscapeKeydown(onEscapeKeyDownProp, ownerDocument = globalThis?.document) {
-	const onEscapeKeyDown = useCallbackRef(onEscapeKeyDownProp);
-	import_react.useEffect(() => {
-		const handleKeyDown = (event) => {
-			if (event.key === "Escape") onEscapeKeyDown(event);
-		};
-		ownerDocument.addEventListener("keydown", handleKeyDown, { capture: true });
-		return () => ownerDocument.removeEventListener("keydown", handleKeyDown, { capture: true });
-	}, [onEscapeKeyDown, ownerDocument]);
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-dismissable-layer@1.1.11_@types+react-dom@19.2.3_@types+react@19.2.14___3d3960154a4c07d09bb90cb341135fc5/node_modules/@radix-ui/react-dismissable-layer/dist/index.mjs
-var DISMISSABLE_LAYER_NAME = "DismissableLayer";
-var CONTEXT_UPDATE = "dismissableLayer.update";
-var POINTER_DOWN_OUTSIDE = "dismissableLayer.pointerDownOutside";
-var FOCUS_OUTSIDE = "dismissableLayer.focusOutside";
-var originalBodyPointerEvents;
-var DismissableLayerContext = import_react.createContext({
-	layers: /* @__PURE__ */ new Set(),
-	layersWithOutsidePointerEventsDisabled: /* @__PURE__ */ new Set(),
-	branches: /* @__PURE__ */ new Set()
-});
-var DismissableLayer = import_react.forwardRef((props, forwardedRef) => {
-	const { disableOutsidePointerEvents = false, onEscapeKeyDown, onPointerDownOutside, onFocusOutside, onInteractOutside, onDismiss, ...layerProps } = props;
-	const context = import_react.useContext(DismissableLayerContext);
-	const [node, setNode] = import_react.useState(null);
-	const ownerDocument = node?.ownerDocument ?? globalThis?.document;
-	const [, force] = import_react.useState({});
-	const composedRefs = useComposedRefs(forwardedRef, (node2) => setNode(node2));
-	const layers = Array.from(context.layers);
-	const [highestLayerWithOutsidePointerEventsDisabled] = [...context.layersWithOutsidePointerEventsDisabled].slice(-1);
-	const highestLayerWithOutsidePointerEventsDisabledIndex = layers.indexOf(highestLayerWithOutsidePointerEventsDisabled);
-	const index = node ? layers.indexOf(node) : -1;
-	const isBodyPointerEventsDisabled = context.layersWithOutsidePointerEventsDisabled.size > 0;
-	const isPointerEventsEnabled = index >= highestLayerWithOutsidePointerEventsDisabledIndex;
-	const pointerDownOutside = usePointerDownOutside((event) => {
-		const target = event.target;
-		const isPointerDownOnBranch = [...context.branches].some((branch) => branch.contains(target));
-		if (!isPointerEventsEnabled || isPointerDownOnBranch) return;
-		onPointerDownOutside?.(event);
-		onInteractOutside?.(event);
-		if (!event.defaultPrevented) onDismiss?.();
-	}, ownerDocument);
-	const focusOutside = useFocusOutside((event) => {
-		const target = event.target;
-		if ([...context.branches].some((branch) => branch.contains(target))) return;
-		onFocusOutside?.(event);
-		onInteractOutside?.(event);
-		if (!event.defaultPrevented) onDismiss?.();
-	}, ownerDocument);
-	useEscapeKeydown((event) => {
-		if (!(index === context.layers.size - 1)) return;
-		onEscapeKeyDown?.(event);
-		if (!event.defaultPrevented && onDismiss) {
-			event.preventDefault();
-			onDismiss();
-		}
-	}, ownerDocument);
-	import_react.useEffect(() => {
-		if (!node) return;
-		if (disableOutsidePointerEvents) {
-			if (context.layersWithOutsidePointerEventsDisabled.size === 0) {
-				originalBodyPointerEvents = ownerDocument.body.style.pointerEvents;
-				ownerDocument.body.style.pointerEvents = "none";
-			}
-			context.layersWithOutsidePointerEventsDisabled.add(node);
-		}
-		context.layers.add(node);
-		dispatchUpdate();
-		return () => {
-			if (disableOutsidePointerEvents && context.layersWithOutsidePointerEventsDisabled.size === 1) ownerDocument.body.style.pointerEvents = originalBodyPointerEvents;
-		};
-	}, [
-		node,
-		ownerDocument,
-		disableOutsidePointerEvents,
-		context
-	]);
-	import_react.useEffect(() => {
-		return () => {
-			if (!node) return;
-			context.layers.delete(node);
-			context.layersWithOutsidePointerEventsDisabled.delete(node);
-			dispatchUpdate();
-		};
-	}, [node, context]);
-	import_react.useEffect(() => {
-		const handleUpdate = () => force({});
-		document.addEventListener(CONTEXT_UPDATE, handleUpdate);
-		return () => document.removeEventListener(CONTEXT_UPDATE, handleUpdate);
-	}, []);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.div, {
-		...layerProps,
-		ref: composedRefs,
-		style: {
-			pointerEvents: isBodyPointerEventsDisabled ? isPointerEventsEnabled ? "auto" : "none" : void 0,
-			...props.style
-		},
-		onFocusCapture: composeEventHandlers(props.onFocusCapture, focusOutside.onFocusCapture),
-		onBlurCapture: composeEventHandlers(props.onBlurCapture, focusOutside.onBlurCapture),
-		onPointerDownCapture: composeEventHandlers(props.onPointerDownCapture, pointerDownOutside.onPointerDownCapture)
-	});
-});
-DismissableLayer.displayName = DISMISSABLE_LAYER_NAME;
-var BRANCH_NAME = "DismissableLayerBranch";
-var DismissableLayerBranch = import_react.forwardRef((props, forwardedRef) => {
-	const context = import_react.useContext(DismissableLayerContext);
-	const ref = import_react.useRef(null);
-	const composedRefs = useComposedRefs(forwardedRef, ref);
-	import_react.useEffect(() => {
-		const node = ref.current;
-		if (node) {
-			context.branches.add(node);
-			return () => {
-				context.branches.delete(node);
-			};
-		}
-	}, [context.branches]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.div, {
-		...props,
-		ref: composedRefs
-	});
-});
-DismissableLayerBranch.displayName = BRANCH_NAME;
-function usePointerDownOutside(onPointerDownOutside, ownerDocument = globalThis?.document) {
-	const handlePointerDownOutside = useCallbackRef(onPointerDownOutside);
-	const isPointerInsideReactTreeRef = import_react.useRef(false);
-	const handleClickRef = import_react.useRef(() => {});
-	import_react.useEffect(() => {
-		const handlePointerDown = (event) => {
-			if (event.target && !isPointerInsideReactTreeRef.current) {
-				let handleAndDispatchPointerDownOutsideEvent2 = function() {
-					handleAndDispatchCustomEvent$1(POINTER_DOWN_OUTSIDE, handlePointerDownOutside, eventDetail, { discrete: true });
-				};
-				const eventDetail = { originalEvent: event };
-				if (event.pointerType === "touch") {
-					ownerDocument.removeEventListener("click", handleClickRef.current);
-					handleClickRef.current = handleAndDispatchPointerDownOutsideEvent2;
-					ownerDocument.addEventListener("click", handleClickRef.current, { once: true });
-				} else handleAndDispatchPointerDownOutsideEvent2();
-			} else ownerDocument.removeEventListener("click", handleClickRef.current);
-			isPointerInsideReactTreeRef.current = false;
-		};
-		const timerId = window.setTimeout(() => {
-			ownerDocument.addEventListener("pointerdown", handlePointerDown);
-		}, 0);
-		return () => {
-			window.clearTimeout(timerId);
-			ownerDocument.removeEventListener("pointerdown", handlePointerDown);
-			ownerDocument.removeEventListener("click", handleClickRef.current);
-		};
-	}, [ownerDocument, handlePointerDownOutside]);
-	return { onPointerDownCapture: () => isPointerInsideReactTreeRef.current = true };
-}
-function useFocusOutside(onFocusOutside, ownerDocument = globalThis?.document) {
-	const handleFocusOutside = useCallbackRef(onFocusOutside);
-	const isFocusInsideReactTreeRef = import_react.useRef(false);
-	import_react.useEffect(() => {
-		const handleFocus = (event) => {
-			if (event.target && !isFocusInsideReactTreeRef.current) handleAndDispatchCustomEvent$1(FOCUS_OUTSIDE, handleFocusOutside, { originalEvent: event }, { discrete: false });
-		};
-		ownerDocument.addEventListener("focusin", handleFocus);
-		return () => ownerDocument.removeEventListener("focusin", handleFocus);
-	}, [ownerDocument, handleFocusOutside]);
-	return {
-		onFocusCapture: () => isFocusInsideReactTreeRef.current = true,
-		onBlurCapture: () => isFocusInsideReactTreeRef.current = false
-	};
-}
-function dispatchUpdate() {
-	const event = new CustomEvent(CONTEXT_UPDATE);
-	document.dispatchEvent(event);
-}
-function handleAndDispatchCustomEvent$1(name, handler, detail, { discrete }) {
-	const target = detail.originalEvent.target;
-	const event = new CustomEvent(name, {
-		bubbles: false,
-		cancelable: true,
-		detail
-	});
-	if (handler) target.addEventListener(name, handler, { once: true });
-	if (discrete) dispatchDiscreteCustomEvent(target, event);
-	else target.dispatchEvent(event);
-}
-var Root$3 = DismissableLayer;
-var Branch = DismissableLayerBranch;
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-use-layout-effect@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-use-layout-effect/dist/index.mjs
-var useLayoutEffect2 = globalThis?.document ? import_react.useLayoutEffect : () => {};
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-portal@1.1.9_@types+react-dom@19.2.3_@types+react@19.2.14__@types+react_7668895bec2444446faa4e0f4eb5244b/node_modules/@radix-ui/react-portal/dist/index.mjs
-var PORTAL_NAME$1 = "Portal";
-var Portal = import_react.forwardRef((props, forwardedRef) => {
-	const { container: containerProp, ...portalProps } = props;
-	const [mounted, setMounted] = import_react.useState(false);
-	useLayoutEffect2(() => setMounted(true), []);
-	const container = containerProp || mounted && globalThis?.document?.body;
-	return container ? import_react_dom.createPortal(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.div, {
-		...portalProps,
-		ref: forwardedRef
-	}), container) : null;
-});
-Portal.displayName = PORTAL_NAME$1;
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-presence@1.1.5_@types+react-dom@19.2.3_@types+react@19.2.14__@types+rea_c01c26c80b5ab5e3ecefbda6eca51ad1/node_modules/@radix-ui/react-presence/dist/index.mjs
-function useStateMachine(initialState, machine) {
-	return import_react.useReducer((state, event) => {
-		return machine[state][event] ?? state;
-	}, initialState);
-}
-var Presence = (props) => {
-	const { present, children } = props;
-	const presence = usePresence(present);
-	const child = typeof children === "function" ? children({ present: presence.isPresent }) : import_react.Children.only(children);
-	const ref = useComposedRefs(presence.ref, getElementRef$1(child));
-	return typeof children === "function" || presence.isPresent ? import_react.cloneElement(child, { ref }) : null;
-};
-Presence.displayName = "Presence";
-function usePresence(present) {
-	const [node, setNode] = import_react.useState();
-	const stylesRef = import_react.useRef(null);
-	const prevPresentRef = import_react.useRef(present);
-	const prevAnimationNameRef = import_react.useRef("none");
-	const [state, send] = useStateMachine(present ? "mounted" : "unmounted", {
-		mounted: {
-			UNMOUNT: "unmounted",
-			ANIMATION_OUT: "unmountSuspended"
-		},
-		unmountSuspended: {
-			MOUNT: "mounted",
-			ANIMATION_END: "unmounted"
-		},
-		unmounted: { MOUNT: "mounted" }
-	});
-	import_react.useEffect(() => {
-		const currentAnimationName = getAnimationName(stylesRef.current);
-		prevAnimationNameRef.current = state === "mounted" ? currentAnimationName : "none";
-	}, [state]);
-	useLayoutEffect2(() => {
-		const styles = stylesRef.current;
-		const wasPresent = prevPresentRef.current;
-		if (wasPresent !== present) {
-			const prevAnimationName = prevAnimationNameRef.current;
-			const currentAnimationName = getAnimationName(styles);
-			if (present) send("MOUNT");
-			else if (currentAnimationName === "none" || styles?.display === "none") send("UNMOUNT");
-			else if (wasPresent && prevAnimationName !== currentAnimationName) send("ANIMATION_OUT");
-			else send("UNMOUNT");
-			prevPresentRef.current = present;
-		}
-	}, [present, send]);
-	useLayoutEffect2(() => {
-		if (node) {
-			let timeoutId;
-			const ownerWindow = node.ownerDocument.defaultView ?? window;
-			const handleAnimationEnd = (event) => {
-				const isCurrentAnimation = getAnimationName(stylesRef.current).includes(CSS.escape(event.animationName));
-				if (event.target === node && isCurrentAnimation) {
-					send("ANIMATION_END");
-					if (!prevPresentRef.current) {
-						const currentFillMode = node.style.animationFillMode;
-						node.style.animationFillMode = "forwards";
-						timeoutId = ownerWindow.setTimeout(() => {
-							if (node.style.animationFillMode === "forwards") node.style.animationFillMode = currentFillMode;
-						});
-					}
-				}
-			};
-			const handleAnimationStart = (event) => {
-				if (event.target === node) prevAnimationNameRef.current = getAnimationName(stylesRef.current);
-			};
-			node.addEventListener("animationstart", handleAnimationStart);
-			node.addEventListener("animationcancel", handleAnimationEnd);
-			node.addEventListener("animationend", handleAnimationEnd);
-			return () => {
-				ownerWindow.clearTimeout(timeoutId);
-				node.removeEventListener("animationstart", handleAnimationStart);
-				node.removeEventListener("animationcancel", handleAnimationEnd);
-				node.removeEventListener("animationend", handleAnimationEnd);
-			};
-		} else send("ANIMATION_END");
-	}, [node, send]);
-	return {
-		isPresent: ["mounted", "unmountSuspended"].includes(state),
-		ref: import_react.useCallback((node2) => {
-			stylesRef.current = node2 ? getComputedStyle(node2) : null;
-			setNode(node2);
-		}, [])
-	};
-}
-function getAnimationName(styles) {
-	return styles?.animationName || "none";
-}
-function getElementRef$1(element) {
-	let getter = Object.getOwnPropertyDescriptor(element.props, "ref")?.get;
-	let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
-	if (mayWarn) return element.ref;
-	getter = Object.getOwnPropertyDescriptor(element, "ref")?.get;
-	mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
-	if (mayWarn) return element.props.ref;
-	return element.props.ref || element.ref;
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-use-controllable-state@1.2.2_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-use-controllable-state/dist/index.mjs
-var useInsertionEffect = import_react[" useInsertionEffect ".trim().toString()] || useLayoutEffect2;
-function useControllableState({ prop, defaultProp, onChange = () => {}, caller }) {
-	const [uncontrolledProp, setUncontrolledProp, onChangeRef] = useUncontrolledState({
-		defaultProp,
-		onChange
-	});
-	const isControlled = prop !== void 0;
-	const value = isControlled ? prop : uncontrolledProp;
-	{
-		const isControlledRef = import_react.useRef(prop !== void 0);
-		import_react.useEffect(() => {
-			const wasControlled = isControlledRef.current;
-			if (wasControlled !== isControlled) {
-				const from = wasControlled ? "controlled" : "uncontrolled";
-				const to = isControlled ? "controlled" : "uncontrolled";
-				console.warn(`${caller} is changing from ${from} to ${to}. Components should not switch from controlled to uncontrolled (or vice versa). Decide between using a controlled or uncontrolled value for the lifetime of the component.`);
-			}
-			isControlledRef.current = isControlled;
-		}, [isControlled, caller]);
-	}
-	return [value, import_react.useCallback((nextValue) => {
-		if (isControlled) {
-			const value2 = isFunction(nextValue) ? nextValue(prop) : nextValue;
-			if (value2 !== prop) onChangeRef.current?.(value2);
-		} else setUncontrolledProp(nextValue);
-	}, [
-		isControlled,
-		prop,
-		setUncontrolledProp,
-		onChangeRef
-	])];
-}
-function useUncontrolledState({ defaultProp, onChange }) {
-	const [value, setValue] = import_react.useState(defaultProp);
-	const prevValueRef = import_react.useRef(value);
-	const onChangeRef = import_react.useRef(onChange);
-	useInsertionEffect(() => {
-		onChangeRef.current = onChange;
-	}, [onChange]);
-	import_react.useEffect(() => {
-		if (prevValueRef.current !== value) {
-			onChangeRef.current?.(value);
-			prevValueRef.current = value;
-		}
-	}, [value, prevValueRef]);
-	return [
-		value,
-		setValue,
-		onChangeRef
-	];
-}
-function isFunction(value) {
-	return typeof value === "function";
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-visually-hidden@1.2.3_@types+react-dom@19.2.3_@types+react@19.2.14__@ty_fa89646d7248b32d1762bf88948f6339/node_modules/@radix-ui/react-visually-hidden/dist/index.mjs
-var VISUALLY_HIDDEN_STYLES = Object.freeze({
-	position: "absolute",
-	border: 0,
-	width: 1,
-	height: 1,
-	padding: 0,
-	margin: -1,
-	overflow: "hidden",
-	clip: "rect(0, 0, 0, 0)",
-	whiteSpace: "nowrap",
-	wordWrap: "normal"
-});
-var NAME$2 = "VisuallyHidden";
-var VisuallyHidden = import_react.forwardRef((props, forwardedRef) => {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.span, {
-		...props,
-		ref: forwardedRef,
-		style: {
-			...VISUALLY_HIDDEN_STYLES,
-			...props.style
-		}
-	});
-});
-VisuallyHidden.displayName = NAME$2;
-var Root$2 = VisuallyHidden;
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-toast@1.2.15_@types+react-dom@19.2.3_@types+react@19.2.14__@types+react_4581e89c6ba13e4159ce65546c8b2a16/node_modules/@radix-ui/react-toast/dist/index.mjs
-var PROVIDER_NAME$1 = "ToastProvider";
-var [Collection, useCollection, createCollectionScope] = createCollection("Toast");
-var [createToastContext, createToastScope] = createContextScope("Toast", [createCollectionScope]);
-var [ToastProviderProvider, useToastProviderContext] = createToastContext(PROVIDER_NAME$1);
-var ToastProvider$1 = (props) => {
-	const { __scopeToast, label = "Notification", duration = 5e3, swipeDirection = "right", swipeThreshold = 50, children } = props;
-	const [viewport, setViewport] = import_react.useState(null);
-	const [toastCount, setToastCount] = import_react.useState(0);
-	const isFocusedToastEscapeKeyDownRef = import_react.useRef(false);
-	const isClosePausedRef = import_react.useRef(false);
-	if (!label.trim()) console.error(`Invalid prop \`label\` supplied to \`${PROVIDER_NAME$1}\`. Expected non-empty \`string\`.`);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.Provider, {
-		scope: __scopeToast,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastProviderProvider, {
-			scope: __scopeToast,
-			label,
-			duration,
-			swipeDirection,
-			swipeThreshold,
-			toastCount,
-			viewport,
-			onViewportChange: setViewport,
-			onToastAdd: import_react.useCallback(() => setToastCount((prevCount) => prevCount + 1), []),
-			onToastRemove: import_react.useCallback(() => setToastCount((prevCount) => prevCount - 1), []),
-			isFocusedToastEscapeKeyDownRef,
-			isClosePausedRef,
-			children
-		})
-	});
-};
-ToastProvider$1.displayName = PROVIDER_NAME$1;
-var VIEWPORT_NAME = "ToastViewport";
-var VIEWPORT_DEFAULT_HOTKEY = ["F8"];
-var VIEWPORT_PAUSE = "toast.viewportPause";
-var VIEWPORT_RESUME = "toast.viewportResume";
-var ToastViewport$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, hotkey = VIEWPORT_DEFAULT_HOTKEY, label = "Notifications ({hotkey})", ...viewportProps } = props;
-	const context = useToastProviderContext(VIEWPORT_NAME, __scopeToast);
-	const getItems = useCollection(__scopeToast);
-	const wrapperRef = import_react.useRef(null);
-	const headFocusProxyRef = import_react.useRef(null);
-	const tailFocusProxyRef = import_react.useRef(null);
-	const ref = import_react.useRef(null);
-	const composedRefs = useComposedRefs(forwardedRef, ref, context.onViewportChange);
-	const hotkeyLabel = hotkey.join("+").replace(/Key/g, "").replace(/Digit/g, "");
-	const hasToasts = context.toastCount > 0;
-	import_react.useEffect(() => {
-		const handleKeyDown = (event) => {
-			if (hotkey.length !== 0 && hotkey.every((key) => event[key] || event.code === key)) ref.current?.focus();
-		};
-		document.addEventListener("keydown", handleKeyDown);
-		return () => document.removeEventListener("keydown", handleKeyDown);
-	}, [hotkey]);
-	import_react.useEffect(() => {
-		const wrapper = wrapperRef.current;
-		const viewport = ref.current;
-		if (hasToasts && wrapper && viewport) {
-			const handlePause = () => {
-				if (!context.isClosePausedRef.current) {
-					const pauseEvent = new CustomEvent(VIEWPORT_PAUSE);
-					viewport.dispatchEvent(pauseEvent);
-					context.isClosePausedRef.current = true;
-				}
-			};
-			const handleResume = () => {
-				if (context.isClosePausedRef.current) {
-					const resumeEvent = new CustomEvent(VIEWPORT_RESUME);
-					viewport.dispatchEvent(resumeEvent);
-					context.isClosePausedRef.current = false;
-				}
-			};
-			const handleFocusOutResume = (event) => {
-				if (!wrapper.contains(event.relatedTarget)) handleResume();
-			};
-			const handlePointerLeaveResume = () => {
-				if (!wrapper.contains(document.activeElement)) handleResume();
-			};
-			wrapper.addEventListener("focusin", handlePause);
-			wrapper.addEventListener("focusout", handleFocusOutResume);
-			wrapper.addEventListener("pointermove", handlePause);
-			wrapper.addEventListener("pointerleave", handlePointerLeaveResume);
-			window.addEventListener("blur", handlePause);
-			window.addEventListener("focus", handleResume);
-			return () => {
-				wrapper.removeEventListener("focusin", handlePause);
-				wrapper.removeEventListener("focusout", handleFocusOutResume);
-				wrapper.removeEventListener("pointermove", handlePause);
-				wrapper.removeEventListener("pointerleave", handlePointerLeaveResume);
-				window.removeEventListener("blur", handlePause);
-				window.removeEventListener("focus", handleResume);
-			};
-		}
-	}, [hasToasts, context.isClosePausedRef]);
-	const getSortedTabbableCandidates = import_react.useCallback(({ tabbingDirection }) => {
-		const tabbableCandidates = getItems().map((toastItem) => {
-			const toastNode = toastItem.ref.current;
-			const toastTabbableCandidates = [toastNode, ...getTabbableCandidates(toastNode)];
-			return tabbingDirection === "forwards" ? toastTabbableCandidates : toastTabbableCandidates.reverse();
-		});
-		return (tabbingDirection === "forwards" ? tabbableCandidates.reverse() : tabbableCandidates).flat();
-	}, [getItems]);
-	import_react.useEffect(() => {
-		const viewport = ref.current;
-		if (viewport) {
-			const handleKeyDown = (event) => {
-				const isMetaKey = event.altKey || event.ctrlKey || event.metaKey;
-				if (event.key === "Tab" && !isMetaKey) {
-					const focusedElement = document.activeElement;
-					const isTabbingBackwards = event.shiftKey;
-					if (event.target === viewport && isTabbingBackwards) {
-						headFocusProxyRef.current?.focus();
-						return;
-					}
-					const sortedCandidates = getSortedTabbableCandidates({ tabbingDirection: isTabbingBackwards ? "backwards" : "forwards" });
-					const index = sortedCandidates.findIndex((candidate) => candidate === focusedElement);
-					if (focusFirst(sortedCandidates.slice(index + 1))) event.preventDefault();
-					else isTabbingBackwards ? headFocusProxyRef.current?.focus() : tailFocusProxyRef.current?.focus();
-				}
-			};
-			viewport.addEventListener("keydown", handleKeyDown);
-			return () => viewport.removeEventListener("keydown", handleKeyDown);
-		}
-	}, [getItems, getSortedTabbableCandidates]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Branch, {
-		ref: wrapperRef,
-		role: "region",
-		"aria-label": label.replace("{hotkey}", hotkeyLabel),
-		tabIndex: -1,
-		style: { pointerEvents: hasToasts ? void 0 : "none" },
-		children: [
-			hasToasts && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FocusProxy, {
-				ref: headFocusProxyRef,
-				onFocusFromOutsideViewport: () => {
-					focusFirst(getSortedTabbableCandidates({ tabbingDirection: "forwards" }));
-				}
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.Slot, {
-				scope: __scopeToast,
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.ol, {
-					tabIndex: -1,
-					...viewportProps,
-					ref: composedRefs
-				})
-			}),
-			hasToasts && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FocusProxy, {
-				ref: tailFocusProxyRef,
-				onFocusFromOutsideViewport: () => {
-					focusFirst(getSortedTabbableCandidates({ tabbingDirection: "backwards" }));
-				}
-			})
-		]
-	});
-});
-ToastViewport$1.displayName = VIEWPORT_NAME;
-var FOCUS_PROXY_NAME = "ToastFocusProxy";
-var FocusProxy = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, onFocusFromOutsideViewport, ...proxyProps } = props;
-	const context = useToastProviderContext(FOCUS_PROXY_NAME, __scopeToast);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(VisuallyHidden, {
-		tabIndex: 0,
-		...proxyProps,
-		ref: forwardedRef,
-		style: { position: "fixed" },
-		onFocus: (event) => {
-			const prevFocusedElement = event.relatedTarget;
-			if (!context.viewport?.contains(prevFocusedElement)) onFocusFromOutsideViewport();
-		}
-	});
-});
-FocusProxy.displayName = FOCUS_PROXY_NAME;
-var TOAST_NAME = "Toast";
-var TOAST_SWIPE_START = "toast.swipeStart";
-var TOAST_SWIPE_MOVE = "toast.swipeMove";
-var TOAST_SWIPE_CANCEL = "toast.swipeCancel";
-var TOAST_SWIPE_END = "toast.swipeEnd";
-var Toast$2 = import_react.forwardRef((props, forwardedRef) => {
-	const { forceMount, open: openProp, defaultOpen, onOpenChange, ...toastProps } = props;
-	const [open, setOpen] = useControllableState({
-		prop: openProp,
-		defaultProp: defaultOpen ?? true,
-		onChange: onOpenChange,
-		caller: TOAST_NAME
-	});
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Presence, {
-		present: forceMount || open,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastImpl, {
-			open,
-			...toastProps,
-			ref: forwardedRef,
-			onClose: () => setOpen(false),
-			onPause: useCallbackRef(props.onPause),
-			onResume: useCallbackRef(props.onResume),
-			onSwipeStart: composeEventHandlers(props.onSwipeStart, (event) => {
-				event.currentTarget.setAttribute("data-swipe", "start");
-			}),
-			onSwipeMove: composeEventHandlers(props.onSwipeMove, (event) => {
-				const { x, y } = event.detail.delta;
-				event.currentTarget.setAttribute("data-swipe", "move");
-				event.currentTarget.style.setProperty("--radix-toast-swipe-move-x", `${x}px`);
-				event.currentTarget.style.setProperty("--radix-toast-swipe-move-y", `${y}px`);
-			}),
-			onSwipeCancel: composeEventHandlers(props.onSwipeCancel, (event) => {
-				event.currentTarget.setAttribute("data-swipe", "cancel");
-				event.currentTarget.style.removeProperty("--radix-toast-swipe-move-x");
-				event.currentTarget.style.removeProperty("--radix-toast-swipe-move-y");
-				event.currentTarget.style.removeProperty("--radix-toast-swipe-end-x");
-				event.currentTarget.style.removeProperty("--radix-toast-swipe-end-y");
-			}),
-			onSwipeEnd: composeEventHandlers(props.onSwipeEnd, (event) => {
-				const { x, y } = event.detail.delta;
-				event.currentTarget.setAttribute("data-swipe", "end");
-				event.currentTarget.style.removeProperty("--radix-toast-swipe-move-x");
-				event.currentTarget.style.removeProperty("--radix-toast-swipe-move-y");
-				event.currentTarget.style.setProperty("--radix-toast-swipe-end-x", `${x}px`);
-				event.currentTarget.style.setProperty("--radix-toast-swipe-end-y", `${y}px`);
-				setOpen(false);
-			})
-		})
-	});
-});
-Toast$2.displayName = TOAST_NAME;
-var [ToastInteractiveProvider, useToastInteractiveContext] = createToastContext(TOAST_NAME, { onClose() {} });
-var ToastImpl = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, type = "foreground", duration: durationProp, open, onClose, onEscapeKeyDown, onPause, onResume, onSwipeStart, onSwipeMove, onSwipeCancel, onSwipeEnd, ...toastProps } = props;
-	const context = useToastProviderContext(TOAST_NAME, __scopeToast);
-	const [node, setNode] = import_react.useState(null);
-	const composedRefs = useComposedRefs(forwardedRef, (node2) => setNode(node2));
-	const pointerStartRef = import_react.useRef(null);
-	const swipeDeltaRef = import_react.useRef(null);
-	const duration = durationProp || context.duration;
-	const closeTimerStartTimeRef = import_react.useRef(0);
-	const closeTimerRemainingTimeRef = import_react.useRef(duration);
-	const closeTimerRef = import_react.useRef(0);
-	const { onToastAdd, onToastRemove } = context;
-	const handleClose = useCallbackRef(() => {
-		if (node?.contains(document.activeElement)) context.viewport?.focus();
-		onClose();
-	});
-	const startTimer = import_react.useCallback((duration2) => {
-		if (!duration2 || duration2 === Infinity) return;
-		window.clearTimeout(closeTimerRef.current);
-		closeTimerStartTimeRef.current = (/* @__PURE__ */ new Date()).getTime();
-		closeTimerRef.current = window.setTimeout(handleClose, duration2);
-	}, [handleClose]);
-	import_react.useEffect(() => {
-		const viewport = context.viewport;
-		if (viewport) {
-			const handleResume = () => {
-				startTimer(closeTimerRemainingTimeRef.current);
-				onResume?.();
-			};
-			const handlePause = () => {
-				const elapsedTime = (/* @__PURE__ */ new Date()).getTime() - closeTimerStartTimeRef.current;
-				closeTimerRemainingTimeRef.current = closeTimerRemainingTimeRef.current - elapsedTime;
-				window.clearTimeout(closeTimerRef.current);
-				onPause?.();
-			};
-			viewport.addEventListener(VIEWPORT_PAUSE, handlePause);
-			viewport.addEventListener(VIEWPORT_RESUME, handleResume);
-			return () => {
-				viewport.removeEventListener(VIEWPORT_PAUSE, handlePause);
-				viewport.removeEventListener(VIEWPORT_RESUME, handleResume);
-			};
-		}
-	}, [
-		context.viewport,
-		duration,
-		onPause,
-		onResume,
-		startTimer
-	]);
-	import_react.useEffect(() => {
-		if (open && !context.isClosePausedRef.current) startTimer(duration);
-	}, [
-		open,
-		duration,
-		context.isClosePausedRef,
-		startTimer
-	]);
-	import_react.useEffect(() => {
-		onToastAdd();
-		return () => onToastRemove();
-	}, [onToastAdd, onToastRemove]);
-	const announceTextContent = import_react.useMemo(() => {
-		return node ? getAnnounceTextContent(node) : null;
-	}, [node]);
-	if (!context.viewport) return null;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [announceTextContent && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastAnnounce, {
-		__scopeToast,
-		role: "status",
-		"aria-live": type === "foreground" ? "assertive" : "polite",
-		children: announceTextContent
-	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastInteractiveProvider, {
-		scope: __scopeToast,
-		onClose: handleClose,
-		children: import_react_dom.createPortal(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.ItemSlot, {
-			scope: __scopeToast,
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$3, {
-				asChild: true,
-				onEscapeKeyDown: composeEventHandlers(onEscapeKeyDown, () => {
-					if (!context.isFocusedToastEscapeKeyDownRef.current) handleClose();
-					context.isFocusedToastEscapeKeyDownRef.current = false;
-				}),
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.li, {
-					tabIndex: 0,
-					"data-state": open ? "open" : "closed",
-					"data-swipe-direction": context.swipeDirection,
-					...toastProps,
-					ref: composedRefs,
-					style: {
-						userSelect: "none",
-						touchAction: "none",
-						...props.style
-					},
-					onKeyDown: composeEventHandlers(props.onKeyDown, (event) => {
-						if (event.key !== "Escape") return;
-						onEscapeKeyDown?.(event.nativeEvent);
-						if (!event.nativeEvent.defaultPrevented) {
-							context.isFocusedToastEscapeKeyDownRef.current = true;
-							handleClose();
-						}
-					}),
-					onPointerDown: composeEventHandlers(props.onPointerDown, (event) => {
-						if (event.button !== 0) return;
-						pointerStartRef.current = {
-							x: event.clientX,
-							y: event.clientY
-						};
-					}),
-					onPointerMove: composeEventHandlers(props.onPointerMove, (event) => {
-						if (!pointerStartRef.current) return;
-						const x = event.clientX - pointerStartRef.current.x;
-						const y = event.clientY - pointerStartRef.current.y;
-						const hasSwipeMoveStarted = Boolean(swipeDeltaRef.current);
-						const isHorizontalSwipe = ["left", "right"].includes(context.swipeDirection);
-						const clamp = ["left", "up"].includes(context.swipeDirection) ? Math.min : Math.max;
-						const clampedX = isHorizontalSwipe ? clamp(0, x) : 0;
-						const clampedY = !isHorizontalSwipe ? clamp(0, y) : 0;
-						const moveStartBuffer = event.pointerType === "touch" ? 10 : 2;
-						const delta = {
-							x: clampedX,
-							y: clampedY
-						};
-						const eventDetail = {
-							originalEvent: event,
-							delta
-						};
-						if (hasSwipeMoveStarted) {
-							swipeDeltaRef.current = delta;
-							handleAndDispatchCustomEvent(TOAST_SWIPE_MOVE, onSwipeMove, eventDetail, { discrete: false });
-						} else if (isDeltaInDirection(delta, context.swipeDirection, moveStartBuffer)) {
-							swipeDeltaRef.current = delta;
-							handleAndDispatchCustomEvent(TOAST_SWIPE_START, onSwipeStart, eventDetail, { discrete: false });
-							event.target.setPointerCapture(event.pointerId);
-						} else if (Math.abs(x) > moveStartBuffer || Math.abs(y) > moveStartBuffer) pointerStartRef.current = null;
-					}),
-					onPointerUp: composeEventHandlers(props.onPointerUp, (event) => {
-						const delta = swipeDeltaRef.current;
-						const target = event.target;
-						if (target.hasPointerCapture(event.pointerId)) target.releasePointerCapture(event.pointerId);
-						swipeDeltaRef.current = null;
-						pointerStartRef.current = null;
-						if (delta) {
-							const toast = event.currentTarget;
-							const eventDetail = {
-								originalEvent: event,
-								delta
-							};
-							if (isDeltaInDirection(delta, context.swipeDirection, context.swipeThreshold)) handleAndDispatchCustomEvent(TOAST_SWIPE_END, onSwipeEnd, eventDetail, { discrete: true });
-							else handleAndDispatchCustomEvent(TOAST_SWIPE_CANCEL, onSwipeCancel, eventDetail, { discrete: true });
-							toast.addEventListener("click", (event2) => event2.preventDefault(), { once: true });
-						}
-					})
-				})
-			})
-		}), context.viewport)
-	})] });
-});
-var ToastAnnounce = (props) => {
-	const { __scopeToast, children, ...announceProps } = props;
-	const context = useToastProviderContext(TOAST_NAME, __scopeToast);
-	const [renderAnnounceText, setRenderAnnounceText] = import_react.useState(false);
-	const [isAnnounced, setIsAnnounced] = import_react.useState(false);
-	useNextFrame(() => setRenderAnnounceText(true));
-	import_react.useEffect(() => {
-		const timer = window.setTimeout(() => setIsAnnounced(true), 1e3);
-		return () => window.clearTimeout(timer);
-	}, []);
-	return isAnnounced ? null : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Portal, {
-		asChild: true,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(VisuallyHidden, {
-			...announceProps,
-			children: renderAnnounceText && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-				context.label,
-				" ",
-				children
-			] })
-		})
-	});
-};
-var TITLE_NAME = "ToastTitle";
-var ToastTitle$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, ...titleProps } = props;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.div, {
-		...titleProps,
-		ref: forwardedRef
-	});
-});
-ToastTitle$1.displayName = TITLE_NAME;
-var DESCRIPTION_NAME = "ToastDescription";
-var ToastDescription$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, ...descriptionProps } = props;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.div, {
-		...descriptionProps,
-		ref: forwardedRef
-	});
-});
-ToastDescription$1.displayName = DESCRIPTION_NAME;
-var ACTION_NAME = "ToastAction";
-var ToastAction$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { altText, ...actionProps } = props;
-	if (!altText.trim()) {
-		console.error(`Invalid prop \`altText\` supplied to \`${ACTION_NAME}\`. Expected non-empty \`string\`.`);
-		return null;
-	}
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastAnnounceExclude, {
-		altText,
-		asChild: true,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastClose$1, {
-			...actionProps,
-			ref: forwardedRef
-		})
-	});
-});
-ToastAction$1.displayName = ACTION_NAME;
-var CLOSE_NAME = "ToastClose";
-var ToastClose$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, ...closeProps } = props;
-	const interactiveContext = useToastInteractiveContext(CLOSE_NAME, __scopeToast);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastAnnounceExclude, {
-		asChild: true,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.button, {
-			type: "button",
-			...closeProps,
-			ref: forwardedRef,
-			onClick: composeEventHandlers(props.onClick, interactiveContext.onClose)
-		})
-	});
-});
-ToastClose$1.displayName = CLOSE_NAME;
-var ToastAnnounceExclude = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeToast, altText, ...announceExcludeProps } = props;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.div, {
-		"data-radix-toast-announce-exclude": "",
-		"data-radix-toast-announce-alt": altText || void 0,
-		...announceExcludeProps,
-		ref: forwardedRef
-	});
-});
-function getAnnounceTextContent(container) {
-	const textContent = [];
-	Array.from(container.childNodes).forEach((node) => {
-		if (node.nodeType === node.TEXT_NODE && node.textContent) textContent.push(node.textContent);
-		if (isHTMLElement$1(node)) {
-			const isHidden = node.ariaHidden || node.hidden || node.style.display === "none";
-			const isExcluded = node.dataset.radixToastAnnounceExclude === "";
-			if (!isHidden) if (isExcluded) {
-				const altText = node.dataset.radixToastAnnounceAlt;
-				if (altText) textContent.push(altText);
-			} else textContent.push(...getAnnounceTextContent(node));
-		}
-	});
-	return textContent;
-}
-function handleAndDispatchCustomEvent(name, handler, detail, { discrete }) {
-	const currentTarget = detail.originalEvent.currentTarget;
-	const event = new CustomEvent(name, {
-		bubbles: true,
-		cancelable: true,
-		detail
-	});
-	if (handler) currentTarget.addEventListener(name, handler, { once: true });
-	if (discrete) dispatchDiscreteCustomEvent(currentTarget, event);
-	else currentTarget.dispatchEvent(event);
-}
-var isDeltaInDirection = (delta, direction, threshold = 0) => {
-	const deltaX = Math.abs(delta.x);
-	const deltaY = Math.abs(delta.y);
-	const isDeltaX = deltaX > deltaY;
-	if (direction === "left" || direction === "right") return isDeltaX && deltaX > threshold;
-	else return !isDeltaX && deltaY > threshold;
-};
-function useNextFrame(callback = () => {}) {
-	const fn = useCallbackRef(callback);
-	useLayoutEffect2(() => {
-		let raf1 = 0;
-		let raf2 = 0;
-		raf1 = window.requestAnimationFrame(() => raf2 = window.requestAnimationFrame(fn));
-		return () => {
-			window.cancelAnimationFrame(raf1);
-			window.cancelAnimationFrame(raf2);
-		};
-	}, [fn]);
-}
-function isHTMLElement$1(node) {
-	return node.nodeType === node.ELEMENT_NODE;
-}
-function getTabbableCandidates(container) {
-	const nodes = [];
-	const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, { acceptNode: (node) => {
-		const isHiddenInput = node.tagName === "INPUT" && node.type === "hidden";
-		if (node.disabled || node.hidden || isHiddenInput) return NodeFilter.FILTER_SKIP;
-		return node.tabIndex >= 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
-	} });
-	while (walker.nextNode()) nodes.push(walker.currentNode);
-	return nodes;
-}
-function focusFirst(candidates) {
-	const previouslyFocusedElement = document.activeElement;
-	return candidates.some((candidate) => {
-		if (candidate === previouslyFocusedElement) return true;
-		candidate.focus();
-		return document.activeElement !== previouslyFocusedElement;
-	});
-}
-var Provider$1 = ToastProvider$1;
-var Viewport = ToastViewport$1;
-var Root2$1 = Toast$2;
-var Title = ToastTitle$1;
-var Description = ToastDescription$1;
-var Action = ToastAction$1;
-var Close = ToastClose$1;
 //#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/clsx@2.1.1/node_modules/clsx/dist/clsx.mjs
 function r(e) {
@@ -18893,301 +17664,6 @@ var cva = (base, config) => (props) => {
 		] : acc;
 	}, []), props === null || props === void 0 ? void 0 : props.class, props === null || props === void 0 ? void 0 : props.className);
 };
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var mergeClasses = (...classes) => classes.filter((className, index, array) => {
-	return Boolean(className) && className.trim() !== "" && array.indexOf(className) === index;
-}).join(" ").trim();
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/toKebabCase.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/toCamelCase.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var toCamelCase = (string) => string.replace(/^([A-Z])|[\s-_]+(\w)/g, (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase());
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/toPascalCase.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var toPascalCase = (string) => {
-	const camelCase = toCamelCase(string);
-	return camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
-};
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/defaultAttributes.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var defaultAttributes = {
-	xmlns: "http://www.w3.org/2000/svg",
-	width: 24,
-	height: 24,
-	viewBox: "0 0 24 24",
-	fill: "none",
-	stroke: "currentColor",
-	strokeWidth: 2,
-	strokeLinecap: "round",
-	strokeLinejoin: "round"
-};
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/hasA11yProp.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var hasA11yProp = (props) => {
-	for (const prop in props) if (prop.startsWith("aria-") || prop === "role" || prop === "title") return true;
-	return false;
-};
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/Icon.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var Icon = (0, import_react.forwardRef)(({ color = "currentColor", size = 24, strokeWidth = 2, absoluteStrokeWidth, className = "", children, iconNode, ...rest }, ref) => (0, import_react.createElement)("svg", {
-	ref,
-	...defaultAttributes,
-	width: size,
-	height: size,
-	stroke: color,
-	strokeWidth: absoluteStrokeWidth ? Number(strokeWidth) * 24 / Number(size) : strokeWidth,
-	className: mergeClasses("lucide", className),
-	...!children && !hasA11yProp(rest) && { "aria-hidden": "true" },
-	...rest
-}, [...iconNode.map(([tag, attrs]) => (0, import_react.createElement)(tag, attrs)), ...Array.isArray(children) ? children : [children]]));
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/createLucideIcon.js
-/**
-* @license lucide-react v0.577.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
-var createLucideIcon = (iconName, iconNode) => {
-	const Component = (0, import_react.forwardRef)(({ className, ...props }, ref) => (0, import_react.createElement)(Icon, {
-		ref,
-		iconNode,
-		className: mergeClasses(`lucide-${toKebabCase(toPascalCase(iconName))}`, `lucide-${iconName}`, className),
-		...props
-	}));
-	Component.displayName = toPascalCase(iconName);
-	return Component;
-};
-var Activity = createLucideIcon("activity", [["path", {
-	d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",
-	key: "169zse"
-}]]);
-var ArrowRight = createLucideIcon("arrow-right", [["path", {
-	d: "M5 12h14",
-	key: "1ays0h"
-}], ["path", {
-	d: "m12 5 7 7-7 7",
-	key: "xquz4c"
-}]]);
-var CircleCheckBig = createLucideIcon("circle-check-big", [["path", {
-	d: "M21.801 10A10 10 0 1 1 17 3.335",
-	key: "yps3ct"
-}], ["path", {
-	d: "m9 11 3 3L22 4",
-	key: "1pflzl"
-}]]);
-var Coffee = createLucideIcon("coffee", [
-	["path", {
-		d: "M10 2v2",
-		key: "7u0qdc"
-	}],
-	["path", {
-		d: "M14 2v2",
-		key: "6buw04"
-	}],
-	["path", {
-		d: "M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1",
-		key: "pwadti"
-	}],
-	["path", {
-		d: "M6 2v2",
-		key: "colzsn"
-	}]
-]);
-var Facebook = createLucideIcon("facebook", [["path", {
-	d: "M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z",
-	key: "1jg4f8"
-}]]);
-var HeartPulse = createLucideIcon("heart-pulse", [["path", {
-	d: "M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5",
-	key: "mvr1a0"
-}], ["path", {
-	d: "M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27",
-	key: "auskq0"
-}]]);
-var Heart = createLucideIcon("heart", [["path", {
-	d: "M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5",
-	key: "mvr1a0"
-}]]);
-var Instagram = createLucideIcon("instagram", [
-	["rect", {
-		width: "20",
-		height: "20",
-		x: "2",
-		y: "2",
-		rx: "5",
-		ry: "5",
-		key: "2e1cvw"
-	}],
-	["path", {
-		d: "M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z",
-		key: "9exkf1"
-	}],
-	["line", {
-		x1: "17.5",
-		x2: "17.51",
-		y1: "6.5",
-		y2: "6.5",
-		key: "r4j83e"
-	}]
-]);
-var Mail = createLucideIcon("mail", [["path", {
-	d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7",
-	key: "132q7q"
-}], ["rect", {
-	x: "2",
-	y: "4",
-	width: "20",
-	height: "16",
-	rx: "2",
-	key: "izxlao"
-}]]);
-var MapPin = createLucideIcon("map-pin", [["path", {
-	d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
-	key: "1r0f0z"
-}], ["circle", {
-	cx: "12",
-	cy: "10",
-	r: "3",
-	key: "ilqhr7"
-}]]);
-var Menu = createLucideIcon("menu", [
-	["path", {
-		d: "M4 5h16",
-		key: "1tepv9"
-	}],
-	["path", {
-		d: "M4 12h16",
-		key: "1lakjw"
-	}],
-	["path", {
-		d: "M4 19h16",
-		key: "1djgab"
-	}]
-]);
-var MessageCircle = createLucideIcon("message-circle", [["path", {
-	d: "M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719",
-	key: "1sd12s"
-}]]);
-var Phone = createLucideIcon("phone", [["path", {
-	d: "M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384",
-	key: "9njp5v"
-}]]);
-var Sparkles = createLucideIcon("sparkles", [
-	["path", {
-		d: "M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z",
-		key: "1s2grr"
-	}],
-	["path", {
-		d: "M20 2v4",
-		key: "1rf3ol"
-	}],
-	["path", {
-		d: "M22 4h-4",
-		key: "gwowj6"
-	}],
-	["circle", {
-		cx: "4",
-		cy: "20",
-		r: "2",
-		key: "6kqj1y"
-	}]
-]);
-var Stethoscope = createLucideIcon("stethoscope", [
-	["path", {
-		d: "M11 2v2",
-		key: "1539x4"
-	}],
-	["path", {
-		d: "M5 2v2",
-		key: "1yf1q8"
-	}],
-	["path", {
-		d: "M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1",
-		key: "rb5t3r"
-	}],
-	["path", {
-		d: "M8 15a6 6 0 0 0 12 0v-3",
-		key: "x18d4x"
-	}],
-	["circle", {
-		cx: "20",
-		cy: "10",
-		r: "2",
-		key: "ts1r5v"
-	}]
-]);
-var Users = createLucideIcon("users", [
-	["path", {
-		d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2",
-		key: "1yyitq"
-	}],
-	["path", {
-		d: "M16 3.128a4 4 0 0 1 0 7.744",
-		key: "16gr8j"
-	}],
-	["path", {
-		d: "M22 21v-2a4 4 0 0 0-3-3.87",
-		key: "kshegd"
-	}],
-	["circle", {
-		cx: "9",
-		cy: "7",
-		r: "4",
-		key: "nufk8"
-	}]
-]);
-var X = createLucideIcon("x", [["path", {
-	d: "M18 6 6 18",
-	key: "1bl5f8"
-}], ["path", {
-	d: "m6 6 12 12",
-	key: "d8bk6v"
-}]]);
 //#endregion
 //#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/tailwind-merge@2.6.1/node_modules/tailwind-merge/dist/bundle-mjs.mjs
 var CLASS_PART_SEPARATOR = "-";
@@ -20610,8 +19086,3033 @@ function cn$1(...inputs) {
 	return twMerge(clsx(inputs));
 }
 //#endregion
+//#region src/components/ui/button.tsx
+var buttonVariants = cva("inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", {
+	variants: {
+		variant: {
+			default: "bg-primary text-primary-foreground hover:bg-primary/90",
+			destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+			outline: "border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground",
+			secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+			ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
+			link: "text-foreground underline-offset-4 hover:underline"
+		},
+		size: {
+			default: "h-10 px-4 py-2",
+			sm: "h-9 rounded-md px-3",
+			lg: "h-11 rounded-md px-8",
+			icon: "h-10 w-10"
+		}
+	},
+	defaultVariants: {
+		variant: "default",
+		size: "default"
+	}
+});
+var Button = import_react.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(asChild ? Slot : "button", {
+		"data-uid": "src/components/ui/button.tsx:44:7",
+		"data-prohibitions": "[editContent]",
+		className: cn$1(buttonVariants({
+			variant,
+			size,
+			className
+		})),
+		ref,
+		...props
+	});
+});
+Button.displayName = "Button";
+//#endregion
+//#region src/lib/tracking.ts
+var trackWhatsAppClick = () => {
+	if (typeof window !== "undefined" && window.gtag) window.gtag("event", "conversion", { send_to: "AW-CONVERSION_ID/CONVERSION_LABEL" });
+	console.log("WhatsApp Conversion Tracked!");
+};
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var mergeClasses = (...classes) => classes.filter((className, index, array) => {
+	return Boolean(className) && className.trim() !== "" && array.indexOf(className) === index;
+}).join(" ").trim();
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/toKebabCase.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var toKebabCase = (string) => string.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/toCamelCase.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var toCamelCase = (string) => string.replace(/^([A-Z])|[\s-_]+(\w)/g, (match, p1, p2) => p2 ? p2.toUpperCase() : p1.toLowerCase());
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/toPascalCase.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var toPascalCase = (string) => {
+	const camelCase = toCamelCase(string);
+	return camelCase.charAt(0).toUpperCase() + camelCase.slice(1);
+};
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/defaultAttributes.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var defaultAttributes = {
+	xmlns: "http://www.w3.org/2000/svg",
+	width: 24,
+	height: 24,
+	viewBox: "0 0 24 24",
+	fill: "none",
+	stroke: "currentColor",
+	strokeWidth: 2,
+	strokeLinecap: "round",
+	strokeLinejoin: "round"
+};
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/shared/src/utils/hasA11yProp.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var hasA11yProp = (props) => {
+	for (const prop in props) if (prop.startsWith("aria-") || prop === "role" || prop === "title") return true;
+	return false;
+};
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/Icon.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Icon = (0, import_react.forwardRef)(({ color = "currentColor", size = 24, strokeWidth = 2, absoluteStrokeWidth, className = "", children, iconNode, ...rest }, ref) => (0, import_react.createElement)("svg", {
+	ref,
+	...defaultAttributes,
+	width: size,
+	height: size,
+	stroke: color,
+	strokeWidth: absoluteStrokeWidth ? Number(strokeWidth) * 24 / Number(size) : strokeWidth,
+	className: mergeClasses("lucide", className),
+	...!children && !hasA11yProp(rest) && { "aria-hidden": "true" },
+	...rest
+}, [...iconNode.map(([tag, attrs]) => (0, import_react.createElement)(tag, attrs)), ...Array.isArray(children) ? children : [children]]));
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/lucide-react@0.577.0_react@19.2.4/node_modules/lucide-react/dist/esm/createLucideIcon.js
+/**
+* @license lucide-react v0.577.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var createLucideIcon = (iconName, iconNode) => {
+	const Component = (0, import_react.forwardRef)(({ className, ...props }, ref) => (0, import_react.createElement)(Icon, {
+		ref,
+		iconNode,
+		className: mergeClasses(`lucide-${toKebabCase(toPascalCase(iconName))}`, `lucide-${iconName}`, className),
+		...props
+	}));
+	Component.displayName = toPascalCase(iconName);
+	return Component;
+};
+var Activity = createLucideIcon("activity", [["path", {
+	d: "M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2",
+	key: "169zse"
+}]]);
+var ChevronDown = createLucideIcon("chevron-down", [["path", {
+	d: "m6 9 6 6 6-6",
+	key: "qrunsl"
+}]]);
+var Coffee = createLucideIcon("coffee", [
+	["path", {
+		d: "M10 2v2",
+		key: "7u0qdc"
+	}],
+	["path", {
+		d: "M14 2v2",
+		key: "6buw04"
+	}],
+	["path", {
+		d: "M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1",
+		key: "pwadti"
+	}],
+	["path", {
+		d: "M6 2v2",
+		key: "colzsn"
+	}]
+]);
+var HeartPulse = createLucideIcon("heart-pulse", [["path", {
+	d: "M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5",
+	key: "mvr1a0"
+}], ["path", {
+	d: "M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27",
+	key: "auskq0"
+}]]);
+var Heart = createLucideIcon("heart", [["path", {
+	d: "M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5",
+	key: "mvr1a0"
+}]]);
+var Mail = createLucideIcon("mail", [["path", {
+	d: "m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7",
+	key: "132q7q"
+}], ["rect", {
+	x: "2",
+	y: "4",
+	width: "20",
+	height: "16",
+	rx: "2",
+	key: "izxlao"
+}]]);
+var MapPin = createLucideIcon("map-pin", [["path", {
+	d: "M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0",
+	key: "1r0f0z"
+}], ["circle", {
+	cx: "12",
+	cy: "10",
+	r: "3",
+	key: "ilqhr7"
+}]]);
+var Menu = createLucideIcon("menu", [
+	["path", {
+		d: "M4 5h16",
+		key: "1tepv9"
+	}],
+	["path", {
+		d: "M4 12h16",
+		key: "1lakjw"
+	}],
+	["path", {
+		d: "M4 19h16",
+		key: "1djgab"
+	}]
+]);
+var MessageCircle = createLucideIcon("message-circle", [["path", {
+	d: "M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719",
+	key: "1sd12s"
+}]]);
+var Phone = createLucideIcon("phone", [["path", {
+	d: "M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384",
+	key: "9njp5v"
+}]]);
+var UserCheck = createLucideIcon("user-check", [
+	["path", {
+		d: "m16 11 2 2 4-4",
+		key: "9rsbq5"
+	}],
+	["path", {
+		d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2",
+		key: "1yyitq"
+	}],
+	["circle", {
+		cx: "9",
+		cy: "7",
+		r: "4",
+		key: "nufk8"
+	}]
+]);
+var X = createLucideIcon("x", [["path", {
+	d: "M18 6 6 18",
+	key: "1bl5f8"
+}], ["path", {
+	d: "m6 6 12 12",
+	key: "d8bk6v"
+}]]);
+//#endregion
+//#region src/components/Header.tsx
+function Header$1() {
+	const [isScrolled, setIsScrolled] = (0, import_react.useState)(false);
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = (0, import_react.useState)(false);
+	(0, import_react.useEffect)(() => {
+		const handleScroll = () => {
+			setIsScrolled(window.scrollY > 10);
+		};
+		window.addEventListener("scroll", handleScroll);
+		return () => window.removeEventListener("scroll", handleScroll);
+	}, []);
+	const handleWhatsApp = () => {
+		trackWhatsAppClick();
+		window.open("https://wa.me/551137684392", "_blank");
+	};
+	const navLinks = [
+		{
+			name: "Sobre",
+			href: "#sobre"
+		},
+		{
+			name: "Serviços",
+			href: "#servicos"
+		},
+		{
+			name: "Estrutura",
+			href: "#estrutura"
+		},
+		{
+			name: "Equipe",
+			href: "#equipe"
+		},
+		{
+			name: "FAQ",
+			href: "#faq"
+		}
+	];
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", {
+		"data-uid": "src/components/Header.tsx:32:5",
+		"data-prohibitions": "[editContent]",
+		className: `fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-white/95 backdrop-blur-md shadow-sm py-3" : "bg-transparent py-5"}`,
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/Header.tsx:35:7",
+			"data-prohibitions": "[editContent]",
+			className: "container mx-auto px-4 flex items-center justify-between",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
+					"data-uid": "src/components/Header.tsx:36:9",
+					"data-prohibitions": "[]",
+					href: "#",
+					className: "flex items-center gap-2 text-emerald-700",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Heart, {
+						"data-uid": "src/components/Header.tsx:37:11",
+						"data-prohibitions": "[editContent]",
+						className: "w-8 h-8 fill-emerald-600"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+						"data-uid": "src/components/Header.tsx:38:11",
+						"data-prohibitions": "[]",
+						className: "text-2xl font-bold tracking-tight",
+						children: "Casa Vita"
+					})]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("nav", {
+					"data-uid": "src/components/Header.tsx:42:9",
+					"data-prohibitions": "[editContent]",
+					className: "hidden lg:flex items-center gap-8",
+					children: navLinks.map((link) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+						"data-uid": "src/components/Header.tsx:44:13",
+						"data-prohibitions": "[editContent]",
+						href: link.href,
+						className: "text-sm font-medium text-slate-700 hover:text-emerald-600 transition-colors",
+						children: link.name
+					}, link.name))
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/Header.tsx:54:9",
+					"data-prohibitions": "[editContent]",
+					className: "hidden lg:flex items-center gap-4",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/Header.tsx:55:11",
+						"data-prohibitions": "[editContent]",
+						className: "text-right mr-4",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							"data-uid": "src/components/Header.tsx:56:13",
+							"data-prohibitions": "[editContent]",
+							className: `text-xs ${isScrolled ? "text-slate-500" : "text-slate-600"}`,
+							children: "Unidade 2"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							"data-uid": "src/components/Header.tsx:59:13",
+							"data-prohibitions": "[editContent]",
+							className: `text-sm font-bold ${isScrolled ? "text-slate-800" : "text-slate-900"}`,
+							children: "(11) 3768-4392"
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						"data-uid": "src/components/Header.tsx:63:11",
+						"data-prohibitions": "[]",
+						onClick: handleWhatsApp,
+						className: "bg-green-600 hover:bg-green-700 text-white rounded-full px-6 shadow-md transition-transform hover:scale-105",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
+							"data-uid": "src/components/Header.tsx:67:13",
+							"data-prohibitions": "[editContent]",
+							className: "mr-2 h-4 w-4"
+						}), "WhatsApp"]
+					})]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+					"data-uid": "src/components/Header.tsx:73:9",
+					"data-prohibitions": "[editContent]",
+					className: "lg:hidden p-2 text-slate-800",
+					onClick: () => setIsMobileMenuOpen(!isMobileMenuOpen),
+					children: isMobileMenuOpen ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, {
+						"data-uid": "src/components/Header.tsx:77:31",
+						"data-prohibitions": "[editContent]",
+						className: "w-6 h-6"
+					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Menu, {
+						"data-uid": "src/components/Header.tsx:77:59",
+						"data-prohibitions": "[editContent]",
+						className: "w-6 h-6"
+					})
+				})
+			]
+		}), isMobileMenuOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/Header.tsx:83:9",
+			"data-prohibitions": "[editContent]",
+			className: "lg:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-slate-100 py-4 px-4 flex flex-col gap-4 animate-fade-in-down",
+			children: [navLinks.map((link) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+				"data-uid": "src/components/Header.tsx:85:13",
+				"data-prohibitions": "[editContent]",
+				href: link.href,
+				className: "text-lg font-medium text-slate-700 py-2 border-b border-slate-50",
+				onClick: () => setIsMobileMenuOpen(false),
+				children: link.name
+			}, link.name)), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/Header.tsx:94:11",
+				"data-prohibitions": "[]",
+				className: "pt-4 pb-2",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						"data-uid": "src/components/Header.tsx:95:13",
+						"data-prohibitions": "[]",
+						className: "text-sm text-slate-500 mb-1",
+						children: "Central de Atendimento"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+						"data-uid": "src/components/Header.tsx:96:13",
+						"data-prohibitions": "[]",
+						className: "text-lg font-bold text-slate-800 mb-4",
+						children: "(11) 3768-4392"
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						"data-uid": "src/components/Header.tsx:97:13",
+						"data-prohibitions": "[]",
+						onClick: handleWhatsApp,
+						className: "w-full bg-green-600 hover:bg-green-700 text-white rounded-full shadow-md h-12 text-lg",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
+							"data-uid": "src/components/Header.tsx:101:15",
+							"data-prohibitions": "[editContent]",
+							className: "mr-2 h-5 w-5"
+						}), "Chamar no WhatsApp"]
+					})
+				]
+			})]
+		})]
+	});
+}
+//#endregion
+//#region src/assets/ancs-f63c8.png
+var ancs_f63c8_default = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAF8AAAA1CAYAAAAnIzfJAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OTMwM0E3NkM5RjcxMTFFNjg5RTdCNzM4RTIyOTgwRkUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OTMwM0E3NkQ5RjcxMTFFNjg5RTdCNzM4RTIyOTgwRkUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo5MzAzQTc2QTlGNzExMUU2ODlFN0I3MzhFMjI5ODBGRSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo5MzAzQTc2QjlGNzExMUU2ODlFN0I3MzhFMjI5ODBGRSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PqRoGnUAAAqPSURBVHja7JpbSJXbFseXVqYWpBHpIUPtgtLFjCD1ITUK2pGoQeWpILWo9kEwowi6gApdzq4HTbBOV/WhzApySZRBmdZDLqi2dgEt8EIGWpTLSGtr1Jm/hWOf2XfUlu0s1+6b8LGW85tzjDH/4zLHGEu3T58+WYbzePHiRdDLly+DZs6cWenMOjVqxowZY7e4wHAf7gLevHkzJTMz86az65qamsItLjLcLeYwwTfBN4cJ/s8yRg4HId6/f+9TV1eX2NzcHNPa2hre1tb22aUZFhZmycvLaxw3blyTv79/jZ+fX21oaGipp6en3QT/L4B+7dq1nPr6+sSQkJBSHx+f5sDAwKqOjo4g3tvt9sCnT5/GdnV1BanvjkcpKJZ3ZWVlBeyJiIg4rNLLShP8QYyampqUy5cv50ybNq102bJly/V3EyZMaOr9tLS0tFhqa2tTtm3blqqUlICiZB3feebMmVOo/mxmrrGx8Yup5pdqhu813H5EkUVoOX/+/CUVPkovXLiQ4cyeixcvuvV6QxDKsNlsW/Aced/e3m559uyZZTC0fkrLJ9SsWrVq+atXrwCvYzB7VWhqiomJycLaq6qqMlEE876+vpaAgIAa9VhdJex8d8vHcgE/KSlp+begpyraWOI/dLmAd+zY4WummgNYrroov9o6jx49WrBu3bpPaWlp7bdv307hst20adNcLl/CEMowLX8IRmVlZcqxY8cKvL29LR4eHhZ3d3d7fn7+n5ZeUlJyyZWyn2FbZKl4nsXFrM+plNMHY/nw4YOlu7vb8ubNGx/9fUJCQqor5f7DFvzRo0fbyYiI5TI3f/78UtrFKrxYOjs7LVFRUYX6HoCnCHPm3jHDzhfS0ePHj/8OoPHx8alUtMzTs797926iCj12lfUUfg1tq9VasGTJkq0/2kt+KPgURISS/t5fUuPjx4+O96SW3wowWhXp6enBP7Xl8+PH48eP+81Opk+fbvHy8vosrERHR2dHRkbmDpaWjODgYEtcXFw2tcJPDT6/PvHz30BrGhoaknt6eoKM6aryhCK8ge86+AO1Dt69exc7derUms2bN881Y76T3qHiexAe0NdF6efnV4MibDZbssr7w42tA+mY0o4gBVUWnz1cMiKXAJ/P7OzshTTjaK7R2dT7OkavoPUswNMhpQADdPGS4TJGWlxohIeHF/JINsQj7efy8nJHoy0wMLBJWXgVqSpp53AuuFwKfH0ArJ7TV1RUxND7z8nJWWgWWeYwwTfBN4drxvzY2NgiZ9fNmDGjypXAd6mW8t9tmOCb4JvgD8loaGhw/CAyZcqUmr8riG1tbUG9rY5BVdBfle3s3bv30pkzZ7KcAX7nzp03WS9KcFZhJ06cyHGWvk6bfc7yun79eoozfJyhwzPk2c7Dhw9jq6urE3kSEhJyx44daxft06GcOHFiE5+zZ892lPUbN27cKnvfvn3rQw8/ODi4hk/WirUAWGdnp6Nfw7xaU6vT5Rcso/ewHnlyc3ML9u/fvxBZoBMZGWkVWfmEn8gpfKCnW6rIxneRnbVyHt17hYYu/3dJNc+ePZu5evXq7Bs3biRbrdaMtWvXZokFRUVFlT548CAWYc+dO+cLKAiIsLwDFCyVOcAA2Ly8vLnFxcWZd+7cSVy8eHEha9esWeOgz9+sDwsLq+Q98yhclwdAAO7kyZM5GRkZqbp3ioKgWVJS4iseCD3A9/b27nj06FEMYKenp/8u4Ko9OSiTMyGjyAp/1oABoHNu5P8u4GNJCL97927H/9yUlZVtAQyEEWBYA2B4BmsjIiKsCI+ixCL37NmznEPExcV9Yj2HgCYK0i2WceDAgYX8zeEB2SgTIAI64Im3MJjDklEi+8VjT506FSzWKqET/szBi7/Xr1/fqPY5wog602HOxVr4oyjlzXbowVu8dcjBVwBugeG+ffsuyRxCihuL+4rFYeFYGX8vWrSoSLdWI20JC/rA2vEeFDuQe0MPsMXTmNu1a5fDwxRYVUZl9UVDn0cWOYdRVrwB4OPj4w//lZAzKPCxvL4sB4UgCEJhZXLzK7AL8QjeA7y4u5EutLAm9uMlXV1d48RDJNYCBOEMUPR7Rh+EKEKIXHzwAzgFVIyuJJQi3ijzyEXoE0/gDEKvr0seRSmvmtOLSQLh62vAH5GVleXUQlwYK9IB7FWCG4JGR0eXhIaG2tRcc0tLS+jKlSt/Y66np8cLIVnL4ZXgHUJDpbluAI9ymMdbAgIC6mWd2n9OgdTR3d3tqe6WbNZPnjy5TgeOdWKds2bNqho1atQf0FQhzKqU5hsTE1OC3NBOTk7eibzQU3zqoKW8o1nuI+SGTlpa2r/kbNCGn5ubm+O8yApdNdoISa9fv/4H5+HdYD3hm+T5WAxWD3MsgwwHhZhllFnhmuCbwwR/WI3P2gtkFXqOPdT9EL0NIDWEq/Z2vgY3d2NGQ4HkRL6fkZSU1G7sb1CcsH+gvo+81/sq5OekpIPtATGkUHOm/8Ja+Du7py8+yCfptN5f0ueclc+RalLM3L9//xdSMHJ5ihq84NatW/9ko0qrWvX0jjRNVbcZpFuS5gEk6Rrpl0o5q6XPcuXKlV/5ThpHfkw6ynvekcerrMiRZnp4ePwxb968ayEhIdXq+3sRmCKuvb3dn7RQDgtNDAU52EPvhjXsQWb4IbNR6StWrPht69atqdQlvGcP5+X8sgf64AAtMIEH8pCuUrQdOnSo+Pnz55zFkdtzLnAg3WS/9KLq6uoi7Xa7P+cT+YQXWSH8RkyaNClHFUNZlOYVFRXJLAL87du33+E7+W1+fv5/li5degwhYMgnhK9evforYCNwUVHRv2kbYMXkwQhw8ODBYgWmrby8fDM8AEqtO8B7KaIQDsVxGPhzaOqDDRs2NCLs+PHjW9nLAXlHdc2//JHz8w45oYsMT548iVB1haeSoRBD0BUg8ipgvcQ4KKyYlz3k8EeOHDkKP2Srr6+P1OVRhlZ77969X6RGoXYw8kT5KAi6KAylIx+pOHM8rMUARhJCpK+C9lgs7kUlKK2C3iLrzwKLzexlrTTBdO+QORpv4n79uTTKxiKMvRLpAYmrQ5MKV++UylAHL9V768aeC3swMKpuelL0cWgQomDZIxU1crOes7FeLyp5KOY4l7QgjDyRWfpEMoy8wHPAfj5EUAiEcB1jWwAhEY54ijL6o9NXQ0zv36DwvirEwfwAQ9uAUr+vFobegjh9+rSjPYLcvd71f3ucbRf0x7Ov/hG8aEnoa0dizbgf1oVlST+bg2MhuBLgQVBZ9mdg4KYAJ+sNlmiVHzb6u4x0a2MN/RvdkowDfsgkAOnKYg8xWc4ALd1TucwJA5yDtXg1loi36nu+BDg8bTZbAp/CEwUMtB/88Aoe4cXeESoOWqXfkZiYeJheB9pZsGCBoy/DRgTkIBLzdUF6ezAlGhBuxGT6MiiAC5a4TrzFlblYec96eBn7N/Rm4Cdy6DSxXOjRT2GSUAl/ZCOuEs+JyyiJ+0q3Mt4xBwDIq86aizK4f/Q9zIl8eu9I+lC9xugLnZSUlJ18px+l80R2MUb2KdnKpdckvLioh6zIIhTJjw5Yv8RRs7T6jhUul5bu/ub43/ivAAMAFTUmkTDdyFUAAAAASUVORK5CYII=";
+//#endregion
+//#region src/components/Footer.tsx
+function Footer() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("footer", {
+		"data-uid": "src/components/Footer.tsx:6:5",
+		"data-prohibitions": "[editContent]",
+		className: "bg-slate-900 text-slate-300 py-16",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/Footer.tsx:7:7",
+			"data-prohibitions": "[editContent]",
+			className: "container mx-auto px-4",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/Footer.tsx:8:9",
+				"data-prohibitions": "[]",
+				className: "grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12",
+				children: [
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/Footer.tsx:9:11",
+						"data-prohibitions": "[]",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								"data-uid": "src/components/Footer.tsx:10:13",
+								"data-prohibitions": "[]",
+								className: "flex items-center gap-2 text-white mb-6",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Heart, {
+									"data-uid": "src/components/Footer.tsx:11:15",
+									"data-prohibitions": "[editContent]",
+									className: "w-8 h-8 fill-emerald-500 text-emerald-500"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									"data-uid": "src/components/Footer.tsx:12:15",
+									"data-prohibitions": "[]",
+									className: "text-2xl font-bold tracking-tight",
+									children: "Casa Vita"
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								"data-uid": "src/components/Footer.tsx:14:13",
+								"data-prohibitions": "[]",
+								className: "text-slate-400 mb-6 leading-relaxed",
+								children: "Dedicados a proporcionar a melhor qualidade de vida para quem você ama, com estrutura moderna e equipe qualificada."
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								"data-uid": "src/components/Footer.tsx:18:13",
+								"data-prohibitions": "[]",
+								className: "bg-white/10 p-4 rounded-xl inline-block",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+									"data-uid": "src/components/Footer.tsx:19:15",
+									"data-prohibitions": "[editContent]",
+									src: ancs_f63c8_default,
+									alt: "Agência Nacional de Vigilância Sanitária",
+									className: "h-12 object-contain filter invert opacity-80"
+								})
+							})
+						]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/Footer.tsx:27:11",
+						"data-prohibitions": "[]",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							"data-uid": "src/components/Footer.tsx:28:13",
+							"data-prohibitions": "[]",
+							className: "text-lg font-semibold text-white mb-6",
+							children: "Unidade 2"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+							"data-uid": "src/components/Footer.tsx:29:13",
+							"data-prohibitions": "[]",
+							className: "space-y-4",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
+									"data-uid": "src/components/Footer.tsx:30:15",
+									"data-prohibitions": "[]",
+									className: "flex items-start gap-3",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MapPin, {
+										"data-uid": "src/components/Footer.tsx:31:17",
+										"data-prohibitions": "[editContent]",
+										className: "w-5 h-5 text-emerald-500 shrink-0 mt-0.5"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+										"data-uid": "src/components/Footer.tsx:32:17",
+										"data-prohibitions": "[]",
+										children: [
+											"Rua Heitor Penteado, 193",
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
+												"data-uid": "src/components/Footer.tsx:34:19",
+												"data-prohibitions": "[editContent]"
+											}),
+											"Sumarezinho, São Paulo - SP",
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
+												"data-uid": "src/components/Footer.tsx:36:19",
+												"data-prohibitions": "[editContent]"
+											}),
+											"05437-000"
+										]
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
+									"data-uid": "src/components/Footer.tsx:40:15",
+									"data-prohibitions": "[]",
+									className: "flex items-center gap-3",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
+										"data-uid": "src/components/Footer.tsx:41:17",
+										"data-prohibitions": "[editContent]",
+										className: "w-5 h-5 text-emerald-500 shrink-0"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										"data-uid": "src/components/Footer.tsx:42:17",
+										"data-prohibitions": "[]",
+										children: "(11) 3768-4392"
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
+									"data-uid": "src/components/Footer.tsx:44:15",
+									"data-prohibitions": "[]",
+									className: "flex items-center gap-3",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Mail, {
+										"data-uid": "src/components/Footer.tsx:45:17",
+										"data-prohibitions": "[editContent]",
+										className: "w-5 h-5 text-emerald-500 shrink-0"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										"data-uid": "src/components/Footer.tsx:46:17",
+										"data-prohibitions": "[]",
+										children: "contato@casavita.com.br"
+									})]
+								})
+							]
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/Footer.tsx:51:11",
+						"data-prohibitions": "[]",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							"data-uid": "src/components/Footer.tsx:52:13",
+							"data-prohibitions": "[]",
+							className: "text-lg font-semibold text-white mb-6",
+							children: "Links Úteis"
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
+							"data-uid": "src/components/Footer.tsx:53:13",
+							"data-prohibitions": "[]",
+							className: "space-y-3",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:54:15",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:55:17",
+										"data-prohibitions": "[]",
+										href: "#sobre",
+										className: "hover:text-emerald-400 transition-colors",
+										children: "Sobre Nós"
+									})
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:59:15",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:60:17",
+										"data-prohibitions": "[]",
+										href: "#servicos",
+										className: "hover:text-emerald-400 transition-colors",
+										children: "Nossos Serviços"
+									})
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:64:15",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:65:17",
+										"data-prohibitions": "[]",
+										href: "#estrutura",
+										className: "hover:text-emerald-400 transition-colors",
+										children: "Estrutura"
+									})
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:69:15",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:70:17",
+										"data-prohibitions": "[]",
+										href: "#equipe",
+										className: "hover:text-emerald-400 transition-colors",
+										children: "Nossa Equipe"
+									})
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", {
+									"data-uid": "src/components/Footer.tsx:74:15",
+									"data-prohibitions": "[]",
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
+										"data-uid": "src/components/Footer.tsx:75:17",
+										"data-prohibitions": "[]",
+										href: "#faq",
+										className: "hover:text-emerald-400 transition-colors",
+										children: "Perguntas Frequentes"
+									})
+								})
+							]
+						})]
+					}),
+					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/Footer.tsx:82:11",
+						"data-prohibitions": "[]",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+								"data-uid": "src/components/Footer.tsx:83:13",
+								"data-prohibitions": "[]",
+								className: "text-lg font-semibold text-white mb-6",
+								children: "Horário de Visitas"
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+								"data-uid": "src/components/Footer.tsx:84:13",
+								"data-prohibitions": "[]",
+								className: "text-slate-400 mb-4",
+								children: [
+									"Aberto todos os dias",
+									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
+										"data-uid": "src/components/Footer.tsx:86:15",
+										"data-prohibitions": "[editContent]"
+									}),
+									"das 10h às 17h."
+								]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								"data-uid": "src/components/Footer.tsx:89:13",
+								"data-prohibitions": "[]",
+								className: "text-sm text-slate-500",
+								children: "* Para visitas fora do horário comercial, favor entrar em contato antecipadamente."
+							})
+						]
+					})
+				]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/Footer.tsx:94:9",
+				"data-prohibitions": "[editContent]",
+				className: "pt-8 border-t border-slate-800 text-center text-sm text-slate-500 flex flex-col md:flex-row justify-between items-center gap-4",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+					"data-uid": "src/components/Footer.tsx:95:11",
+					"data-prohibitions": "[editContent]",
+					children: [
+						"© ",
+						(/* @__PURE__ */ new Date()).getFullYear(),
+						" Casa Vita Repouso. Todos os direitos reservados."
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					"data-uid": "src/components/Footer.tsx:96:11",
+					"data-prohibitions": "[]",
+					children: "Responsável Técnico: Dra. Ana Lúcia - CRM-SP 123456"
+				})]
+			})]
+		})
+	});
+}
+//#endregion
+//#region src/components/FloatingWhatsApp.tsx
+function FloatingWhatsApp() {
+	const handleWhatsApp = () => {
+		trackWhatsAppClick();
+		window.open("https://wa.me/551137684392", "_blank");
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
+		"data-uid": "src/components/FloatingWhatsApp.tsx:11:5",
+		"data-prohibitions": "[]",
+		onClick: handleWhatsApp,
+		className: "fixed bottom-6 right-6 z-50 flex items-center justify-center w-16 h-16 bg-green-500 text-white rounded-full shadow-2xl hover:bg-green-600 hover:scale-110 transition-all duration-300 animate-fade-in-up",
+		"aria-label": "Fale conosco pelo WhatsApp",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
+			"data-uid": "src/components/FloatingWhatsApp.tsx:16:7",
+			"data-prohibitions": "[editContent]",
+			className: "w-8 h-8"
+		})
+	});
+}
+//#endregion
+//#region src/components/Layout.tsx
+function Layout() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		"data-uid": "src/components/Layout.tsx:8:5",
+		"data-prohibitions": "[]",
+		className: "min-h-screen font-sans antialiased text-slate-900 bg-slate-50 flex flex-col",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Header$1, {
+				"data-uid": "src/components/Layout.tsx:9:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("main", {
+				"data-uid": "src/components/Layout.tsx:10:7",
+				"data-prohibitions": "[]",
+				className: "flex-grow",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {
+					"data-uid": "src/components/Layout.tsx:11:9",
+					"data-prohibitions": "[editContent]"
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Footer, {
+				"data-uid": "src/components/Layout.tsx:13:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FloatingWhatsApp, {
+				"data-uid": "src/components/Layout.tsx:14:7",
+				"data-prohibitions": "[editContent]"
+			})
+		]
+	});
+}
+//#endregion
+//#region src/components/sections/Hero.tsx
+function Hero() {
+	const handleWhatsApp = () => {
+		trackWhatsAppClick();
+		window.open("https://wa.me/551137684392", "_blank");
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
+		"data-uid": "src/components/sections/Hero.tsx:12:5",
+		"data-prohibitions": "[]",
+		className: "relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden bg-emerald-50/50",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			"data-uid": "src/components/sections/Hero.tsx:13:7",
+			"data-prohibitions": "[]",
+			className: "container px-4 mx-auto relative z-10",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/sections/Hero.tsx:14:9",
+				"data-prohibitions": "[]",
+				className: "flex flex-col lg:flex-row items-center gap-12",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/sections/Hero.tsx:15:11",
+					"data-prohibitions": "[]",
+					className: "lg:w-1/2 text-center lg:text-left",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h1", {
+							"data-uid": "src/components/sections/Hero.tsx:16:13",
+							"data-prohibitions": "[]",
+							className: "text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.15] mb-6 tracking-tight",
+							children: [
+								"Cuidado, conforto e ",
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									"data-uid": "src/components/sections/Hero.tsx:17:35",
+									"data-prohibitions": "[]",
+									className: "text-emerald-600",
+									children: "alegria de viver"
+								}),
+								" todos os dias."
+							]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							"data-uid": "src/components/sections/Hero.tsx:20:13",
+							"data-prohibitions": "[]",
+							className: "text-lg md:text-xl text-slate-600 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed",
+							children: "Na Casa Vita, oferecemos um ambiente acolhedor e profissional para a melhor idade. Uma verdadeira extensão do seu lar, com assistência humanizada 24 horas."
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+							"data-uid": "src/components/sections/Hero.tsx:24:13",
+							"data-prohibitions": "[]",
+							className: "flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4",
+							children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+								"data-uid": "src/components/sections/Hero.tsx:25:15",
+								"data-prohibitions": "[]",
+								onClick: handleWhatsApp,
+								size: "lg",
+								className: "bg-green-600 hover:bg-green-700 text-white rounded-full px-8 h-14 text-lg w-full sm:w-auto shadow-xl shadow-green-600/20 transition-all hover:scale-105",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
+									"data-uid": "src/components/sections/Hero.tsx:30:17",
+									"data-prohibitions": "[editContent]",
+									className: "mr-2 h-6 w-6"
+								}), "Fale Conosco"]
+							})
+						})
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/sections/Hero.tsx:35:11",
+					"data-prohibitions": "[]",
+					className: "lg:w-1/2 relative",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						"data-uid": "src/components/sections/Hero.tsx:36:13",
+						"data-prohibitions": "[]",
+						className: "absolute inset-0 bg-emerald-200 rounded-[3rem] rotate-3 scale-105 opacity-50 blur-lg"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+						"data-uid": "src/components/sections/Hero.tsx:37:13",
+						"data-prohibitions": "[editContent]",
+						src: "https://img.usecurling.com/p/800/600?q=happy%20elderly%20smiling",
+						alt: "Idosos felizes e bem cuidados",
+						className: "relative rounded-[2.5rem] shadow-2xl object-cover w-full h-[400px] lg:h-[500px] border-8 border-white"
+					})]
+				})]
+			})
+		})
+	});
+}
+//#endregion
+//#region src/assets/video-section-820b3.jpg
+var video_section_820b3_default = "/assets/video-section-820b3-BrXiGUIQ.jpg";
+//#endregion
+//#region src/components/sections/About.tsx
+function About() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
+		"data-uid": "src/components/sections/About.tsx:5:5",
+		"data-prohibitions": "[]",
+		id: "sobre",
+		className: "py-24 bg-white",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			"data-uid": "src/components/sections/About.tsx:6:7",
+			"data-prohibitions": "[]",
+			className: "container mx-auto px-4",
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/sections/About.tsx:7:9",
+				"data-prohibitions": "[]",
+				className: "flex flex-col lg:flex-row-reverse items-center gap-16",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/sections/About.tsx:8:11",
+					"data-prohibitions": "[]",
+					className: "lg:w-1/2",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+							"data-uid": "src/components/sections/About.tsx:9:13",
+							"data-prohibitions": "[]",
+							className: "text-3xl lg:text-4xl font-bold text-slate-900 mb-6 leading-tight",
+							children: "Uma estrutura pensada para o bem-estar e convívio"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							"data-uid": "src/components/sections/About.tsx:12:13",
+							"data-prohibitions": "[]",
+							className: "text-slate-600 text-lg mb-6 leading-relaxed",
+							children: "A Casa Vita Repouso foi idealizada para oferecer não apenas cuidados médicos de excelência, mas qualidade de vida, convivência social e alegria para nossos residentes."
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							"data-uid": "src/components/sections/About.tsx:17:13",
+							"data-prohibitions": "[]",
+							className: "text-slate-600 text-lg leading-relaxed",
+							children: "Nossa unidade conta com ambientes amplos, bem iluminados e adaptados para garantir total segurança e mobilidade. Um verdadeiro lar, cercado de verde e tranquilidade, bem no coração de São Paulo."
+						})
+					]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/sections/About.tsx:23:11",
+					"data-prohibitions": "[]",
+					className: "lg:w-1/2 relative",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						"data-uid": "src/components/sections/About.tsx:24:13",
+						"data-prohibitions": "[]",
+						className: "absolute -inset-4 bg-emerald-50 rounded-[3rem] -z-10 transform -rotate-2"
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+						"data-uid": "src/components/sections/About.tsx:25:13",
+						"data-prohibitions": "[editContent]",
+						src: video_section_820b3_default,
+						alt: "Fachada arborizada da Casa Vita",
+						className: "rounded-[2.5rem] shadow-xl w-full h-[400px] object-cover"
+					})]
+				})]
+			})
+		})
+	});
+}
+//#endregion
+//#region src/components/sections/Services.tsx
+function Services() {
+	const services = [
+		{
+			icon: HeartPulse,
+			title: "Enfermagem 24h",
+			desc: "Equipe de saúde dedicada em tempo integral para assistência contínua."
+		},
+		{
+			icon: UserCheck,
+			title: "Acompanhamento Médico",
+			desc: "Visitas médicas regulares focadas em cuidado preventivo e humanizado."
+		},
+		{
+			icon: Coffee,
+			title: "Nutrição Balanceada",
+			desc: "6 refeições diárias elaboradas e supervisionadas por nutricionistas."
+		},
+		{
+			icon: Activity,
+			title: "Fisioterapia",
+			desc: "Atividades motoras para manter e recuperar a mobilidade e vitalidade."
+		}
+	];
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
+		"data-uid": "src/components/sections/Services.tsx:28:5",
+		"data-prohibitions": "[editContent]",
+		id: "servicos",
+		className: "py-24 bg-emerald-50/50",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/sections/Services.tsx:29:7",
+			"data-prohibitions": "[editContent]",
+			className: "container mx-auto px-4 text-center",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+					"data-uid": "src/components/sections/Services.tsx:30:9",
+					"data-prohibitions": "[]",
+					className: "text-3xl lg:text-4xl font-bold text-slate-900 mb-4",
+					children: "Nossos Serviços"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					"data-uid": "src/components/sections/Services.tsx:31:9",
+					"data-prohibitions": "[]",
+					className: "text-slate-600 text-lg mb-16 max-w-2xl mx-auto",
+					children: "Cuidado integral e acolhedor, atendendo todas as necessidades físicas e emocionais dos nossos residentes para uma vida plena."
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					"data-uid": "src/components/sections/Services.tsx:35:9",
+					"data-prohibitions": "[editContent]",
+					className: "grid md:grid-cols-2 lg:grid-cols-4 gap-8",
+					children: services.map((s, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						"data-uid": "src/components/sections/Services.tsx:37:13",
+						"data-prohibitions": "[editContent]",
+						className: "bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-emerald-50",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								"data-uid": "src/components/sections/Services.tsx:41:15",
+								"data-prohibitions": "[]",
+								className: "w-16 h-16 bg-emerald-100 text-emerald-600 rounded-[1.5rem] flex items-center justify-center mx-auto mb-6",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(s.icon, {
+									"data-uid": "src/components/sections/Services.tsx:42:17",
+									"data-prohibitions": "[editContent]",
+									className: "w-8 h-8"
+								})
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+								"data-uid": "src/components/sections/Services.tsx:44:15",
+								"data-prohibitions": "[editContent]",
+								className: "text-xl font-bold text-slate-900 mb-3",
+								children: s.title
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+								"data-uid": "src/components/sections/Services.tsx:45:15",
+								"data-prohibitions": "[editContent]",
+								className: "text-slate-600 leading-relaxed",
+								children: s.desc
+							})
+						]
+					}, i))
+				})
+			]
+		})
+	});
+}
+//#endregion
+//#region src/assets/barra_unidade2-dda45.jpg
+var barra_unidade2_dda45_default = "/assets/barra_unidade2-dda45-CsAoTHIT.jpg";
+//#endregion
+//#region src/components/sections/Gallery.tsx
+function Gallery() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
+		"data-uid": "src/components/sections/Gallery.tsx:5:5",
+		"data-prohibitions": "[]",
+		id: "estrutura",
+		className: "py-24 bg-white",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/sections/Gallery.tsx:6:7",
+			"data-prohibitions": "[]",
+			className: "container mx-auto px-4",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/sections/Gallery.tsx:7:9",
+				"data-prohibitions": "[]",
+				className: "text-center mb-16",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+					"data-uid": "src/components/sections/Gallery.tsx:8:11",
+					"data-prohibitions": "[]",
+					className: "text-3xl lg:text-4xl font-bold text-slate-900 mb-4",
+					children: "Nossa Estrutura"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					"data-uid": "src/components/sections/Gallery.tsx:9:11",
+					"data-prohibitions": "[]",
+					className: "text-slate-600 text-lg max-w-2xl mx-auto",
+					children: "Conheça as instalações da Casa Vita. Ambientes limpos, organizados, iluminados e totalmente adaptados para o conforto e segurança dos residentes."
+				})]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				"data-uid": "src/components/sections/Gallery.tsx:14:9",
+				"data-prohibitions": "[]",
+				className: "rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-slate-50",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+					"data-uid": "src/components/sections/Gallery.tsx:15:11",
+					"data-prohibitions": "[editContent]",
+					src: barra_unidade2_dda45_default,
+					alt: "Ambientes internos e externos da Casa Vita Unidade 2",
+					className: "w-full h-auto object-cover"
+				})
+			})]
+		})
+	});
+}
+//#endregion
+//#region src/components/sections/Team.tsx
+function Team() {
+	const team = [
+		{
+			name: "Dra. Ana Lúcia",
+			role: "Diretora Médica",
+			desc: "Especialista em Geriatria com mais de 15 anos de experiência em cuidados com idosos.",
+			img: "https://img.usecurling.com/ppl/medium?gender=female&seed=15"
+		},
+		{
+			name: "Carlos Mendes",
+			role: "Enfermeiro Chefe",
+			desc: "Lidera nossa equipe de enfermagem garantindo atendimento humanizado e seguro 24 horas.",
+			img: "https://img.usecurling.com/ppl/medium?gender=male&seed=42"
+		},
+		{
+			name: "Mariana Costa",
+			role: "Fisioterapeuta",
+			desc: "Focada na reabilitação e manutenção da capacidade motora e autonomia dos nossos residentes.",
+			img: "https://img.usecurling.com/ppl/medium?gender=female&seed=23"
+		},
+		{
+			name: "Roberto Almeida",
+			role: "Nutricionista",
+			desc: "Responsável por elaborar cardápios saudáveis, saborosos e perfeitamente adaptados a cada necessidade.",
+			img: "https://img.usecurling.com/ppl/medium?gender=male&seed=8"
+		}
+	];
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
+		"data-uid": "src/components/sections/Team.tsx:30:5",
+		"data-prohibitions": "[editContent]",
+		id: "equipe",
+		className: "py-24 bg-emerald-50/50",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/sections/Team.tsx:31:7",
+			"data-prohibitions": "[editContent]",
+			className: "container mx-auto px-4",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/sections/Team.tsx:32:9",
+				"data-prohibitions": "[]",
+				className: "text-center mb-16",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+					"data-uid": "src/components/sections/Team.tsx:33:11",
+					"data-prohibitions": "[]",
+					className: "text-3xl lg:text-4xl font-bold text-slate-900 mb-4",
+					children: "Nossa Equipe"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					"data-uid": "src/components/sections/Team.tsx:34:11",
+					"data-prohibitions": "[]",
+					className: "text-slate-600 text-lg max-w-2xl mx-auto",
+					children: "Profissionais altamente qualificados e apaixonados pelo que fazem. Cuidamos de quem você ama com carinho, técnica e muito respeito."
+				})]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+				"data-uid": "src/components/sections/Team.tsx:39:9",
+				"data-prohibitions": "[editContent]",
+				className: "grid md:grid-cols-2 lg:grid-cols-4 gap-8",
+				children: team.map((member, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					"data-uid": "src/components/sections/Team.tsx:41:13",
+					"data-prohibitions": "[editContent]",
+					className: "bg-white rounded-[2rem] p-8 text-center shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-emerald-50",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
+							"data-uid": "src/components/sections/Team.tsx:45:15",
+							"data-prohibitions": "[editContent]",
+							src: member.img,
+							alt: member.name,
+							className: "w-32 h-32 rounded-full mx-auto mb-6 object-cover border-4 border-emerald-100"
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+							"data-uid": "src/components/sections/Team.tsx:50:15",
+							"data-prohibitions": "[editContent]",
+							className: "text-xl font-bold text-slate-900 mb-1",
+							children: member.name
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							"data-uid": "src/components/sections/Team.tsx:51:15",
+							"data-prohibitions": "[editContent]",
+							className: "text-emerald-600 font-medium mb-4",
+							children: member.role
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+							"data-uid": "src/components/sections/Team.tsx:52:15",
+							"data-prohibitions": "[editContent]",
+							className: "text-slate-500 text-sm leading-relaxed",
+							children: member.desc
+						})
+					]
+				}, i))
+			})]
+		})
+	});
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-context@1.1.2_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-context/dist/index.mjs
+function createContextScope(scopeName, createContextScopeDeps = []) {
+	let defaultContexts = [];
+	function createContext3(rootComponentName, defaultContext) {
+		const BaseContext = import_react.createContext(defaultContext);
+		const index = defaultContexts.length;
+		defaultContexts = [...defaultContexts, defaultContext];
+		const Provider = (props) => {
+			const { scope, children, ...context } = props;
+			const Context = scope?.[scopeName]?.[index] || BaseContext;
+			const value = import_react.useMemo(() => context, Object.values(context));
+			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Context.Provider, {
+				value,
+				children
+			});
+		};
+		Provider.displayName = rootComponentName + "Provider";
+		function useContext2(consumerName, scope) {
+			const Context = scope?.[scopeName]?.[index] || BaseContext;
+			const context = import_react.useContext(Context);
+			if (context) return context;
+			if (defaultContext !== void 0) return defaultContext;
+			throw new Error(`\`${consumerName}\` must be used within \`${rootComponentName}\``);
+		}
+		return [Provider, useContext2];
+	}
+	const createScope = () => {
+		const scopeContexts = defaultContexts.map((defaultContext) => {
+			return import_react.createContext(defaultContext);
+		});
+		return function useScope(scope) {
+			const contexts = scope?.[scopeName] || scopeContexts;
+			return import_react.useMemo(() => ({ [`__scope${scopeName}`]: {
+				...scope,
+				[scopeName]: contexts
+			} }), [scope, contexts]);
+		};
+	};
+	createScope.scopeName = scopeName;
+	return [createContext3, composeContextScopes(createScope, ...createContextScopeDeps)];
+}
+function composeContextScopes(...scopes) {
+	const baseScope = scopes[0];
+	if (scopes.length === 1) return baseScope;
+	const createScope = () => {
+		const scopeHooks = scopes.map((createScope2) => ({
+			useScope: createScope2(),
+			scopeName: createScope2.scopeName
+		}));
+		return function useComposedScopes(overrideScopes) {
+			const nextScopes = scopeHooks.reduce((nextScopes2, { useScope, scopeName }) => {
+				const currentScope = useScope(overrideScopes)[`__scope${scopeName}`];
+				return {
+					...nextScopes2,
+					...currentScope
+				};
+			}, {});
+			return import_react.useMemo(() => ({ [`__scope${baseScope.scopeName}`]: nextScopes }), [nextScopes]);
+		};
+	};
+	createScope.scopeName = baseScope.scopeName;
+	return createScope;
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-slot@1.2.3_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-slot/dist/index.mjs
+/* @__NO_SIDE_EFFECTS__ */
+function createSlot(ownerName) {
+	const SlotClone = /* @__PURE__ */ createSlotClone(ownerName);
+	const Slot2 = import_react.forwardRef((props, forwardedRef) => {
+		const { children, ...slotProps } = props;
+		const childrenArray = import_react.Children.toArray(children);
+		const slottable = childrenArray.find(isSlottable);
+		if (slottable) {
+			const newElement = slottable.props.children;
+			const newChildren = childrenArray.map((child) => {
+				if (child === slottable) {
+					if (import_react.Children.count(newElement) > 1) return import_react.Children.only(null);
+					return import_react.isValidElement(newElement) ? newElement.props.children : null;
+				} else return child;
+			});
+			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
+				...slotProps,
+				ref: forwardedRef,
+				children: import_react.isValidElement(newElement) ? import_react.cloneElement(newElement, void 0, newChildren) : null
+			});
+		}
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
+			...slotProps,
+			ref: forwardedRef,
+			children
+		});
+	});
+	Slot2.displayName = `${ownerName}.Slot`;
+	return Slot2;
+}
+/* @__NO_SIDE_EFFECTS__ */
+function createSlotClone(ownerName) {
+	const SlotClone = import_react.forwardRef((props, forwardedRef) => {
+		const { children, ...slotProps } = props;
+		if (import_react.isValidElement(children)) {
+			const childrenRef = getElementRef$1(children);
+			const props2 = mergeProps(slotProps, children.props);
+			if (children.type !== import_react.Fragment) props2.ref = forwardedRef ? composeRefs(forwardedRef, childrenRef) : childrenRef;
+			return import_react.cloneElement(children, props2);
+		}
+		return import_react.Children.count(children) > 1 ? import_react.Children.only(null) : null;
+	});
+	SlotClone.displayName = `${ownerName}.SlotClone`;
+	return SlotClone;
+}
+var SLOTTABLE_IDENTIFIER = Symbol("radix.slottable");
+function isSlottable(child) {
+	return import_react.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
+}
+function mergeProps(slotProps, childProps) {
+	const overrideProps = { ...childProps };
+	for (const propName in childProps) {
+		const slotPropValue = slotProps[propName];
+		const childPropValue = childProps[propName];
+		if (/^on[A-Z]/.test(propName)) {
+			if (slotPropValue && childPropValue) overrideProps[propName] = (...args) => {
+				const result = childPropValue(...args);
+				slotPropValue(...args);
+				return result;
+			};
+			else if (slotPropValue) overrideProps[propName] = slotPropValue;
+		} else if (propName === "style") overrideProps[propName] = {
+			...slotPropValue,
+			...childPropValue
+		};
+		else if (propName === "className") overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
+	}
+	return {
+		...slotProps,
+		...overrideProps
+	};
+}
+function getElementRef$1(element) {
+	let getter = Object.getOwnPropertyDescriptor(element.props, "ref")?.get;
+	let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+	if (mayWarn) return element.ref;
+	getter = Object.getOwnPropertyDescriptor(element, "ref")?.get;
+	mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+	if (mayWarn) return element.props.ref;
+	return element.props.ref || element.ref;
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-collection@1.1.7_@types+react-dom@19.2.3_@types+react@19.2.14__@types+r_161926fa2509d0b7370b60b8bb4eb8b0/node_modules/@radix-ui/react-collection/dist/index.mjs
+function createCollection(name) {
+	const PROVIDER_NAME = name + "CollectionProvider";
+	const [createCollectionContext, createCollectionScope] = createContextScope(PROVIDER_NAME);
+	const [CollectionProviderImpl, useCollectionContext] = createCollectionContext(PROVIDER_NAME, {
+		collectionRef: { current: null },
+		itemMap: /* @__PURE__ */ new Map()
+	});
+	const CollectionProvider = (props) => {
+		const { scope, children } = props;
+		const ref = import_react.useRef(null);
+		const itemMap = import_react.useRef(/* @__PURE__ */ new Map()).current;
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollectionProviderImpl, {
+			scope,
+			itemMap,
+			collectionRef: ref,
+			children
+		});
+	};
+	CollectionProvider.displayName = PROVIDER_NAME;
+	const COLLECTION_SLOT_NAME = name + "CollectionSlot";
+	const CollectionSlotImpl = /* @__PURE__ */ createSlot(COLLECTION_SLOT_NAME);
+	const CollectionSlot = import_react.forwardRef((props, forwardedRef) => {
+		const { scope, children } = props;
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollectionSlotImpl, {
+			ref: useComposedRefs(forwardedRef, useCollectionContext(COLLECTION_SLOT_NAME, scope).collectionRef),
+			children
+		});
+	});
+	CollectionSlot.displayName = COLLECTION_SLOT_NAME;
+	const ITEM_SLOT_NAME = name + "CollectionItemSlot";
+	const ITEM_DATA_ATTR = "data-radix-collection-item";
+	const CollectionItemSlotImpl = /* @__PURE__ */ createSlot(ITEM_SLOT_NAME);
+	const CollectionItemSlot = import_react.forwardRef((props, forwardedRef) => {
+		const { scope, children, ...itemData } = props;
+		const ref = import_react.useRef(null);
+		const composedRefs = useComposedRefs(forwardedRef, ref);
+		const context = useCollectionContext(ITEM_SLOT_NAME, scope);
+		import_react.useEffect(() => {
+			context.itemMap.set(ref, {
+				ref,
+				...itemData
+			});
+			return () => void context.itemMap.delete(ref);
+		});
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollectionItemSlotImpl, {
+			[ITEM_DATA_ATTR]: "",
+			ref: composedRefs,
+			children
+		});
+	});
+	CollectionItemSlot.displayName = ITEM_SLOT_NAME;
+	function useCollection(scope) {
+		const context = useCollectionContext(name + "CollectionConsumer", scope);
+		return import_react.useCallback(() => {
+			const collectionNode = context.collectionRef.current;
+			if (!collectionNode) return [];
+			const orderedNodes = Array.from(collectionNode.querySelectorAll(`[${ITEM_DATA_ATTR}]`));
+			return Array.from(context.itemMap.values()).sort((a, b) => orderedNodes.indexOf(a.ref.current) - orderedNodes.indexOf(b.ref.current));
+		}, [context.collectionRef, context.itemMap]);
+	}
+	return [
+		{
+			Provider: CollectionProvider,
+			Slot: CollectionSlot,
+			ItemSlot: CollectionItemSlot
+		},
+		useCollection,
+		createCollectionScope
+	];
+}
+typeof window !== "undefined" && window.document && window.document.createElement;
+function composeEventHandlers(originalEventHandler, ourEventHandler, { checkForDefaultPrevented = true } = {}) {
+	return function handleEvent(event) {
+		originalEventHandler?.(event);
+		if (checkForDefaultPrevented === false || !event.defaultPrevented) return ourEventHandler?.(event);
+	};
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-use-layout-effect@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-use-layout-effect/dist/index.mjs
+var useLayoutEffect2 = globalThis?.document ? import_react.useLayoutEffect : () => {};
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-use-controllable-state@1.2.2_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-use-controllable-state/dist/index.mjs
+var useInsertionEffect = import_react[" useInsertionEffect ".trim().toString()] || useLayoutEffect2;
+function useControllableState({ prop, defaultProp, onChange = () => {}, caller }) {
+	const [uncontrolledProp, setUncontrolledProp, onChangeRef] = useUncontrolledState({
+		defaultProp,
+		onChange
+	});
+	const isControlled = prop !== void 0;
+	const value = isControlled ? prop : uncontrolledProp;
+	{
+		const isControlledRef = import_react.useRef(prop !== void 0);
+		import_react.useEffect(() => {
+			const wasControlled = isControlledRef.current;
+			if (wasControlled !== isControlled) {
+				const from = wasControlled ? "controlled" : "uncontrolled";
+				const to = isControlled ? "controlled" : "uncontrolled";
+				console.warn(`${caller} is changing from ${from} to ${to}. Components should not switch from controlled to uncontrolled (or vice versa). Decide between using a controlled or uncontrolled value for the lifetime of the component.`);
+			}
+			isControlledRef.current = isControlled;
+		}, [isControlled, caller]);
+	}
+	return [value, import_react.useCallback((nextValue) => {
+		if (isControlled) {
+			const value2 = isFunction(nextValue) ? nextValue(prop) : nextValue;
+			if (value2 !== prop) onChangeRef.current?.(value2);
+		} else setUncontrolledProp(nextValue);
+	}, [
+		isControlled,
+		prop,
+		setUncontrolledProp,
+		onChangeRef
+	])];
+}
+function useUncontrolledState({ defaultProp, onChange }) {
+	const [value, setValue] = import_react.useState(defaultProp);
+	const prevValueRef = import_react.useRef(value);
+	const onChangeRef = import_react.useRef(onChange);
+	useInsertionEffect(() => {
+		onChangeRef.current = onChange;
+	}, [onChange]);
+	import_react.useEffect(() => {
+		if (prevValueRef.current !== value) {
+			onChangeRef.current?.(value);
+			prevValueRef.current = value;
+		}
+	}, [value, prevValueRef]);
+	return [
+		value,
+		setValue,
+		onChangeRef
+	];
+}
+function isFunction(value) {
+	return typeof value === "function";
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-primitive@2.1.3_@types+react-dom@19.2.3_@types+react@19.2.14__@types+re_1181ea5061ec9212248424669240e4ec/node_modules/@radix-ui/react-primitive/dist/index.mjs
+var import_react_dom = /* @__PURE__ */ __toESM(require_react_dom(), 1);
+var Primitive = [
+	"a",
+	"button",
+	"div",
+	"form",
+	"h2",
+	"h3",
+	"img",
+	"input",
+	"label",
+	"li",
+	"nav",
+	"ol",
+	"p",
+	"select",
+	"span",
+	"svg",
+	"ul"
+].reduce((primitive, node) => {
+	const Slot = /* @__PURE__ */ createSlot(`Primitive.${node}`);
+	const Node = import_react.forwardRef((props, forwardedRef) => {
+		const { asChild, ...primitiveProps } = props;
+		const Comp = asChild ? Slot : node;
+		if (typeof window !== "undefined") window[Symbol.for("radix-ui")] = true;
+		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Comp, {
+			...primitiveProps,
+			ref: forwardedRef
+		});
+	});
+	Node.displayName = `Primitive.${node}`;
+	return {
+		...primitive,
+		[node]: Node
+	};
+}, {});
+function dispatchDiscreteCustomEvent(target, event) {
+	if (target) import_react_dom.flushSync(() => target.dispatchEvent(event));
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-presence@1.1.5_@types+react-dom@19.2.3_@types+react@19.2.14__@types+rea_c01c26c80b5ab5e3ecefbda6eca51ad1/node_modules/@radix-ui/react-presence/dist/index.mjs
+function useStateMachine(initialState, machine) {
+	return import_react.useReducer((state, event) => {
+		return machine[state][event] ?? state;
+	}, initialState);
+}
+var Presence = (props) => {
+	const { present, children } = props;
+	const presence = usePresence(present);
+	const child = typeof children === "function" ? children({ present: presence.isPresent }) : import_react.Children.only(children);
+	const ref = useComposedRefs(presence.ref, getElementRef(child));
+	return typeof children === "function" || presence.isPresent ? import_react.cloneElement(child, { ref }) : null;
+};
+Presence.displayName = "Presence";
+function usePresence(present) {
+	const [node, setNode] = import_react.useState();
+	const stylesRef = import_react.useRef(null);
+	const prevPresentRef = import_react.useRef(present);
+	const prevAnimationNameRef = import_react.useRef("none");
+	const [state, send] = useStateMachine(present ? "mounted" : "unmounted", {
+		mounted: {
+			UNMOUNT: "unmounted",
+			ANIMATION_OUT: "unmountSuspended"
+		},
+		unmountSuspended: {
+			MOUNT: "mounted",
+			ANIMATION_END: "unmounted"
+		},
+		unmounted: { MOUNT: "mounted" }
+	});
+	import_react.useEffect(() => {
+		const currentAnimationName = getAnimationName(stylesRef.current);
+		prevAnimationNameRef.current = state === "mounted" ? currentAnimationName : "none";
+	}, [state]);
+	useLayoutEffect2(() => {
+		const styles = stylesRef.current;
+		const wasPresent = prevPresentRef.current;
+		if (wasPresent !== present) {
+			const prevAnimationName = prevAnimationNameRef.current;
+			const currentAnimationName = getAnimationName(styles);
+			if (present) send("MOUNT");
+			else if (currentAnimationName === "none" || styles?.display === "none") send("UNMOUNT");
+			else if (wasPresent && prevAnimationName !== currentAnimationName) send("ANIMATION_OUT");
+			else send("UNMOUNT");
+			prevPresentRef.current = present;
+		}
+	}, [present, send]);
+	useLayoutEffect2(() => {
+		if (node) {
+			let timeoutId;
+			const ownerWindow = node.ownerDocument.defaultView ?? window;
+			const handleAnimationEnd = (event) => {
+				const isCurrentAnimation = getAnimationName(stylesRef.current).includes(CSS.escape(event.animationName));
+				if (event.target === node && isCurrentAnimation) {
+					send("ANIMATION_END");
+					if (!prevPresentRef.current) {
+						const currentFillMode = node.style.animationFillMode;
+						node.style.animationFillMode = "forwards";
+						timeoutId = ownerWindow.setTimeout(() => {
+							if (node.style.animationFillMode === "forwards") node.style.animationFillMode = currentFillMode;
+						});
+					}
+				}
+			};
+			const handleAnimationStart = (event) => {
+				if (event.target === node) prevAnimationNameRef.current = getAnimationName(stylesRef.current);
+			};
+			node.addEventListener("animationstart", handleAnimationStart);
+			node.addEventListener("animationcancel", handleAnimationEnd);
+			node.addEventListener("animationend", handleAnimationEnd);
+			return () => {
+				ownerWindow.clearTimeout(timeoutId);
+				node.removeEventListener("animationstart", handleAnimationStart);
+				node.removeEventListener("animationcancel", handleAnimationEnd);
+				node.removeEventListener("animationend", handleAnimationEnd);
+			};
+		} else send("ANIMATION_END");
+	}, [node, send]);
+	return {
+		isPresent: ["mounted", "unmountSuspended"].includes(state),
+		ref: import_react.useCallback((node2) => {
+			stylesRef.current = node2 ? getComputedStyle(node2) : null;
+			setNode(node2);
+		}, [])
+	};
+}
+function getAnimationName(styles) {
+	return styles?.animationName || "none";
+}
+function getElementRef(element) {
+	let getter = Object.getOwnPropertyDescriptor(element.props, "ref")?.get;
+	let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+	if (mayWarn) return element.ref;
+	getter = Object.getOwnPropertyDescriptor(element, "ref")?.get;
+	mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
+	if (mayWarn) return element.props.ref;
+	return element.props.ref || element.ref;
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-id@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-id/dist/index.mjs
+var useReactId = import_react[" useId ".trim().toString()] || (() => void 0);
+var count$1 = 0;
+function useId(deterministicId) {
+	const [id, setId] = import_react.useState(useReactId());
+	useLayoutEffect2(() => {
+		if (!deterministicId) setId((reactId) => reactId ?? String(count$1++));
+	}, [deterministicId]);
+	return deterministicId || (id ? `radix-${id}` : "");
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-collapsible@1.1.12_@types+react-dom@19.2.3_@types+react@19.2.14__@types_10a2c6d0ac3bcc7422bd3020fe61e076/node_modules/@radix-ui/react-collapsible/dist/index.mjs
+var COLLAPSIBLE_NAME = "Collapsible";
+var [createCollapsibleContext, createCollapsibleScope] = createContextScope(COLLAPSIBLE_NAME);
+var [CollapsibleProvider, useCollapsibleContext] = createCollapsibleContext(COLLAPSIBLE_NAME);
+var Collapsible = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeCollapsible, open: openProp, defaultOpen, disabled, onOpenChange, ...collapsibleProps } = props;
+	const [open, setOpen] = useControllableState({
+		prop: openProp,
+		defaultProp: defaultOpen ?? false,
+		onChange: onOpenChange,
+		caller: COLLAPSIBLE_NAME
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollapsibleProvider, {
+		scope: __scopeCollapsible,
+		disabled,
+		contentId: useId(),
+		open,
+		onOpenToggle: import_react.useCallback(() => setOpen((prevOpen) => !prevOpen), [setOpen]),
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
+			"data-state": getState$1(open),
+			"data-disabled": disabled ? "" : void 0,
+			...collapsibleProps,
+			ref: forwardedRef
+		})
+	});
+});
+Collapsible.displayName = COLLAPSIBLE_NAME;
+var TRIGGER_NAME$1 = "CollapsibleTrigger";
+var CollapsibleTrigger = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeCollapsible, ...triggerProps } = props;
+	const context = useCollapsibleContext(TRIGGER_NAME$1, __scopeCollapsible);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
+		type: "button",
+		"aria-controls": context.contentId,
+		"aria-expanded": context.open || false,
+		"data-state": getState$1(context.open),
+		"data-disabled": context.disabled ? "" : void 0,
+		disabled: context.disabled,
+		...triggerProps,
+		ref: forwardedRef,
+		onClick: composeEventHandlers(props.onClick, context.onOpenToggle)
+	});
+});
+CollapsibleTrigger.displayName = TRIGGER_NAME$1;
+var CONTENT_NAME$1 = "CollapsibleContent";
+var CollapsibleContent = import_react.forwardRef((props, forwardedRef) => {
+	const { forceMount, ...contentProps } = props;
+	const context = useCollapsibleContext(CONTENT_NAME$1, props.__scopeCollapsible);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Presence, {
+		present: forceMount || context.open,
+		children: ({ present }) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CollapsibleContentImpl, {
+			...contentProps,
+			ref: forwardedRef,
+			present
+		})
+	});
+});
+CollapsibleContent.displayName = CONTENT_NAME$1;
+var CollapsibleContentImpl = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeCollapsible, present, children, ...contentProps } = props;
+	const context = useCollapsibleContext(CONTENT_NAME$1, __scopeCollapsible);
+	const [isPresent, setIsPresent] = import_react.useState(present);
+	const ref = import_react.useRef(null);
+	const composedRefs = useComposedRefs(forwardedRef, ref);
+	const heightRef = import_react.useRef(0);
+	const height = heightRef.current;
+	const widthRef = import_react.useRef(0);
+	const width = widthRef.current;
+	const isOpen = context.open || isPresent;
+	const isMountAnimationPreventedRef = import_react.useRef(isOpen);
+	const originalStylesRef = import_react.useRef(void 0);
+	import_react.useEffect(() => {
+		const rAF = requestAnimationFrame(() => isMountAnimationPreventedRef.current = false);
+		return () => cancelAnimationFrame(rAF);
+	}, []);
+	useLayoutEffect2(() => {
+		const node = ref.current;
+		if (node) {
+			originalStylesRef.current = originalStylesRef.current || {
+				transitionDuration: node.style.transitionDuration,
+				animationName: node.style.animationName
+			};
+			node.style.transitionDuration = "0s";
+			node.style.animationName = "none";
+			const rect = node.getBoundingClientRect();
+			heightRef.current = rect.height;
+			widthRef.current = rect.width;
+			if (!isMountAnimationPreventedRef.current) {
+				node.style.transitionDuration = originalStylesRef.current.transitionDuration;
+				node.style.animationName = originalStylesRef.current.animationName;
+			}
+			setIsPresent(present);
+		}
+	}, [context.open, present]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
+		"data-state": getState$1(context.open),
+		"data-disabled": context.disabled ? "" : void 0,
+		id: context.contentId,
+		hidden: !isOpen,
+		...contentProps,
+		ref: composedRefs,
+		style: {
+			[`--radix-collapsible-content-height`]: height ? `${height}px` : void 0,
+			[`--radix-collapsible-content-width`]: width ? `${width}px` : void 0,
+			...props.style
+		},
+		children: isOpen && children
+	});
+});
+function getState$1(open) {
+	return open ? "open" : "closed";
+}
+var Root$1 = Collapsible;
+var Trigger = CollapsibleTrigger;
+var Content = CollapsibleContent;
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-direction@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-direction/dist/index.mjs
+var DirectionContext = import_react.createContext(void 0);
+function useDirection(localDir) {
+	const globalDir = import_react.useContext(DirectionContext);
+	return localDir || globalDir || "ltr";
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-accordion@1.2.12_@types+react-dom@19.2.3_@types+react@19.2.14__@types+r_8b3df72274e0fa0cff1629993ef7cc33/node_modules/@radix-ui/react-accordion/dist/index.mjs
+var ACCORDION_NAME = "Accordion";
+var ACCORDION_KEYS = [
+	"Home",
+	"End",
+	"ArrowDown",
+	"ArrowUp",
+	"ArrowLeft",
+	"ArrowRight"
+];
+var [Collection$1, useCollection$1, createCollectionScope$1] = createCollection(ACCORDION_NAME);
+var [createAccordionContext, createAccordionScope] = createContextScope(ACCORDION_NAME, [createCollectionScope$1, createCollapsibleScope]);
+var useCollapsibleScope = createCollapsibleScope();
+var Accordion$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { type, ...accordionProps } = props;
+	const singleProps = accordionProps;
+	const multipleProps = accordionProps;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$1.Provider, {
+		scope: props.__scopeAccordion,
+		children: type === "multiple" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionImplMultiple, {
+			...multipleProps,
+			ref: forwardedRef
+		}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionImplSingle, {
+			...singleProps,
+			ref: forwardedRef
+		})
+	});
+});
+Accordion$1.displayName = ACCORDION_NAME;
+var [AccordionValueProvider, useAccordionValueContext] = createAccordionContext(ACCORDION_NAME);
+var [AccordionCollapsibleProvider, useAccordionCollapsibleContext] = createAccordionContext(ACCORDION_NAME, { collapsible: false });
+var AccordionImplSingle = import_react.forwardRef((props, forwardedRef) => {
+	const { value: valueProp, defaultValue, onValueChange = () => {}, collapsible = false, ...accordionSingleProps } = props;
+	const [value, setValue] = useControllableState({
+		prop: valueProp,
+		defaultProp: defaultValue ?? "",
+		onChange: onValueChange,
+		caller: ACCORDION_NAME
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionValueProvider, {
+		scope: props.__scopeAccordion,
+		value: import_react.useMemo(() => value ? [value] : [], [value]),
+		onItemOpen: setValue,
+		onItemClose: import_react.useCallback(() => collapsible && setValue(""), [collapsible, setValue]),
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionCollapsibleProvider, {
+			scope: props.__scopeAccordion,
+			collapsible,
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionImpl, {
+				...accordionSingleProps,
+				ref: forwardedRef
+			})
+		})
+	});
+});
+var AccordionImplMultiple = import_react.forwardRef((props, forwardedRef) => {
+	const { value: valueProp, defaultValue, onValueChange = () => {}, ...accordionMultipleProps } = props;
+	const [value, setValue] = useControllableState({
+		prop: valueProp,
+		defaultProp: defaultValue ?? [],
+		onChange: onValueChange,
+		caller: ACCORDION_NAME
+	});
+	const handleItemOpen = import_react.useCallback((itemValue) => setValue((prevValue = []) => [...prevValue, itemValue]), [setValue]);
+	const handleItemClose = import_react.useCallback((itemValue) => setValue((prevValue = []) => prevValue.filter((value2) => value2 !== itemValue)), [setValue]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionValueProvider, {
+		scope: props.__scopeAccordion,
+		value,
+		onItemOpen: handleItemOpen,
+		onItemClose: handleItemClose,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionCollapsibleProvider, {
+			scope: props.__scopeAccordion,
+			collapsible: true,
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionImpl, {
+				...accordionMultipleProps,
+				ref: forwardedRef
+			})
+		})
+	});
+});
+var [AccordionImplProvider, useAccordionContext] = createAccordionContext(ACCORDION_NAME);
+var AccordionImpl = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeAccordion, disabled, dir, orientation = "vertical", ...accordionProps } = props;
+	const composedRefs = useComposedRefs(import_react.useRef(null), forwardedRef);
+	const getItems = useCollection$1(__scopeAccordion);
+	const isDirectionLTR = useDirection(dir) === "ltr";
+	const handleKeyDown = composeEventHandlers(props.onKeyDown, (event) => {
+		if (!ACCORDION_KEYS.includes(event.key)) return;
+		const target = event.target;
+		const triggerCollection = getItems().filter((item) => !item.ref.current?.disabled);
+		const triggerIndex = triggerCollection.findIndex((item) => item.ref.current === target);
+		const triggerCount = triggerCollection.length;
+		if (triggerIndex === -1) return;
+		event.preventDefault();
+		let nextIndex = triggerIndex;
+		const homeIndex = 0;
+		const endIndex = triggerCount - 1;
+		const moveNext = () => {
+			nextIndex = triggerIndex + 1;
+			if (nextIndex > endIndex) nextIndex = homeIndex;
+		};
+		const movePrev = () => {
+			nextIndex = triggerIndex - 1;
+			if (nextIndex < homeIndex) nextIndex = endIndex;
+		};
+		switch (event.key) {
+			case "Home":
+				nextIndex = homeIndex;
+				break;
+			case "End":
+				nextIndex = endIndex;
+				break;
+			case "ArrowRight":
+				if (orientation === "horizontal") if (isDirectionLTR) moveNext();
+				else movePrev();
+				break;
+			case "ArrowDown":
+				if (orientation === "vertical") moveNext();
+				break;
+			case "ArrowLeft":
+				if (orientation === "horizontal") if (isDirectionLTR) movePrev();
+				else moveNext();
+				break;
+			case "ArrowUp":
+				if (orientation === "vertical") movePrev();
+				break;
+		}
+		triggerCollection[nextIndex % triggerCount].ref.current?.focus();
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionImplProvider, {
+		scope: __scopeAccordion,
+		disabled,
+		direction: dir,
+		orientation,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$1.Slot, {
+			scope: __scopeAccordion,
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
+				...accordionProps,
+				"data-orientation": orientation,
+				ref: composedRefs,
+				onKeyDown: disabled ? void 0 : handleKeyDown
+			})
+		})
+	});
+});
+var ITEM_NAME = "AccordionItem";
+var [AccordionItemProvider, useAccordionItemContext] = createAccordionContext(ITEM_NAME);
+var AccordionItem$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeAccordion, value, ...accordionItemProps } = props;
+	const accordionContext = useAccordionContext(ITEM_NAME, __scopeAccordion);
+	const valueContext = useAccordionValueContext(ITEM_NAME, __scopeAccordion);
+	const collapsibleScope = useCollapsibleScope(__scopeAccordion);
+	const triggerId = useId();
+	const open = value && valueContext.value.includes(value) || false;
+	const disabled = accordionContext.disabled || props.disabled;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionItemProvider, {
+		scope: __scopeAccordion,
+		open,
+		disabled,
+		triggerId,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$1, {
+			"data-orientation": accordionContext.orientation,
+			"data-state": getState(open),
+			...collapsibleScope,
+			...accordionItemProps,
+			ref: forwardedRef,
+			disabled,
+			open,
+			onOpenChange: (open2) => {
+				if (open2) valueContext.onItemOpen(value);
+				else valueContext.onItemClose(value);
+			}
+		})
+	});
+});
+AccordionItem$1.displayName = ITEM_NAME;
+var HEADER_NAME = "AccordionHeader";
+var AccordionHeader = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeAccordion, ...headerProps } = props;
+	const accordionContext = useAccordionContext(ACCORDION_NAME, __scopeAccordion);
+	const itemContext = useAccordionItemContext(HEADER_NAME, __scopeAccordion);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.h3, {
+		"data-orientation": accordionContext.orientation,
+		"data-state": getState(itemContext.open),
+		"data-disabled": itemContext.disabled ? "" : void 0,
+		...headerProps,
+		ref: forwardedRef
+	});
+});
+AccordionHeader.displayName = HEADER_NAME;
+var TRIGGER_NAME = "AccordionTrigger";
+var AccordionTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeAccordion, ...triggerProps } = props;
+	const accordionContext = useAccordionContext(ACCORDION_NAME, __scopeAccordion);
+	const itemContext = useAccordionItemContext(TRIGGER_NAME, __scopeAccordion);
+	const collapsibleContext = useAccordionCollapsibleContext(TRIGGER_NAME, __scopeAccordion);
+	const collapsibleScope = useCollapsibleScope(__scopeAccordion);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection$1.ItemSlot, {
+		scope: __scopeAccordion,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trigger, {
+			"aria-disabled": itemContext.open && !collapsibleContext.collapsible || void 0,
+			"data-orientation": accordionContext.orientation,
+			id: itemContext.triggerId,
+			...collapsibleScope,
+			...triggerProps,
+			ref: forwardedRef
+		})
+	});
+});
+AccordionTrigger$1.displayName = TRIGGER_NAME;
+var CONTENT_NAME = "AccordionContent";
+var AccordionContent$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeAccordion, ...contentProps } = props;
+	const accordionContext = useAccordionContext(ACCORDION_NAME, __scopeAccordion);
+	const itemContext = useAccordionItemContext(CONTENT_NAME, __scopeAccordion);
+	const collapsibleScope = useCollapsibleScope(__scopeAccordion);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content, {
+		role: "region",
+		"aria-labelledby": itemContext.triggerId,
+		"data-orientation": accordionContext.orientation,
+		...collapsibleScope,
+		...contentProps,
+		ref: forwardedRef,
+		style: {
+			["--radix-accordion-content-height"]: "var(--radix-collapsible-content-height)",
+			["--radix-accordion-content-width"]: "var(--radix-collapsible-content-width)",
+			...props.style
+		}
+	});
+});
+AccordionContent$1.displayName = CONTENT_NAME;
+function getState(open) {
+	return open ? "open" : "closed";
+}
+var Root2$1 = Accordion$1;
+var Item = AccordionItem$1;
+var Header = AccordionHeader;
+var Trigger2 = AccordionTrigger$1;
+var Content2 = AccordionContent$1;
+//#endregion
+//#region src/components/ui/accordion.tsx
+var Accordion = Root2$1;
+var AccordionItem = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Item, {
+	"data-uid": "src/components/ui/accordion.tsx:14:3",
+	"data-prohibitions": "[editContent]",
+	ref,
+	className: cn$1("border-b", className),
+	...props
+}));
+AccordionItem.displayName = "AccordionItem";
+var AccordionTrigger = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Header, {
+	"data-uid": "src/components/ui/accordion.tsx:22:3",
+	"data-prohibitions": "[editContent]",
+	className: "flex",
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Trigger2, {
+		"data-uid": "src/components/ui/accordion.tsx:23:5",
+		"data-prohibitions": "[editContent]",
+		ref,
+		className: cn$1("flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180", className),
+		...props,
+		children: [children, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, {
+			"data-uid": "src/components/ui/accordion.tsx:32:7",
+			"data-prohibitions": "[editContent]",
+			className: "h-4 w-4 shrink-0 transition-transform duration-200"
+		})]
+	})
+}));
+AccordionTrigger.displayName = Trigger2.displayName;
+var AccordionContent = import_react.forwardRef(({ className, children, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content2, {
+	"data-uid": "src/components/ui/accordion.tsx:42:3",
+	"data-prohibitions": "[editContent]",
+	ref,
+	className: "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+	...props,
+	children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+		"data-uid": "src/components/ui/accordion.tsx:47:5",
+		"data-prohibitions": "[editContent]",
+		className: cn$1("pb-4 pt-0", className),
+		children
+	})
+}));
+AccordionContent.displayName = Content2.displayName;
+//#endregion
+//#region src/components/sections/FAQ.tsx
+function FAQ() {
+	const faqs = [
+		{
+			question: "Quais são os horários de visita?",
+			answer: "As visitas são abertas diariamente das 10h às 17h. Acreditamos que o contato frequente e afetuoso com a família é fundamental para o bem-estar físico e emocional dos residentes."
+		},
+		{
+			question: "O que está incluso na mensalidade?",
+			answer: "Nossa mensalidade contempla a hospedagem completa, 6 refeições diárias balanceadas, acompanhamento médico periódico, assistência de enfermagem 24 horas, fisioterapia preventiva, suporte nutricional e serviço de lavanderia."
+		},
+		{
+			question: "A Casa Vita aceita idosos com Alzheimer ou outras demências?",
+			answer: "Sim, nossa equipe multidisciplinar é amplamente capacitada para acolher, respeitar e cuidar de idosos com Alzheimer e outras condições cognitivas, garantindo um ambiente seguro e estímulos adequados."
+		},
+		{
+			question: "Como funciona o período de adaptação?",
+			answer: "Temos um protocolo especial e cuidadoso de acolhimento. Nos primeiros dias, acompanhamos de perto o residente, incentivando a participação nas rotinas e mantendo a família sempre informada sobre cada avanço."
+		},
+		{
+			question: "O idoso pode levar seus móveis ou pertences pessoais?",
+			answer: "Com certeza! Incentivamos que os quartos sejam decorados com objetos afetivos, fotos e pequenos móveis (mediante avaliação de espaço) para que o ambiente fique realmente com 'cara de casa'."
+		}
+	];
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
+		"data-uid": "src/components/sections/FAQ.tsx:38:5",
+		"data-prohibitions": "[editContent]",
+		id: "faq",
+		className: "py-24 bg-white",
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/sections/FAQ.tsx:39:7",
+			"data-prohibitions": "[editContent]",
+			className: "container mx-auto px-4 max-w-3xl",
+			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				"data-uid": "src/components/sections/FAQ.tsx:40:9",
+				"data-prohibitions": "[]",
+				className: "text-center mb-16",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+					"data-uid": "src/components/sections/FAQ.tsx:41:11",
+					"data-prohibitions": "[]",
+					className: "text-3xl lg:text-4xl font-bold text-slate-900 mb-4",
+					children: "Perguntas Frequentes"
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					"data-uid": "src/components/sections/FAQ.tsx:44:11",
+					"data-prohibitions": "[]",
+					className: "text-slate-600 text-lg",
+					children: "Tire suas principais dúvidas sobre o funcionamento e o cuidado na Casa Vita."
+				})]
+			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Accordion, {
+				"data-uid": "src/components/sections/FAQ.tsx:48:9",
+				"data-prohibitions": "[editContent]",
+				type: "single",
+				collapsible: true,
+				className: "w-full space-y-4",
+				children: faqs.map((faq, index) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AccordionItem, {
+					"data-uid": "src/components/sections/FAQ.tsx:50:13",
+					"data-prohibitions": "[editContent]",
+					value: `item-${index}`,
+					className: "border border-emerald-100 rounded-2xl px-6 bg-emerald-50/30 data-[state=open]:bg-white data-[state=open]:shadow-md transition-all",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionTrigger, {
+						"data-uid": "src/components/sections/FAQ.tsx:55:15",
+						"data-prohibitions": "[editContent]",
+						className: "text-left text-lg font-semibold text-slate-800 hover:text-emerald-600 hover:no-underline py-4",
+						children: faq.question
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionContent, {
+						"data-uid": "src/components/sections/FAQ.tsx:58:15",
+						"data-prohibitions": "[editContent]",
+						className: "text-slate-600 text-base leading-relaxed pb-6 pt-2",
+						children: faq.answer
+					})]
+				}, index))
+			})]
+		})
+	});
+}
+//#endregion
+//#region src/components/sections/CTA.tsx
+function CTA() {
+	const handleWhatsApp = () => {
+		trackWhatsAppClick();
+		window.open("https://wa.me/551137684392", "_blank");
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
+		"data-uid": "src/components/sections/CTA.tsx:12:5",
+		"data-prohibitions": "[]",
+		className: "py-24 bg-emerald-600 text-white relative overflow-hidden",
+		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+			"data-uid": "src/components/sections/CTA.tsx:13:7",
+			"data-prohibitions": "[]",
+			className: "absolute inset-0 bg-[url('https://img.usecurling.com/p/1200/400?q=leaves%20pattern&color=green')] opacity-10 mix-blend-overlay object-cover w-full h-full"
+		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+			"data-uid": "src/components/sections/CTA.tsx:14:7",
+			"data-prohibitions": "[]",
+			className: "container mx-auto px-4 text-center relative z-10",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+					"data-uid": "src/components/sections/CTA.tsx:15:9",
+					"data-prohibitions": "[]",
+					className: "text-3xl md:text-4xl lg:text-5xl font-bold mb-6 tracking-tight",
+					children: "Pronto para oferecer o melhor para quem você ama?"
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+					"data-uid": "src/components/sections/CTA.tsx:18:9",
+					"data-prohibitions": "[]",
+					className: "text-emerald-50 text-xl mb-10 max-w-2xl mx-auto font-light",
+					children: "Entre em contato agora mesmo e agende uma visita. Nossa equipe está sempre pronta para ouvir você e tirar todas as suas dúvidas."
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+					"data-uid": "src/components/sections/CTA.tsx:22:9",
+					"data-prohibitions": "[]",
+					onClick: handleWhatsApp,
+					size: "lg",
+					className: "bg-white text-emerald-600 hover:bg-emerald-50 rounded-full px-10 h-16 text-lg shadow-2xl hover:scale-105 transition-transform",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
+						"data-uid": "src/components/sections/CTA.tsx:27:11",
+						"data-prohibitions": "[editContent]",
+						className: "mr-3 h-6 w-6"
+					}), "Falar pelo WhatsApp"]
+				})
+			]
+		})]
+	});
+}
+//#endregion
+//#region src/pages/Index.tsx
+function Index() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		"data-uid": "src/pages/Index.tsx:11:5",
+		"data-prohibitions": "[]",
+		className: "flex flex-col min-h-screen w-full bg-slate-50",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Hero, {
+				"data-uid": "src/pages/Index.tsx:12:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(About, {
+				"data-uid": "src/pages/Index.tsx:13:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Services, {
+				"data-uid": "src/pages/Index.tsx:14:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Gallery, {
+				"data-uid": "src/pages/Index.tsx:15:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Team, {
+				"data-uid": "src/pages/Index.tsx:16:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FAQ, {
+				"data-uid": "src/pages/Index.tsx:17:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CTA, {
+				"data-uid": "src/pages/Index.tsx:18:7",
+				"data-prohibitions": "[editContent]"
+			})
+		]
+	});
+}
+//#endregion
+//#region src/pages/NotFound.tsx
+function NotFound() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+		"data-uid": "src/pages/NotFound.tsx:6:5",
+		"data-prohibitions": "[]",
+		className: "flex flex-col items-center justify-center min-h-[70vh] text-center px-4",
+		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
+				"data-uid": "src/pages/NotFound.tsx:7:7",
+				"data-prohibitions": "[]",
+				className: "text-8xl font-black text-emerald-600 mb-4",
+				children: "404"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
+				"data-uid": "src/pages/NotFound.tsx:8:7",
+				"data-prohibitions": "[]",
+				className: "text-3xl font-bold text-slate-800 mb-6",
+				children: "Página não encontrada"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
+				"data-uid": "src/pages/NotFound.tsx:9:7",
+				"data-prohibitions": "[]",
+				className: "text-slate-600 text-lg mb-8 max-w-md",
+				children: "A página que você está procurando pode ter sido removida, mudou de nome ou está temporariamente indisponível."
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+				"data-uid": "src/pages/NotFound.tsx:13:7",
+				"data-prohibitions": "[]",
+				asChild: true,
+				className: "bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-8 h-14 text-lg transition-transform hover:scale-105",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
+					"data-uid": "src/pages/NotFound.tsx:17:9",
+					"data-prohibitions": "[]",
+					to: "/",
+					children: "Voltar para a Página Inicial"
+				})
+			})
+		]
+	});
+}
+//#endregion
+//#region src/hooks/use-toast.ts
+var TOAST_LIMIT = 1;
+var TOAST_REMOVE_DELAY = 1e6;
+var count = 0;
+function genId() {
+	count = (count + 1) % Number.MAX_SAFE_INTEGER;
+	return count.toString();
+}
+var toastTimeouts = /* @__PURE__ */ new Map();
+var addToRemoveQueue = (toastId) => {
+	if (toastTimeouts.has(toastId)) return;
+	const timeout = setTimeout(() => {
+		toastTimeouts.delete(toastId);
+		dispatch({
+			type: "REMOVE_TOAST",
+			toastId
+		});
+	}, TOAST_REMOVE_DELAY);
+	toastTimeouts.set(toastId, timeout);
+};
+var reducer = (state, action) => {
+	switch (action.type) {
+		case "ADD_TOAST": return {
+			...state,
+			toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT)
+		};
+		case "UPDATE_TOAST": return {
+			...state,
+			toasts: state.toasts.map((t) => t.id === action.toast.id ? {
+				...t,
+				...action.toast
+			} : t)
+		};
+		case "DISMISS_TOAST": {
+			const { toastId } = action;
+			if (toastId) addToRemoveQueue(toastId);
+			else state.toasts.forEach((toast) => {
+				addToRemoveQueue(toast.id);
+			});
+			return {
+				...state,
+				toasts: state.toasts.map((t) => t.id === toastId || toastId === void 0 ? {
+					...t,
+					open: false
+				} : t)
+			};
+		}
+		case "REMOVE_TOAST":
+			if (action.toastId === void 0) return {
+				...state,
+				toasts: []
+			};
+			return {
+				...state,
+				toasts: state.toasts.filter((t) => t.id !== action.toastId)
+			};
+	}
+};
+var listeners = [];
+var memoryState = { toasts: [] };
+function dispatch(action) {
+	memoryState = reducer(memoryState, action);
+	listeners.forEach((listener) => {
+		listener(memoryState);
+	});
+}
+function toast$1({ ...props }) {
+	const id = genId();
+	const update = (props) => dispatch({
+		type: "UPDATE_TOAST",
+		toast: {
+			...props,
+			id
+		}
+	});
+	const dismiss = () => dispatch({
+		type: "DISMISS_TOAST",
+		toastId: id
+	});
+	dispatch({
+		type: "ADD_TOAST",
+		toast: {
+			...props,
+			id,
+			open: true,
+			onOpenChange: (open) => {
+				if (!open) dismiss();
+			}
+		}
+	});
+	return {
+		id,
+		dismiss,
+		update
+	};
+}
+function useToast() {
+	const [state, setState] = import_react.useState(memoryState);
+	import_react.useEffect(() => {
+		listeners.push(setState);
+		return () => {
+			const index = listeners.indexOf(setState);
+			if (index > -1) listeners.splice(index, 1);
+		};
+	}, [state]);
+	return {
+		...state,
+		toast: toast$1,
+		dismiss: (toastId) => dispatch({
+			type: "DISMISS_TOAST",
+			toastId
+		})
+	};
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-use-callback-ref@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-use-callback-ref/dist/index.mjs
+function useCallbackRef(callback) {
+	const callbackRef = import_react.useRef(callback);
+	import_react.useEffect(() => {
+		callbackRef.current = callback;
+	});
+	return import_react.useMemo(() => (...args) => callbackRef.current?.(...args), []);
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-use-escape-keydown@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-use-escape-keydown/dist/index.mjs
+function useEscapeKeydown(onEscapeKeyDownProp, ownerDocument = globalThis?.document) {
+	const onEscapeKeyDown = useCallbackRef(onEscapeKeyDownProp);
+	import_react.useEffect(() => {
+		const handleKeyDown = (event) => {
+			if (event.key === "Escape") onEscapeKeyDown(event);
+		};
+		ownerDocument.addEventListener("keydown", handleKeyDown, { capture: true });
+		return () => ownerDocument.removeEventListener("keydown", handleKeyDown, { capture: true });
+	}, [onEscapeKeyDown, ownerDocument]);
+}
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-dismissable-layer@1.1.11_@types+react-dom@19.2.3_@types+react@19.2.14___3d3960154a4c07d09bb90cb341135fc5/node_modules/@radix-ui/react-dismissable-layer/dist/index.mjs
+var DISMISSABLE_LAYER_NAME = "DismissableLayer";
+var CONTEXT_UPDATE = "dismissableLayer.update";
+var POINTER_DOWN_OUTSIDE = "dismissableLayer.pointerDownOutside";
+var FOCUS_OUTSIDE = "dismissableLayer.focusOutside";
+var originalBodyPointerEvents;
+var DismissableLayerContext = import_react.createContext({
+	layers: /* @__PURE__ */ new Set(),
+	layersWithOutsidePointerEventsDisabled: /* @__PURE__ */ new Set(),
+	branches: /* @__PURE__ */ new Set()
+});
+var DismissableLayer = import_react.forwardRef((props, forwardedRef) => {
+	const { disableOutsidePointerEvents = false, onEscapeKeyDown, onPointerDownOutside, onFocusOutside, onInteractOutside, onDismiss, ...layerProps } = props;
+	const context = import_react.useContext(DismissableLayerContext);
+	const [node, setNode] = import_react.useState(null);
+	const ownerDocument = node?.ownerDocument ?? globalThis?.document;
+	const [, force] = import_react.useState({});
+	const composedRefs = useComposedRefs(forwardedRef, (node2) => setNode(node2));
+	const layers = Array.from(context.layers);
+	const [highestLayerWithOutsidePointerEventsDisabled] = [...context.layersWithOutsidePointerEventsDisabled].slice(-1);
+	const highestLayerWithOutsidePointerEventsDisabledIndex = layers.indexOf(highestLayerWithOutsidePointerEventsDisabled);
+	const index = node ? layers.indexOf(node) : -1;
+	const isBodyPointerEventsDisabled = context.layersWithOutsidePointerEventsDisabled.size > 0;
+	const isPointerEventsEnabled = index >= highestLayerWithOutsidePointerEventsDisabledIndex;
+	const pointerDownOutside = usePointerDownOutside((event) => {
+		const target = event.target;
+		const isPointerDownOnBranch = [...context.branches].some((branch) => branch.contains(target));
+		if (!isPointerEventsEnabled || isPointerDownOnBranch) return;
+		onPointerDownOutside?.(event);
+		onInteractOutside?.(event);
+		if (!event.defaultPrevented) onDismiss?.();
+	}, ownerDocument);
+	const focusOutside = useFocusOutside((event) => {
+		const target = event.target;
+		if ([...context.branches].some((branch) => branch.contains(target))) return;
+		onFocusOutside?.(event);
+		onInteractOutside?.(event);
+		if (!event.defaultPrevented) onDismiss?.();
+	}, ownerDocument);
+	useEscapeKeydown((event) => {
+		if (!(index === context.layers.size - 1)) return;
+		onEscapeKeyDown?.(event);
+		if (!event.defaultPrevented && onDismiss) {
+			event.preventDefault();
+			onDismiss();
+		}
+	}, ownerDocument);
+	import_react.useEffect(() => {
+		if (!node) return;
+		if (disableOutsidePointerEvents) {
+			if (context.layersWithOutsidePointerEventsDisabled.size === 0) {
+				originalBodyPointerEvents = ownerDocument.body.style.pointerEvents;
+				ownerDocument.body.style.pointerEvents = "none";
+			}
+			context.layersWithOutsidePointerEventsDisabled.add(node);
+		}
+		context.layers.add(node);
+		dispatchUpdate();
+		return () => {
+			if (disableOutsidePointerEvents && context.layersWithOutsidePointerEventsDisabled.size === 1) ownerDocument.body.style.pointerEvents = originalBodyPointerEvents;
+		};
+	}, [
+		node,
+		ownerDocument,
+		disableOutsidePointerEvents,
+		context
+	]);
+	import_react.useEffect(() => {
+		return () => {
+			if (!node) return;
+			context.layers.delete(node);
+			context.layersWithOutsidePointerEventsDisabled.delete(node);
+			dispatchUpdate();
+		};
+	}, [node, context]);
+	import_react.useEffect(() => {
+		const handleUpdate = () => force({});
+		document.addEventListener(CONTEXT_UPDATE, handleUpdate);
+		return () => document.removeEventListener(CONTEXT_UPDATE, handleUpdate);
+	}, []);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
+		...layerProps,
+		ref: composedRefs,
+		style: {
+			pointerEvents: isBodyPointerEventsDisabled ? isPointerEventsEnabled ? "auto" : "none" : void 0,
+			...props.style
+		},
+		onFocusCapture: composeEventHandlers(props.onFocusCapture, focusOutside.onFocusCapture),
+		onBlurCapture: composeEventHandlers(props.onBlurCapture, focusOutside.onBlurCapture),
+		onPointerDownCapture: composeEventHandlers(props.onPointerDownCapture, pointerDownOutside.onPointerDownCapture)
+	});
+});
+DismissableLayer.displayName = DISMISSABLE_LAYER_NAME;
+var BRANCH_NAME = "DismissableLayerBranch";
+var DismissableLayerBranch = import_react.forwardRef((props, forwardedRef) => {
+	const context = import_react.useContext(DismissableLayerContext);
+	const ref = import_react.useRef(null);
+	const composedRefs = useComposedRefs(forwardedRef, ref);
+	import_react.useEffect(() => {
+		const node = ref.current;
+		if (node) {
+			context.branches.add(node);
+			return () => {
+				context.branches.delete(node);
+			};
+		}
+	}, [context.branches]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
+		...props,
+		ref: composedRefs
+	});
+});
+DismissableLayerBranch.displayName = BRANCH_NAME;
+function usePointerDownOutside(onPointerDownOutside, ownerDocument = globalThis?.document) {
+	const handlePointerDownOutside = useCallbackRef(onPointerDownOutside);
+	const isPointerInsideReactTreeRef = import_react.useRef(false);
+	const handleClickRef = import_react.useRef(() => {});
+	import_react.useEffect(() => {
+		const handlePointerDown = (event) => {
+			if (event.target && !isPointerInsideReactTreeRef.current) {
+				let handleAndDispatchPointerDownOutsideEvent2 = function() {
+					handleAndDispatchCustomEvent$1(POINTER_DOWN_OUTSIDE, handlePointerDownOutside, eventDetail, { discrete: true });
+				};
+				const eventDetail = { originalEvent: event };
+				if (event.pointerType === "touch") {
+					ownerDocument.removeEventListener("click", handleClickRef.current);
+					handleClickRef.current = handleAndDispatchPointerDownOutsideEvent2;
+					ownerDocument.addEventListener("click", handleClickRef.current, { once: true });
+				} else handleAndDispatchPointerDownOutsideEvent2();
+			} else ownerDocument.removeEventListener("click", handleClickRef.current);
+			isPointerInsideReactTreeRef.current = false;
+		};
+		const timerId = window.setTimeout(() => {
+			ownerDocument.addEventListener("pointerdown", handlePointerDown);
+		}, 0);
+		return () => {
+			window.clearTimeout(timerId);
+			ownerDocument.removeEventListener("pointerdown", handlePointerDown);
+			ownerDocument.removeEventListener("click", handleClickRef.current);
+		};
+	}, [ownerDocument, handlePointerDownOutside]);
+	return { onPointerDownCapture: () => isPointerInsideReactTreeRef.current = true };
+}
+function useFocusOutside(onFocusOutside, ownerDocument = globalThis?.document) {
+	const handleFocusOutside = useCallbackRef(onFocusOutside);
+	const isFocusInsideReactTreeRef = import_react.useRef(false);
+	import_react.useEffect(() => {
+		const handleFocus = (event) => {
+			if (event.target && !isFocusInsideReactTreeRef.current) handleAndDispatchCustomEvent$1(FOCUS_OUTSIDE, handleFocusOutside, { originalEvent: event }, { discrete: false });
+		};
+		ownerDocument.addEventListener("focusin", handleFocus);
+		return () => ownerDocument.removeEventListener("focusin", handleFocus);
+	}, [ownerDocument, handleFocusOutside]);
+	return {
+		onFocusCapture: () => isFocusInsideReactTreeRef.current = true,
+		onBlurCapture: () => isFocusInsideReactTreeRef.current = false
+	};
+}
+function dispatchUpdate() {
+	const event = new CustomEvent(CONTEXT_UPDATE);
+	document.dispatchEvent(event);
+}
+function handleAndDispatchCustomEvent$1(name, handler, detail, { discrete }) {
+	const target = detail.originalEvent.target;
+	const event = new CustomEvent(name, {
+		bubbles: false,
+		cancelable: true,
+		detail
+	});
+	if (handler) target.addEventListener(name, handler, { once: true });
+	if (discrete) dispatchDiscreteCustomEvent(target, event);
+	else target.dispatchEvent(event);
+}
+var Root = DismissableLayer;
+var Branch = DismissableLayerBranch;
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-portal@1.1.9_@types+react-dom@19.2.3_@types+react@19.2.14__@types+react_7668895bec2444446faa4e0f4eb5244b/node_modules/@radix-ui/react-portal/dist/index.mjs
+var PORTAL_NAME = "Portal";
+var Portal = import_react.forwardRef((props, forwardedRef) => {
+	const { container: containerProp, ...portalProps } = props;
+	const [mounted, setMounted] = import_react.useState(false);
+	useLayoutEffect2(() => setMounted(true), []);
+	const container = containerProp || mounted && globalThis?.document?.body;
+	return container ? import_react_dom.createPortal(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
+		...portalProps,
+		ref: forwardedRef
+	}), container) : null;
+});
+Portal.displayName = PORTAL_NAME;
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-visually-hidden@1.2.3_@types+react-dom@19.2.3_@types+react@19.2.14__@ty_fa89646d7248b32d1762bf88948f6339/node_modules/@radix-ui/react-visually-hidden/dist/index.mjs
+var VISUALLY_HIDDEN_STYLES = Object.freeze({
+	position: "absolute",
+	border: 0,
+	width: 1,
+	height: 1,
+	padding: 0,
+	margin: -1,
+	overflow: "hidden",
+	clip: "rect(0, 0, 0, 0)",
+	whiteSpace: "nowrap",
+	wordWrap: "normal"
+});
+var NAME = "VisuallyHidden";
+var VisuallyHidden = import_react.forwardRef((props, forwardedRef) => {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.span, {
+		...props,
+		ref: forwardedRef,
+		style: {
+			...VISUALLY_HIDDEN_STYLES,
+			...props.style
+		}
+	});
+});
+VisuallyHidden.displayName = NAME;
+//#endregion
+//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-toast@1.2.15_@types+react-dom@19.2.3_@types+react@19.2.14__@types+react_4581e89c6ba13e4159ce65546c8b2a16/node_modules/@radix-ui/react-toast/dist/index.mjs
+var PROVIDER_NAME = "ToastProvider";
+var [Collection, useCollection, createCollectionScope] = createCollection("Toast");
+var [createToastContext, createToastScope] = createContextScope("Toast", [createCollectionScope]);
+var [ToastProviderProvider, useToastProviderContext] = createToastContext(PROVIDER_NAME);
+var ToastProvider$1 = (props) => {
+	const { __scopeToast, label = "Notification", duration = 5e3, swipeDirection = "right", swipeThreshold = 50, children } = props;
+	const [viewport, setViewport] = import_react.useState(null);
+	const [toastCount, setToastCount] = import_react.useState(0);
+	const isFocusedToastEscapeKeyDownRef = import_react.useRef(false);
+	const isClosePausedRef = import_react.useRef(false);
+	if (!label.trim()) console.error(`Invalid prop \`label\` supplied to \`${PROVIDER_NAME}\`. Expected non-empty \`string\`.`);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.Provider, {
+		scope: __scopeToast,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastProviderProvider, {
+			scope: __scopeToast,
+			label,
+			duration,
+			swipeDirection,
+			swipeThreshold,
+			toastCount,
+			viewport,
+			onViewportChange: setViewport,
+			onToastAdd: import_react.useCallback(() => setToastCount((prevCount) => prevCount + 1), []),
+			onToastRemove: import_react.useCallback(() => setToastCount((prevCount) => prevCount - 1), []),
+			isFocusedToastEscapeKeyDownRef,
+			isClosePausedRef,
+			children
+		})
+	});
+};
+ToastProvider$1.displayName = PROVIDER_NAME;
+var VIEWPORT_NAME = "ToastViewport";
+var VIEWPORT_DEFAULT_HOTKEY = ["F8"];
+var VIEWPORT_PAUSE = "toast.viewportPause";
+var VIEWPORT_RESUME = "toast.viewportResume";
+var ToastViewport$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeToast, hotkey = VIEWPORT_DEFAULT_HOTKEY, label = "Notifications ({hotkey})", ...viewportProps } = props;
+	const context = useToastProviderContext(VIEWPORT_NAME, __scopeToast);
+	const getItems = useCollection(__scopeToast);
+	const wrapperRef = import_react.useRef(null);
+	const headFocusProxyRef = import_react.useRef(null);
+	const tailFocusProxyRef = import_react.useRef(null);
+	const ref = import_react.useRef(null);
+	const composedRefs = useComposedRefs(forwardedRef, ref, context.onViewportChange);
+	const hotkeyLabel = hotkey.join("+").replace(/Key/g, "").replace(/Digit/g, "");
+	const hasToasts = context.toastCount > 0;
+	import_react.useEffect(() => {
+		const handleKeyDown = (event) => {
+			if (hotkey.length !== 0 && hotkey.every((key) => event[key] || event.code === key)) ref.current?.focus();
+		};
+		document.addEventListener("keydown", handleKeyDown);
+		return () => document.removeEventListener("keydown", handleKeyDown);
+	}, [hotkey]);
+	import_react.useEffect(() => {
+		const wrapper = wrapperRef.current;
+		const viewport = ref.current;
+		if (hasToasts && wrapper && viewport) {
+			const handlePause = () => {
+				if (!context.isClosePausedRef.current) {
+					const pauseEvent = new CustomEvent(VIEWPORT_PAUSE);
+					viewport.dispatchEvent(pauseEvent);
+					context.isClosePausedRef.current = true;
+				}
+			};
+			const handleResume = () => {
+				if (context.isClosePausedRef.current) {
+					const resumeEvent = new CustomEvent(VIEWPORT_RESUME);
+					viewport.dispatchEvent(resumeEvent);
+					context.isClosePausedRef.current = false;
+				}
+			};
+			const handleFocusOutResume = (event) => {
+				if (!wrapper.contains(event.relatedTarget)) handleResume();
+			};
+			const handlePointerLeaveResume = () => {
+				if (!wrapper.contains(document.activeElement)) handleResume();
+			};
+			wrapper.addEventListener("focusin", handlePause);
+			wrapper.addEventListener("focusout", handleFocusOutResume);
+			wrapper.addEventListener("pointermove", handlePause);
+			wrapper.addEventListener("pointerleave", handlePointerLeaveResume);
+			window.addEventListener("blur", handlePause);
+			window.addEventListener("focus", handleResume);
+			return () => {
+				wrapper.removeEventListener("focusin", handlePause);
+				wrapper.removeEventListener("focusout", handleFocusOutResume);
+				wrapper.removeEventListener("pointermove", handlePause);
+				wrapper.removeEventListener("pointerleave", handlePointerLeaveResume);
+				window.removeEventListener("blur", handlePause);
+				window.removeEventListener("focus", handleResume);
+			};
+		}
+	}, [hasToasts, context.isClosePausedRef]);
+	const getSortedTabbableCandidates = import_react.useCallback(({ tabbingDirection }) => {
+		const tabbableCandidates = getItems().map((toastItem) => {
+			const toastNode = toastItem.ref.current;
+			const toastTabbableCandidates = [toastNode, ...getTabbableCandidates(toastNode)];
+			return tabbingDirection === "forwards" ? toastTabbableCandidates : toastTabbableCandidates.reverse();
+		});
+		return (tabbingDirection === "forwards" ? tabbableCandidates.reverse() : tabbableCandidates).flat();
+	}, [getItems]);
+	import_react.useEffect(() => {
+		const viewport = ref.current;
+		if (viewport) {
+			const handleKeyDown = (event) => {
+				const isMetaKey = event.altKey || event.ctrlKey || event.metaKey;
+				if (event.key === "Tab" && !isMetaKey) {
+					const focusedElement = document.activeElement;
+					const isTabbingBackwards = event.shiftKey;
+					if (event.target === viewport && isTabbingBackwards) {
+						headFocusProxyRef.current?.focus();
+						return;
+					}
+					const sortedCandidates = getSortedTabbableCandidates({ tabbingDirection: isTabbingBackwards ? "backwards" : "forwards" });
+					const index = sortedCandidates.findIndex((candidate) => candidate === focusedElement);
+					if (focusFirst(sortedCandidates.slice(index + 1))) event.preventDefault();
+					else isTabbingBackwards ? headFocusProxyRef.current?.focus() : tailFocusProxyRef.current?.focus();
+				}
+			};
+			viewport.addEventListener("keydown", handleKeyDown);
+			return () => viewport.removeEventListener("keydown", handleKeyDown);
+		}
+	}, [getItems, getSortedTabbableCandidates]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Branch, {
+		ref: wrapperRef,
+		role: "region",
+		"aria-label": label.replace("{hotkey}", hotkeyLabel),
+		tabIndex: -1,
+		style: { pointerEvents: hasToasts ? void 0 : "none" },
+		children: [
+			hasToasts && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FocusProxy, {
+				ref: headFocusProxyRef,
+				onFocusFromOutsideViewport: () => {
+					focusFirst(getSortedTabbableCandidates({ tabbingDirection: "forwards" }));
+				}
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.Slot, {
+				scope: __scopeToast,
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.ol, {
+					tabIndex: -1,
+					...viewportProps,
+					ref: composedRefs
+				})
+			}),
+			hasToasts && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FocusProxy, {
+				ref: tailFocusProxyRef,
+				onFocusFromOutsideViewport: () => {
+					focusFirst(getSortedTabbableCandidates({ tabbingDirection: "backwards" }));
+				}
+			})
+		]
+	});
+});
+ToastViewport$1.displayName = VIEWPORT_NAME;
+var FOCUS_PROXY_NAME = "ToastFocusProxy";
+var FocusProxy = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeToast, onFocusFromOutsideViewport, ...proxyProps } = props;
+	const context = useToastProviderContext(FOCUS_PROXY_NAME, __scopeToast);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(VisuallyHidden, {
+		tabIndex: 0,
+		...proxyProps,
+		ref: forwardedRef,
+		style: { position: "fixed" },
+		onFocus: (event) => {
+			const prevFocusedElement = event.relatedTarget;
+			if (!context.viewport?.contains(prevFocusedElement)) onFocusFromOutsideViewport();
+		}
+	});
+});
+FocusProxy.displayName = FOCUS_PROXY_NAME;
+var TOAST_NAME = "Toast";
+var TOAST_SWIPE_START = "toast.swipeStart";
+var TOAST_SWIPE_MOVE = "toast.swipeMove";
+var TOAST_SWIPE_CANCEL = "toast.swipeCancel";
+var TOAST_SWIPE_END = "toast.swipeEnd";
+var Toast$2 = import_react.forwardRef((props, forwardedRef) => {
+	const { forceMount, open: openProp, defaultOpen, onOpenChange, ...toastProps } = props;
+	const [open, setOpen] = useControllableState({
+		prop: openProp,
+		defaultProp: defaultOpen ?? true,
+		onChange: onOpenChange,
+		caller: TOAST_NAME
+	});
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Presence, {
+		present: forceMount || open,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastImpl, {
+			open,
+			...toastProps,
+			ref: forwardedRef,
+			onClose: () => setOpen(false),
+			onPause: useCallbackRef(props.onPause),
+			onResume: useCallbackRef(props.onResume),
+			onSwipeStart: composeEventHandlers(props.onSwipeStart, (event) => {
+				event.currentTarget.setAttribute("data-swipe", "start");
+			}),
+			onSwipeMove: composeEventHandlers(props.onSwipeMove, (event) => {
+				const { x, y } = event.detail.delta;
+				event.currentTarget.setAttribute("data-swipe", "move");
+				event.currentTarget.style.setProperty("--radix-toast-swipe-move-x", `${x}px`);
+				event.currentTarget.style.setProperty("--radix-toast-swipe-move-y", `${y}px`);
+			}),
+			onSwipeCancel: composeEventHandlers(props.onSwipeCancel, (event) => {
+				event.currentTarget.setAttribute("data-swipe", "cancel");
+				event.currentTarget.style.removeProperty("--radix-toast-swipe-move-x");
+				event.currentTarget.style.removeProperty("--radix-toast-swipe-move-y");
+				event.currentTarget.style.removeProperty("--radix-toast-swipe-end-x");
+				event.currentTarget.style.removeProperty("--radix-toast-swipe-end-y");
+			}),
+			onSwipeEnd: composeEventHandlers(props.onSwipeEnd, (event) => {
+				const { x, y } = event.detail.delta;
+				event.currentTarget.setAttribute("data-swipe", "end");
+				event.currentTarget.style.removeProperty("--radix-toast-swipe-move-x");
+				event.currentTarget.style.removeProperty("--radix-toast-swipe-move-y");
+				event.currentTarget.style.setProperty("--radix-toast-swipe-end-x", `${x}px`);
+				event.currentTarget.style.setProperty("--radix-toast-swipe-end-y", `${y}px`);
+				setOpen(false);
+			})
+		})
+	});
+});
+Toast$2.displayName = TOAST_NAME;
+var [ToastInteractiveProvider, useToastInteractiveContext] = createToastContext(TOAST_NAME, { onClose() {} });
+var ToastImpl = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeToast, type = "foreground", duration: durationProp, open, onClose, onEscapeKeyDown, onPause, onResume, onSwipeStart, onSwipeMove, onSwipeCancel, onSwipeEnd, ...toastProps } = props;
+	const context = useToastProviderContext(TOAST_NAME, __scopeToast);
+	const [node, setNode] = import_react.useState(null);
+	const composedRefs = useComposedRefs(forwardedRef, (node2) => setNode(node2));
+	const pointerStartRef = import_react.useRef(null);
+	const swipeDeltaRef = import_react.useRef(null);
+	const duration = durationProp || context.duration;
+	const closeTimerStartTimeRef = import_react.useRef(0);
+	const closeTimerRemainingTimeRef = import_react.useRef(duration);
+	const closeTimerRef = import_react.useRef(0);
+	const { onToastAdd, onToastRemove } = context;
+	const handleClose = useCallbackRef(() => {
+		if (node?.contains(document.activeElement)) context.viewport?.focus();
+		onClose();
+	});
+	const startTimer = import_react.useCallback((duration2) => {
+		if (!duration2 || duration2 === Infinity) return;
+		window.clearTimeout(closeTimerRef.current);
+		closeTimerStartTimeRef.current = (/* @__PURE__ */ new Date()).getTime();
+		closeTimerRef.current = window.setTimeout(handleClose, duration2);
+	}, [handleClose]);
+	import_react.useEffect(() => {
+		const viewport = context.viewport;
+		if (viewport) {
+			const handleResume = () => {
+				startTimer(closeTimerRemainingTimeRef.current);
+				onResume?.();
+			};
+			const handlePause = () => {
+				const elapsedTime = (/* @__PURE__ */ new Date()).getTime() - closeTimerStartTimeRef.current;
+				closeTimerRemainingTimeRef.current = closeTimerRemainingTimeRef.current - elapsedTime;
+				window.clearTimeout(closeTimerRef.current);
+				onPause?.();
+			};
+			viewport.addEventListener(VIEWPORT_PAUSE, handlePause);
+			viewport.addEventListener(VIEWPORT_RESUME, handleResume);
+			return () => {
+				viewport.removeEventListener(VIEWPORT_PAUSE, handlePause);
+				viewport.removeEventListener(VIEWPORT_RESUME, handleResume);
+			};
+		}
+	}, [
+		context.viewport,
+		duration,
+		onPause,
+		onResume,
+		startTimer
+	]);
+	import_react.useEffect(() => {
+		if (open && !context.isClosePausedRef.current) startTimer(duration);
+	}, [
+		open,
+		duration,
+		context.isClosePausedRef,
+		startTimer
+	]);
+	import_react.useEffect(() => {
+		onToastAdd();
+		return () => onToastRemove();
+	}, [onToastAdd, onToastRemove]);
+	const announceTextContent = import_react.useMemo(() => {
+		return node ? getAnnounceTextContent(node) : null;
+	}, [node]);
+	if (!context.viewport) return null;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [announceTextContent && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastAnnounce, {
+		__scopeToast,
+		role: "status",
+		"aria-live": type === "foreground" ? "assertive" : "polite",
+		children: announceTextContent
+	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastInteractiveProvider, {
+		scope: __scopeToast,
+		onClose: handleClose,
+		children: import_react_dom.createPortal(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Collection.ItemSlot, {
+			scope: __scopeToast,
+			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root, {
+				asChild: true,
+				onEscapeKeyDown: composeEventHandlers(onEscapeKeyDown, () => {
+					if (!context.isFocusedToastEscapeKeyDownRef.current) handleClose();
+					context.isFocusedToastEscapeKeyDownRef.current = false;
+				}),
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.li, {
+					tabIndex: 0,
+					"data-state": open ? "open" : "closed",
+					"data-swipe-direction": context.swipeDirection,
+					...toastProps,
+					ref: composedRefs,
+					style: {
+						userSelect: "none",
+						touchAction: "none",
+						...props.style
+					},
+					onKeyDown: composeEventHandlers(props.onKeyDown, (event) => {
+						if (event.key !== "Escape") return;
+						onEscapeKeyDown?.(event.nativeEvent);
+						if (!event.nativeEvent.defaultPrevented) {
+							context.isFocusedToastEscapeKeyDownRef.current = true;
+							handleClose();
+						}
+					}),
+					onPointerDown: composeEventHandlers(props.onPointerDown, (event) => {
+						if (event.button !== 0) return;
+						pointerStartRef.current = {
+							x: event.clientX,
+							y: event.clientY
+						};
+					}),
+					onPointerMove: composeEventHandlers(props.onPointerMove, (event) => {
+						if (!pointerStartRef.current) return;
+						const x = event.clientX - pointerStartRef.current.x;
+						const y = event.clientY - pointerStartRef.current.y;
+						const hasSwipeMoveStarted = Boolean(swipeDeltaRef.current);
+						const isHorizontalSwipe = ["left", "right"].includes(context.swipeDirection);
+						const clamp = ["left", "up"].includes(context.swipeDirection) ? Math.min : Math.max;
+						const clampedX = isHorizontalSwipe ? clamp(0, x) : 0;
+						const clampedY = !isHorizontalSwipe ? clamp(0, y) : 0;
+						const moveStartBuffer = event.pointerType === "touch" ? 10 : 2;
+						const delta = {
+							x: clampedX,
+							y: clampedY
+						};
+						const eventDetail = {
+							originalEvent: event,
+							delta
+						};
+						if (hasSwipeMoveStarted) {
+							swipeDeltaRef.current = delta;
+							handleAndDispatchCustomEvent(TOAST_SWIPE_MOVE, onSwipeMove, eventDetail, { discrete: false });
+						} else if (isDeltaInDirection(delta, context.swipeDirection, moveStartBuffer)) {
+							swipeDeltaRef.current = delta;
+							handleAndDispatchCustomEvent(TOAST_SWIPE_START, onSwipeStart, eventDetail, { discrete: false });
+							event.target.setPointerCapture(event.pointerId);
+						} else if (Math.abs(x) > moveStartBuffer || Math.abs(y) > moveStartBuffer) pointerStartRef.current = null;
+					}),
+					onPointerUp: composeEventHandlers(props.onPointerUp, (event) => {
+						const delta = swipeDeltaRef.current;
+						const target = event.target;
+						if (target.hasPointerCapture(event.pointerId)) target.releasePointerCapture(event.pointerId);
+						swipeDeltaRef.current = null;
+						pointerStartRef.current = null;
+						if (delta) {
+							const toast = event.currentTarget;
+							const eventDetail = {
+								originalEvent: event,
+								delta
+							};
+							if (isDeltaInDirection(delta, context.swipeDirection, context.swipeThreshold)) handleAndDispatchCustomEvent(TOAST_SWIPE_END, onSwipeEnd, eventDetail, { discrete: true });
+							else handleAndDispatchCustomEvent(TOAST_SWIPE_CANCEL, onSwipeCancel, eventDetail, { discrete: true });
+							toast.addEventListener("click", (event2) => event2.preventDefault(), { once: true });
+						}
+					})
+				})
+			})
+		}), context.viewport)
+	})] });
+});
+var ToastAnnounce = (props) => {
+	const { __scopeToast, children, ...announceProps } = props;
+	const context = useToastProviderContext(TOAST_NAME, __scopeToast);
+	const [renderAnnounceText, setRenderAnnounceText] = import_react.useState(false);
+	const [isAnnounced, setIsAnnounced] = import_react.useState(false);
+	useNextFrame(() => setRenderAnnounceText(true));
+	import_react.useEffect(() => {
+		const timer = window.setTimeout(() => setIsAnnounced(true), 1e3);
+		return () => window.clearTimeout(timer);
+	}, []);
+	return isAnnounced ? null : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Portal, {
+		asChild: true,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(VisuallyHidden, {
+			...announceProps,
+			children: renderAnnounceText && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+				context.label,
+				" ",
+				children
+			] })
+		})
+	});
+};
+var TITLE_NAME = "ToastTitle";
+var ToastTitle$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeToast, ...titleProps } = props;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
+		...titleProps,
+		ref: forwardedRef
+	});
+});
+ToastTitle$1.displayName = TITLE_NAME;
+var DESCRIPTION_NAME = "ToastDescription";
+var ToastDescription$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeToast, ...descriptionProps } = props;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
+		...descriptionProps,
+		ref: forwardedRef
+	});
+});
+ToastDescription$1.displayName = DESCRIPTION_NAME;
+var ACTION_NAME = "ToastAction";
+var ToastAction$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { altText, ...actionProps } = props;
+	if (!altText.trim()) {
+		console.error(`Invalid prop \`altText\` supplied to \`${ACTION_NAME}\`. Expected non-empty \`string\`.`);
+		return null;
+	}
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastAnnounceExclude, {
+		altText,
+		asChild: true,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastClose$1, {
+			...actionProps,
+			ref: forwardedRef
+		})
+	});
+});
+ToastAction$1.displayName = ACTION_NAME;
+var CLOSE_NAME = "ToastClose";
+var ToastClose$1 = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeToast, ...closeProps } = props;
+	const interactiveContext = useToastInteractiveContext(CLOSE_NAME, __scopeToast);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ToastAnnounceExclude, {
+		asChild: true,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.button, {
+			type: "button",
+			...closeProps,
+			ref: forwardedRef,
+			onClick: composeEventHandlers(props.onClick, interactiveContext.onClose)
+		})
+	});
+});
+ToastClose$1.displayName = CLOSE_NAME;
+var ToastAnnounceExclude = import_react.forwardRef((props, forwardedRef) => {
+	const { __scopeToast, altText, ...announceExcludeProps } = props;
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
+		"data-radix-toast-announce-exclude": "",
+		"data-radix-toast-announce-alt": altText || void 0,
+		...announceExcludeProps,
+		ref: forwardedRef
+	});
+});
+function getAnnounceTextContent(container) {
+	const textContent = [];
+	Array.from(container.childNodes).forEach((node) => {
+		if (node.nodeType === node.TEXT_NODE && node.textContent) textContent.push(node.textContent);
+		if (isHTMLElement(node)) {
+			const isHidden = node.ariaHidden || node.hidden || node.style.display === "none";
+			const isExcluded = node.dataset.radixToastAnnounceExclude === "";
+			if (!isHidden) if (isExcluded) {
+				const altText = node.dataset.radixToastAnnounceAlt;
+				if (altText) textContent.push(altText);
+			} else textContent.push(...getAnnounceTextContent(node));
+		}
+	});
+	return textContent;
+}
+function handleAndDispatchCustomEvent(name, handler, detail, { discrete }) {
+	const currentTarget = detail.originalEvent.currentTarget;
+	const event = new CustomEvent(name, {
+		bubbles: true,
+		cancelable: true,
+		detail
+	});
+	if (handler) currentTarget.addEventListener(name, handler, { once: true });
+	if (discrete) dispatchDiscreteCustomEvent(currentTarget, event);
+	else currentTarget.dispatchEvent(event);
+}
+var isDeltaInDirection = (delta, direction, threshold = 0) => {
+	const deltaX = Math.abs(delta.x);
+	const deltaY = Math.abs(delta.y);
+	const isDeltaX = deltaX > deltaY;
+	if (direction === "left" || direction === "right") return isDeltaX && deltaX > threshold;
+	else return !isDeltaX && deltaY > threshold;
+};
+function useNextFrame(callback = () => {}) {
+	const fn = useCallbackRef(callback);
+	useLayoutEffect2(() => {
+		let raf1 = 0;
+		let raf2 = 0;
+		raf1 = window.requestAnimationFrame(() => raf2 = window.requestAnimationFrame(fn));
+		return () => {
+			window.cancelAnimationFrame(raf1);
+			window.cancelAnimationFrame(raf2);
+		};
+	}, [fn]);
+}
+function isHTMLElement(node) {
+	return node.nodeType === node.ELEMENT_NODE;
+}
+function getTabbableCandidates(container) {
+	const nodes = [];
+	const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT, { acceptNode: (node) => {
+		const isHiddenInput = node.tagName === "INPUT" && node.type === "hidden";
+		if (node.disabled || node.hidden || isHiddenInput) return NodeFilter.FILTER_SKIP;
+		return node.tabIndex >= 0 ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+	} });
+	while (walker.nextNode()) nodes.push(walker.currentNode);
+	return nodes;
+}
+function focusFirst(candidates) {
+	const previouslyFocusedElement = document.activeElement;
+	return candidates.some((candidate) => {
+		if (candidate === previouslyFocusedElement) return true;
+		candidate.focus();
+		return document.activeElement !== previouslyFocusedElement;
+	});
+}
+var Provider = ToastProvider$1;
+var Viewport = ToastViewport$1;
+var Root2 = Toast$2;
+var Title = ToastTitle$1;
+var Description = ToastDescription$1;
+var Action = ToastAction$1;
+var Close = ToastClose$1;
+//#endregion
 //#region src/components/ui/toast.tsx
-var ToastProvider = Provider$1;
+var ToastProvider = Provider;
 var ToastViewport = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Viewport, {
 	"data-uid": "src/components/ui/toast.tsx:15:3",
 	"data-prohibitions": "[editContent]",
@@ -20628,7 +22129,7 @@ var toastVariants = cva("group pointer-events-auto relative flex w-full items-ce
 	defaultVariants: { variant: "default" }
 });
 var Toast$1 = import_react.forwardRef(({ className, variant, ...props }, ref) => {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root2$1, {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root2, {
 		"data-uid": "src/components/ui/toast.tsx:47:5",
 		"data-prohibitions": "[editContent]",
 		ref,
@@ -20636,7 +22137,7 @@ var Toast$1 = import_react.forwardRef(({ className, variant, ...props }, ref) =>
 		...props
 	});
 });
-Toast$1.displayName = Root2$1.displayName;
+Toast$1.displayName = Root2.displayName;
 var ToastAction = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Action, {
 	"data-uid": "src/components/ui/toast.tsx:60:3",
 	"data-prohibitions": "[editContent]",
@@ -21683,3656 +23184,52 @@ var Toaster = ({ ...props }) => {
 	});
 };
 //#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-id@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-id/dist/index.mjs
-var useReactId = import_react[" useId ".trim().toString()] || (() => void 0);
-var count = 0;
-function useId(deterministicId) {
-	const [id, setId] = import_react.useState(useReactId());
-	useLayoutEffect2(() => {
-		if (!deterministicId) setId((reactId) => reactId ?? String(count++));
-	}, [deterministicId]);
-	return deterministicId || (id ? `radix-${id}` : "");
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@floating-ui+utils@0.2.11/node_modules/@floating-ui/utils/dist/floating-ui.utils.mjs
-/**
-* Custom positioning reference element.
-* @see https://floating-ui.com/docs/virtual-elements
-*/
-var sides = [
-	"top",
-	"right",
-	"bottom",
-	"left"
-];
-var min = Math.min;
-var max = Math.max;
-var round = Math.round;
-var floor = Math.floor;
-var createCoords = (v) => ({
-	x: v,
-	y: v
-});
-var oppositeSideMap = {
-	left: "right",
-	right: "left",
-	bottom: "top",
-	top: "bottom"
-};
-function clamp(start, value, end) {
-	return max(start, min(value, end));
-}
-function evaluate(value, param) {
-	return typeof value === "function" ? value(param) : value;
-}
-function getSide(placement) {
-	return placement.split("-")[0];
-}
-function getAlignment(placement) {
-	return placement.split("-")[1];
-}
-function getOppositeAxis(axis) {
-	return axis === "x" ? "y" : "x";
-}
-function getAxisLength(axis) {
-	return axis === "y" ? "height" : "width";
-}
-function getSideAxis(placement) {
-	const firstChar = placement[0];
-	return firstChar === "t" || firstChar === "b" ? "y" : "x";
-}
-function getAlignmentAxis(placement) {
-	return getOppositeAxis(getSideAxis(placement));
-}
-function getAlignmentSides(placement, rects, rtl) {
-	if (rtl === void 0) rtl = false;
-	const alignment = getAlignment(placement);
-	const alignmentAxis = getAlignmentAxis(placement);
-	const length = getAxisLength(alignmentAxis);
-	let mainAlignmentSide = alignmentAxis === "x" ? alignment === (rtl ? "end" : "start") ? "right" : "left" : alignment === "start" ? "bottom" : "top";
-	if (rects.reference[length] > rects.floating[length]) mainAlignmentSide = getOppositePlacement(mainAlignmentSide);
-	return [mainAlignmentSide, getOppositePlacement(mainAlignmentSide)];
-}
-function getExpandedPlacements(placement) {
-	const oppositePlacement = getOppositePlacement(placement);
-	return [
-		getOppositeAlignmentPlacement(placement),
-		oppositePlacement,
-		getOppositeAlignmentPlacement(oppositePlacement)
-	];
-}
-function getOppositeAlignmentPlacement(placement) {
-	return placement.includes("start") ? placement.replace("start", "end") : placement.replace("end", "start");
-}
-var lrPlacement = ["left", "right"];
-var rlPlacement = ["right", "left"];
-var tbPlacement = ["top", "bottom"];
-var btPlacement = ["bottom", "top"];
-function getSideList(side, isStart, rtl) {
-	switch (side) {
-		case "top":
-		case "bottom":
-			if (rtl) return isStart ? rlPlacement : lrPlacement;
-			return isStart ? lrPlacement : rlPlacement;
-		case "left":
-		case "right": return isStart ? tbPlacement : btPlacement;
-		default: return [];
-	}
-}
-function getOppositeAxisPlacements(placement, flipAlignment, direction, rtl) {
-	const alignment = getAlignment(placement);
-	let list = getSideList(getSide(placement), direction === "start", rtl);
-	if (alignment) {
-		list = list.map((side) => side + "-" + alignment);
-		if (flipAlignment) list = list.concat(list.map(getOppositeAlignmentPlacement));
-	}
-	return list;
-}
-function getOppositePlacement(placement) {
-	const side = getSide(placement);
-	return oppositeSideMap[side] + placement.slice(side.length);
-}
-function expandPaddingObject(padding) {
-	return {
-		top: 0,
-		right: 0,
-		bottom: 0,
-		left: 0,
-		...padding
-	};
-}
-function getPaddingObject(padding) {
-	return typeof padding !== "number" ? expandPaddingObject(padding) : {
-		top: padding,
-		right: padding,
-		bottom: padding,
-		left: padding
-	};
-}
-function rectToClientRect(rect) {
-	const { x, y, width, height } = rect;
-	return {
-		width,
-		height,
-		top: y,
-		left: x,
-		right: x + width,
-		bottom: y + height,
-		x,
-		y
-	};
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@floating-ui+core@1.7.5/node_modules/@floating-ui/core/dist/floating-ui.core.mjs
-function computeCoordsFromPlacement(_ref, placement, rtl) {
-	let { reference, floating } = _ref;
-	const sideAxis = getSideAxis(placement);
-	const alignmentAxis = getAlignmentAxis(placement);
-	const alignLength = getAxisLength(alignmentAxis);
-	const side = getSide(placement);
-	const isVertical = sideAxis === "y";
-	const commonX = reference.x + reference.width / 2 - floating.width / 2;
-	const commonY = reference.y + reference.height / 2 - floating.height / 2;
-	const commonAlign = reference[alignLength] / 2 - floating[alignLength] / 2;
-	let coords;
-	switch (side) {
-		case "top":
-			coords = {
-				x: commonX,
-				y: reference.y - floating.height
-			};
-			break;
-		case "bottom":
-			coords = {
-				x: commonX,
-				y: reference.y + reference.height
-			};
-			break;
-		case "right":
-			coords = {
-				x: reference.x + reference.width,
-				y: commonY
-			};
-			break;
-		case "left":
-			coords = {
-				x: reference.x - floating.width,
-				y: commonY
-			};
-			break;
-		default: coords = {
-			x: reference.x,
-			y: reference.y
-		};
-	}
-	switch (getAlignment(placement)) {
-		case "start":
-			coords[alignmentAxis] -= commonAlign * (rtl && isVertical ? -1 : 1);
-			break;
-		case "end":
-			coords[alignmentAxis] += commonAlign * (rtl && isVertical ? -1 : 1);
-			break;
-	}
-	return coords;
-}
-/**
-* Resolves with an object of overflow side offsets that determine how much the
-* element is overflowing a given clipping boundary on each side.
-* - positive = overflowing the boundary by that number of pixels
-* - negative = how many pixels left before it will overflow
-* - 0 = lies flush with the boundary
-* @see https://floating-ui.com/docs/detectOverflow
-*/
-async function detectOverflow(state, options) {
-	var _await$platform$isEle;
-	if (options === void 0) options = {};
-	const { x, y, platform, rects, elements, strategy } = state;
-	const { boundary = "clippingAncestors", rootBoundary = "viewport", elementContext = "floating", altBoundary = false, padding = 0 } = evaluate(options, state);
-	const paddingObject = getPaddingObject(padding);
-	const element = elements[altBoundary ? elementContext === "floating" ? "reference" : "floating" : elementContext];
-	const clippingClientRect = rectToClientRect(await platform.getClippingRect({
-		element: ((_await$platform$isEle = await (platform.isElement == null ? void 0 : platform.isElement(element))) != null ? _await$platform$isEle : true) ? element : element.contextElement || await (platform.getDocumentElement == null ? void 0 : platform.getDocumentElement(elements.floating)),
-		boundary,
-		rootBoundary,
-		strategy
-	}));
-	const rect = elementContext === "floating" ? {
-		x,
-		y,
-		width: rects.floating.width,
-		height: rects.floating.height
-	} : rects.reference;
-	const offsetParent = await (platform.getOffsetParent == null ? void 0 : platform.getOffsetParent(elements.floating));
-	const offsetScale = await (platform.isElement == null ? void 0 : platform.isElement(offsetParent)) ? await (platform.getScale == null ? void 0 : platform.getScale(offsetParent)) || {
-		x: 1,
-		y: 1
-	} : {
-		x: 1,
-		y: 1
-	};
-	const elementClientRect = rectToClientRect(platform.convertOffsetParentRelativeRectToViewportRelativeRect ? await platform.convertOffsetParentRelativeRectToViewportRelativeRect({
-		elements,
-		rect,
-		offsetParent,
-		strategy
-	}) : rect);
-	return {
-		top: (clippingClientRect.top - elementClientRect.top + paddingObject.top) / offsetScale.y,
-		bottom: (elementClientRect.bottom - clippingClientRect.bottom + paddingObject.bottom) / offsetScale.y,
-		left: (clippingClientRect.left - elementClientRect.left + paddingObject.left) / offsetScale.x,
-		right: (elementClientRect.right - clippingClientRect.right + paddingObject.right) / offsetScale.x
-	};
-}
-var MAX_RESET_COUNT = 50;
-/**
-* Computes the `x` and `y` coordinates that will place the floating element
-* next to a given reference element.
-*
-* This export does not have any `platform` interface logic. You will need to
-* write one for the platform you are using Floating UI with.
-*/
-var computePosition$1 = async (reference, floating, config) => {
-	const { placement = "bottom", strategy = "absolute", middleware = [], platform } = config;
-	const platformWithDetectOverflow = platform.detectOverflow ? platform : {
-		...platform,
-		detectOverflow
-	};
-	const rtl = await (platform.isRTL == null ? void 0 : platform.isRTL(floating));
-	let rects = await platform.getElementRects({
-		reference,
-		floating,
-		strategy
-	});
-	let { x, y } = computeCoordsFromPlacement(rects, placement, rtl);
-	let statefulPlacement = placement;
-	let resetCount = 0;
-	const middlewareData = {};
-	for (let i = 0; i < middleware.length; i++) {
-		const currentMiddleware = middleware[i];
-		if (!currentMiddleware) continue;
-		const { name, fn } = currentMiddleware;
-		const { x: nextX, y: nextY, data, reset } = await fn({
-			x,
-			y,
-			initialPlacement: placement,
-			placement: statefulPlacement,
-			strategy,
-			middlewareData,
-			rects,
-			platform: platformWithDetectOverflow,
-			elements: {
-				reference,
-				floating
-			}
-		});
-		x = nextX != null ? nextX : x;
-		y = nextY != null ? nextY : y;
-		middlewareData[name] = {
-			...middlewareData[name],
-			...data
-		};
-		if (reset && resetCount < MAX_RESET_COUNT) {
-			resetCount++;
-			if (typeof reset === "object") {
-				if (reset.placement) statefulPlacement = reset.placement;
-				if (reset.rects) rects = reset.rects === true ? await platform.getElementRects({
-					reference,
-					floating,
-					strategy
-				}) : reset.rects;
-				({x, y} = computeCoordsFromPlacement(rects, statefulPlacement, rtl));
-			}
-			i = -1;
-		}
-	}
-	return {
-		x,
-		y,
-		placement: statefulPlacement,
-		strategy,
-		middlewareData
-	};
-};
-/**
-* Provides data to position an inner element of the floating element so that it
-* appears centered to the reference element.
-* @see https://floating-ui.com/docs/arrow
-*/
-var arrow$3 = (options) => ({
-	name: "arrow",
-	options,
-	async fn(state) {
-		const { x, y, placement, rects, platform, elements, middlewareData } = state;
-		const { element, padding = 0 } = evaluate(options, state) || {};
-		if (element == null) return {};
-		const paddingObject = getPaddingObject(padding);
-		const coords = {
-			x,
-			y
-		};
-		const axis = getAlignmentAxis(placement);
-		const length = getAxisLength(axis);
-		const arrowDimensions = await platform.getDimensions(element);
-		const isYAxis = axis === "y";
-		const minProp = isYAxis ? "top" : "left";
-		const maxProp = isYAxis ? "bottom" : "right";
-		const clientProp = isYAxis ? "clientHeight" : "clientWidth";
-		const endDiff = rects.reference[length] + rects.reference[axis] - coords[axis] - rects.floating[length];
-		const startDiff = coords[axis] - rects.reference[axis];
-		const arrowOffsetParent = await (platform.getOffsetParent == null ? void 0 : platform.getOffsetParent(element));
-		let clientSize = arrowOffsetParent ? arrowOffsetParent[clientProp] : 0;
-		if (!clientSize || !await (platform.isElement == null ? void 0 : platform.isElement(arrowOffsetParent))) clientSize = elements.floating[clientProp] || rects.floating[length];
-		const centerToReference = endDiff / 2 - startDiff / 2;
-		const largestPossiblePadding = clientSize / 2 - arrowDimensions[length] / 2 - 1;
-		const minPadding = min(paddingObject[minProp], largestPossiblePadding);
-		const maxPadding = min(paddingObject[maxProp], largestPossiblePadding);
-		const min$1 = minPadding;
-		const max = clientSize - arrowDimensions[length] - maxPadding;
-		const center = clientSize / 2 - arrowDimensions[length] / 2 + centerToReference;
-		const offset = clamp(min$1, center, max);
-		const shouldAddOffset = !middlewareData.arrow && getAlignment(placement) != null && center !== offset && rects.reference[length] / 2 - (center < min$1 ? minPadding : maxPadding) - arrowDimensions[length] / 2 < 0;
-		const alignmentOffset = shouldAddOffset ? center < min$1 ? center - min$1 : center - max : 0;
-		return {
-			[axis]: coords[axis] + alignmentOffset,
-			data: {
-				[axis]: offset,
-				centerOffset: center - offset - alignmentOffset,
-				...shouldAddOffset && { alignmentOffset }
-			},
-			reset: shouldAddOffset
-		};
-	}
-});
-/**
-* Optimizes the visibility of the floating element by flipping the `placement`
-* in order to keep it in view when the preferred placement(s) will overflow the
-* clipping boundary. Alternative to `autoPlacement`.
-* @see https://floating-ui.com/docs/flip
-*/
-var flip$2 = function(options) {
-	if (options === void 0) options = {};
-	return {
-		name: "flip",
-		options,
-		async fn(state) {
-			var _middlewareData$arrow, _middlewareData$flip;
-			const { placement, middlewareData, rects, initialPlacement, platform, elements } = state;
-			const { mainAxis: checkMainAxis = true, crossAxis: checkCrossAxis = true, fallbackPlacements: specifiedFallbackPlacements, fallbackStrategy = "bestFit", fallbackAxisSideDirection = "none", flipAlignment = true, ...detectOverflowOptions } = evaluate(options, state);
-			if ((_middlewareData$arrow = middlewareData.arrow) != null && _middlewareData$arrow.alignmentOffset) return {};
-			const side = getSide(placement);
-			const initialSideAxis = getSideAxis(initialPlacement);
-			const isBasePlacement = getSide(initialPlacement) === initialPlacement;
-			const rtl = await (platform.isRTL == null ? void 0 : platform.isRTL(elements.floating));
-			const fallbackPlacements = specifiedFallbackPlacements || (isBasePlacement || !flipAlignment ? [getOppositePlacement(initialPlacement)] : getExpandedPlacements(initialPlacement));
-			const hasFallbackAxisSideDirection = fallbackAxisSideDirection !== "none";
-			if (!specifiedFallbackPlacements && hasFallbackAxisSideDirection) fallbackPlacements.push(...getOppositeAxisPlacements(initialPlacement, flipAlignment, fallbackAxisSideDirection, rtl));
-			const placements = [initialPlacement, ...fallbackPlacements];
-			const overflow = await platform.detectOverflow(state, detectOverflowOptions);
-			const overflows = [];
-			let overflowsData = ((_middlewareData$flip = middlewareData.flip) == null ? void 0 : _middlewareData$flip.overflows) || [];
-			if (checkMainAxis) overflows.push(overflow[side]);
-			if (checkCrossAxis) {
-				const sides = getAlignmentSides(placement, rects, rtl);
-				overflows.push(overflow[sides[0]], overflow[sides[1]]);
-			}
-			overflowsData = [...overflowsData, {
-				placement,
-				overflows
-			}];
-			if (!overflows.every((side) => side <= 0)) {
-				var _middlewareData$flip2, _overflowsData$filter;
-				const nextIndex = (((_middlewareData$flip2 = middlewareData.flip) == null ? void 0 : _middlewareData$flip2.index) || 0) + 1;
-				const nextPlacement = placements[nextIndex];
-				if (nextPlacement) {
-					if (!(checkCrossAxis === "alignment" ? initialSideAxis !== getSideAxis(nextPlacement) : false) || overflowsData.every((d) => getSideAxis(d.placement) === initialSideAxis ? d.overflows[0] > 0 : true)) return {
-						data: {
-							index: nextIndex,
-							overflows: overflowsData
-						},
-						reset: { placement: nextPlacement }
-					};
-				}
-				let resetPlacement = (_overflowsData$filter = overflowsData.filter((d) => d.overflows[0] <= 0).sort((a, b) => a.overflows[1] - b.overflows[1])[0]) == null ? void 0 : _overflowsData$filter.placement;
-				if (!resetPlacement) switch (fallbackStrategy) {
-					case "bestFit": {
-						var _overflowsData$filter2;
-						const placement = (_overflowsData$filter2 = overflowsData.filter((d) => {
-							if (hasFallbackAxisSideDirection) {
-								const currentSideAxis = getSideAxis(d.placement);
-								return currentSideAxis === initialSideAxis || currentSideAxis === "y";
-							}
-							return true;
-						}).map((d) => [d.placement, d.overflows.filter((overflow) => overflow > 0).reduce((acc, overflow) => acc + overflow, 0)]).sort((a, b) => a[1] - b[1])[0]) == null ? void 0 : _overflowsData$filter2[0];
-						if (placement) resetPlacement = placement;
-						break;
-					}
-					case "initialPlacement":
-						resetPlacement = initialPlacement;
-						break;
-				}
-				if (placement !== resetPlacement) return { reset: { placement: resetPlacement } };
-			}
-			return {};
-		}
-	};
-};
-function getSideOffsets(overflow, rect) {
-	return {
-		top: overflow.top - rect.height,
-		right: overflow.right - rect.width,
-		bottom: overflow.bottom - rect.height,
-		left: overflow.left - rect.width
-	};
-}
-function isAnySideFullyClipped(overflow) {
-	return sides.some((side) => overflow[side] >= 0);
-}
-/**
-* Provides data to hide the floating element in applicable situations, such as
-* when it is not in the same clipping context as the reference element.
-* @see https://floating-ui.com/docs/hide
-*/
-var hide$2 = function(options) {
-	if (options === void 0) options = {};
-	return {
-		name: "hide",
-		options,
-		async fn(state) {
-			const { rects, platform } = state;
-			const { strategy = "referenceHidden", ...detectOverflowOptions } = evaluate(options, state);
-			switch (strategy) {
-				case "referenceHidden": {
-					const offsets = getSideOffsets(await platform.detectOverflow(state, {
-						...detectOverflowOptions,
-						elementContext: "reference"
-					}), rects.reference);
-					return { data: {
-						referenceHiddenOffsets: offsets,
-						referenceHidden: isAnySideFullyClipped(offsets)
-					} };
-				}
-				case "escaped": {
-					const offsets = getSideOffsets(await platform.detectOverflow(state, {
-						...detectOverflowOptions,
-						altBoundary: true
-					}), rects.floating);
-					return { data: {
-						escapedOffsets: offsets,
-						escaped: isAnySideFullyClipped(offsets)
-					} };
-				}
-				default: return {};
-			}
-		}
-	};
-};
-var originSides = /* @__PURE__ */ new Set(["left", "top"]);
-async function convertValueToCoords(state, options) {
-	const { placement, platform, elements } = state;
-	const rtl = await (platform.isRTL == null ? void 0 : platform.isRTL(elements.floating));
-	const side = getSide(placement);
-	const alignment = getAlignment(placement);
-	const isVertical = getSideAxis(placement) === "y";
-	const mainAxisMulti = originSides.has(side) ? -1 : 1;
-	const crossAxisMulti = rtl && isVertical ? -1 : 1;
-	const rawValue = evaluate(options, state);
-	let { mainAxis, crossAxis, alignmentAxis } = typeof rawValue === "number" ? {
-		mainAxis: rawValue,
-		crossAxis: 0,
-		alignmentAxis: null
-	} : {
-		mainAxis: rawValue.mainAxis || 0,
-		crossAxis: rawValue.crossAxis || 0,
-		alignmentAxis: rawValue.alignmentAxis
-	};
-	if (alignment && typeof alignmentAxis === "number") crossAxis = alignment === "end" ? alignmentAxis * -1 : alignmentAxis;
-	return isVertical ? {
-		x: crossAxis * crossAxisMulti,
-		y: mainAxis * mainAxisMulti
-	} : {
-		x: mainAxis * mainAxisMulti,
-		y: crossAxis * crossAxisMulti
-	};
-}
-/**
-* Modifies the placement by translating the floating element along the
-* specified axes.
-* A number (shorthand for `mainAxis` or distance), or an axes configuration
-* object may be passed.
-* @see https://floating-ui.com/docs/offset
-*/
-var offset$2 = function(options) {
-	if (options === void 0) options = 0;
-	return {
-		name: "offset",
-		options,
-		async fn(state) {
-			var _middlewareData$offse, _middlewareData$arrow;
-			const { x, y, placement, middlewareData } = state;
-			const diffCoords = await convertValueToCoords(state, options);
-			if (placement === ((_middlewareData$offse = middlewareData.offset) == null ? void 0 : _middlewareData$offse.placement) && (_middlewareData$arrow = middlewareData.arrow) != null && _middlewareData$arrow.alignmentOffset) return {};
-			return {
-				x: x + diffCoords.x,
-				y: y + diffCoords.y,
-				data: {
-					...diffCoords,
-					placement
-				}
-			};
-		}
-	};
-};
-/**
-* Optimizes the visibility of the floating element by shifting it in order to
-* keep it in view when it will overflow the clipping boundary.
-* @see https://floating-ui.com/docs/shift
-*/
-var shift$2 = function(options) {
-	if (options === void 0) options = {};
-	return {
-		name: "shift",
-		options,
-		async fn(state) {
-			const { x, y, placement, platform } = state;
-			const { mainAxis: checkMainAxis = true, crossAxis: checkCrossAxis = false, limiter = { fn: (_ref) => {
-				let { x, y } = _ref;
-				return {
-					x,
-					y
-				};
-			} }, ...detectOverflowOptions } = evaluate(options, state);
-			const coords = {
-				x,
-				y
-			};
-			const overflow = await platform.detectOverflow(state, detectOverflowOptions);
-			const crossAxis = getSideAxis(getSide(placement));
-			const mainAxis = getOppositeAxis(crossAxis);
-			let mainAxisCoord = coords[mainAxis];
-			let crossAxisCoord = coords[crossAxis];
-			if (checkMainAxis) {
-				const minSide = mainAxis === "y" ? "top" : "left";
-				const maxSide = mainAxis === "y" ? "bottom" : "right";
-				const min = mainAxisCoord + overflow[minSide];
-				const max = mainAxisCoord - overflow[maxSide];
-				mainAxisCoord = clamp(min, mainAxisCoord, max);
-			}
-			if (checkCrossAxis) {
-				const minSide = crossAxis === "y" ? "top" : "left";
-				const maxSide = crossAxis === "y" ? "bottom" : "right";
-				const min = crossAxisCoord + overflow[minSide];
-				const max = crossAxisCoord - overflow[maxSide];
-				crossAxisCoord = clamp(min, crossAxisCoord, max);
-			}
-			const limitedCoords = limiter.fn({
-				...state,
-				[mainAxis]: mainAxisCoord,
-				[crossAxis]: crossAxisCoord
-			});
-			return {
-				...limitedCoords,
-				data: {
-					x: limitedCoords.x - x,
-					y: limitedCoords.y - y,
-					enabled: {
-						[mainAxis]: checkMainAxis,
-						[crossAxis]: checkCrossAxis
-					}
-				}
-			};
-		}
-	};
-};
-/**
-* Built-in `limiter` that will stop `shift()` at a certain point.
-*/
-var limitShift$2 = function(options) {
-	if (options === void 0) options = {};
-	return {
-		options,
-		fn(state) {
-			const { x, y, placement, rects, middlewareData } = state;
-			const { offset = 0, mainAxis: checkMainAxis = true, crossAxis: checkCrossAxis = true } = evaluate(options, state);
-			const coords = {
-				x,
-				y
-			};
-			const crossAxis = getSideAxis(placement);
-			const mainAxis = getOppositeAxis(crossAxis);
-			let mainAxisCoord = coords[mainAxis];
-			let crossAxisCoord = coords[crossAxis];
-			const rawOffset = evaluate(offset, state);
-			const computedOffset = typeof rawOffset === "number" ? {
-				mainAxis: rawOffset,
-				crossAxis: 0
-			} : {
-				mainAxis: 0,
-				crossAxis: 0,
-				...rawOffset
-			};
-			if (checkMainAxis) {
-				const len = mainAxis === "y" ? "height" : "width";
-				const limitMin = rects.reference[mainAxis] - rects.floating[len] + computedOffset.mainAxis;
-				const limitMax = rects.reference[mainAxis] + rects.reference[len] - computedOffset.mainAxis;
-				if (mainAxisCoord < limitMin) mainAxisCoord = limitMin;
-				else if (mainAxisCoord > limitMax) mainAxisCoord = limitMax;
-			}
-			if (checkCrossAxis) {
-				var _middlewareData$offse, _middlewareData$offse2;
-				const len = mainAxis === "y" ? "width" : "height";
-				const isOriginSide = originSides.has(getSide(placement));
-				const limitMin = rects.reference[crossAxis] - rects.floating[len] + (isOriginSide ? ((_middlewareData$offse = middlewareData.offset) == null ? void 0 : _middlewareData$offse[crossAxis]) || 0 : 0) + (isOriginSide ? 0 : computedOffset.crossAxis);
-				const limitMax = rects.reference[crossAxis] + rects.reference[len] + (isOriginSide ? 0 : ((_middlewareData$offse2 = middlewareData.offset) == null ? void 0 : _middlewareData$offse2[crossAxis]) || 0) - (isOriginSide ? computedOffset.crossAxis : 0);
-				if (crossAxisCoord < limitMin) crossAxisCoord = limitMin;
-				else if (crossAxisCoord > limitMax) crossAxisCoord = limitMax;
-			}
-			return {
-				[mainAxis]: mainAxisCoord,
-				[crossAxis]: crossAxisCoord
-			};
-		}
-	};
-};
-/**
-* Provides data that allows you to change the size of the floating element —
-* for instance, prevent it from overflowing the clipping boundary or match the
-* width of the reference element.
-* @see https://floating-ui.com/docs/size
-*/
-var size$2 = function(options) {
-	if (options === void 0) options = {};
-	return {
-		name: "size",
-		options,
-		async fn(state) {
-			var _state$middlewareData, _state$middlewareData2;
-			const { placement, rects, platform, elements } = state;
-			const { apply = () => {}, ...detectOverflowOptions } = evaluate(options, state);
-			const overflow = await platform.detectOverflow(state, detectOverflowOptions);
-			const side = getSide(placement);
-			const alignment = getAlignment(placement);
-			const isYAxis = getSideAxis(placement) === "y";
-			const { width, height } = rects.floating;
-			let heightSide;
-			let widthSide;
-			if (side === "top" || side === "bottom") {
-				heightSide = side;
-				widthSide = alignment === (await (platform.isRTL == null ? void 0 : platform.isRTL(elements.floating)) ? "start" : "end") ? "left" : "right";
-			} else {
-				widthSide = side;
-				heightSide = alignment === "end" ? "top" : "bottom";
-			}
-			const maximumClippingHeight = height - overflow.top - overflow.bottom;
-			const maximumClippingWidth = width - overflow.left - overflow.right;
-			const overflowAvailableHeight = min(height - overflow[heightSide], maximumClippingHeight);
-			const overflowAvailableWidth = min(width - overflow[widthSide], maximumClippingWidth);
-			const noShift = !state.middlewareData.shift;
-			let availableHeight = overflowAvailableHeight;
-			let availableWidth = overflowAvailableWidth;
-			if ((_state$middlewareData = state.middlewareData.shift) != null && _state$middlewareData.enabled.x) availableWidth = maximumClippingWidth;
-			if ((_state$middlewareData2 = state.middlewareData.shift) != null && _state$middlewareData2.enabled.y) availableHeight = maximumClippingHeight;
-			if (noShift && !alignment) {
-				const xMin = max(overflow.left, 0);
-				const xMax = max(overflow.right, 0);
-				const yMin = max(overflow.top, 0);
-				const yMax = max(overflow.bottom, 0);
-				if (isYAxis) availableWidth = width - 2 * (xMin !== 0 || xMax !== 0 ? xMin + xMax : max(overflow.left, overflow.right));
-				else availableHeight = height - 2 * (yMin !== 0 || yMax !== 0 ? yMin + yMax : max(overflow.top, overflow.bottom));
-			}
-			await apply({
-				...state,
-				availableWidth,
-				availableHeight
-			});
-			const nextDimensions = await platform.getDimensions(elements.floating);
-			if (width !== nextDimensions.width || height !== nextDimensions.height) return { reset: { rects: true } };
-			return {};
-		}
-	};
-};
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@floating-ui+utils@0.2.11/node_modules/@floating-ui/utils/dist/floating-ui.utils.dom.mjs
-function hasWindow() {
-	return typeof window !== "undefined";
-}
-function getNodeName(node) {
-	if (isNode(node)) return (node.nodeName || "").toLowerCase();
-	return "#document";
-}
-function getWindow(node) {
-	var _node$ownerDocument;
-	return (node == null || (_node$ownerDocument = node.ownerDocument) == null ? void 0 : _node$ownerDocument.defaultView) || window;
-}
-function getDocumentElement(node) {
-	var _ref;
-	return (_ref = (isNode(node) ? node.ownerDocument : node.document) || window.document) == null ? void 0 : _ref.documentElement;
-}
-function isNode(value) {
-	if (!hasWindow()) return false;
-	return value instanceof Node || value instanceof getWindow(value).Node;
-}
-function isElement(value) {
-	if (!hasWindow()) return false;
-	return value instanceof Element || value instanceof getWindow(value).Element;
-}
-function isHTMLElement(value) {
-	if (!hasWindow()) return false;
-	return value instanceof HTMLElement || value instanceof getWindow(value).HTMLElement;
-}
-function isShadowRoot(value) {
-	if (!hasWindow() || typeof ShadowRoot === "undefined") return false;
-	return value instanceof ShadowRoot || value instanceof getWindow(value).ShadowRoot;
-}
-function isOverflowElement(element) {
-	const { overflow, overflowX, overflowY, display } = getComputedStyle$1(element);
-	return /auto|scroll|overlay|hidden|clip/.test(overflow + overflowY + overflowX) && display !== "inline" && display !== "contents";
-}
-function isTableElement(element) {
-	return /^(table|td|th)$/.test(getNodeName(element));
-}
-function isTopLayer(element) {
-	try {
-		if (element.matches(":popover-open")) return true;
-	} catch (_e) {}
-	try {
-		return element.matches(":modal");
-	} catch (_e) {
-		return false;
-	}
-}
-var willChangeRe = /transform|translate|scale|rotate|perspective|filter/;
-var containRe = /paint|layout|strict|content/;
-var isNotNone = (value) => !!value && value !== "none";
-var isWebKitValue;
-function isContainingBlock(elementOrCss) {
-	const css = isElement(elementOrCss) ? getComputedStyle$1(elementOrCss) : elementOrCss;
-	return isNotNone(css.transform) || isNotNone(css.translate) || isNotNone(css.scale) || isNotNone(css.rotate) || isNotNone(css.perspective) || !isWebKit() && (isNotNone(css.backdropFilter) || isNotNone(css.filter)) || willChangeRe.test(css.willChange || "") || containRe.test(css.contain || "");
-}
-function getContainingBlock(element) {
-	let currentNode = getParentNode(element);
-	while (isHTMLElement(currentNode) && !isLastTraversableNode(currentNode)) {
-		if (isContainingBlock(currentNode)) return currentNode;
-		else if (isTopLayer(currentNode)) return null;
-		currentNode = getParentNode(currentNode);
-	}
-	return null;
-}
-function isWebKit() {
-	if (isWebKitValue == null) isWebKitValue = typeof CSS !== "undefined" && CSS.supports && CSS.supports("-webkit-backdrop-filter", "none");
-	return isWebKitValue;
-}
-function isLastTraversableNode(node) {
-	return /^(html|body|#document)$/.test(getNodeName(node));
-}
-function getComputedStyle$1(element) {
-	return getWindow(element).getComputedStyle(element);
-}
-function getNodeScroll(element) {
-	if (isElement(element)) return {
-		scrollLeft: element.scrollLeft,
-		scrollTop: element.scrollTop
-	};
-	return {
-		scrollLeft: element.scrollX,
-		scrollTop: element.scrollY
-	};
-}
-function getParentNode(node) {
-	if (getNodeName(node) === "html") return node;
-	const result = node.assignedSlot || node.parentNode || isShadowRoot(node) && node.host || getDocumentElement(node);
-	return isShadowRoot(result) ? result.host : result;
-}
-function getNearestOverflowAncestor(node) {
-	const parentNode = getParentNode(node);
-	if (isLastTraversableNode(parentNode)) return node.ownerDocument ? node.ownerDocument.body : node.body;
-	if (isHTMLElement(parentNode) && isOverflowElement(parentNode)) return parentNode;
-	return getNearestOverflowAncestor(parentNode);
-}
-function getOverflowAncestors(node, list, traverseIframes) {
-	var _node$ownerDocument2;
-	if (list === void 0) list = [];
-	if (traverseIframes === void 0) traverseIframes = true;
-	const scrollableAncestor = getNearestOverflowAncestor(node);
-	const isBody = scrollableAncestor === ((_node$ownerDocument2 = node.ownerDocument) == null ? void 0 : _node$ownerDocument2.body);
-	const win = getWindow(scrollableAncestor);
-	if (isBody) {
-		const frameElement = getFrameElement(win);
-		return list.concat(win, win.visualViewport || [], isOverflowElement(scrollableAncestor) ? scrollableAncestor : [], frameElement && traverseIframes ? getOverflowAncestors(frameElement) : []);
-	} else return list.concat(scrollableAncestor, getOverflowAncestors(scrollableAncestor, [], traverseIframes));
-}
-function getFrameElement(win) {
-	return win.parent && Object.getPrototypeOf(win.parent) ? win.frameElement : null;
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@floating-ui+dom@1.7.6/node_modules/@floating-ui/dom/dist/floating-ui.dom.mjs
-function getCssDimensions(element) {
-	const css = getComputedStyle$1(element);
-	let width = parseFloat(css.width) || 0;
-	let height = parseFloat(css.height) || 0;
-	const hasOffset = isHTMLElement(element);
-	const offsetWidth = hasOffset ? element.offsetWidth : width;
-	const offsetHeight = hasOffset ? element.offsetHeight : height;
-	const shouldFallback = round(width) !== offsetWidth || round(height) !== offsetHeight;
-	if (shouldFallback) {
-		width = offsetWidth;
-		height = offsetHeight;
-	}
-	return {
-		width,
-		height,
-		$: shouldFallback
-	};
-}
-function unwrapElement(element) {
-	return !isElement(element) ? element.contextElement : element;
-}
-function getScale(element) {
-	const domElement = unwrapElement(element);
-	if (!isHTMLElement(domElement)) return createCoords(1);
-	const rect = domElement.getBoundingClientRect();
-	const { width, height, $ } = getCssDimensions(domElement);
-	let x = ($ ? round(rect.width) : rect.width) / width;
-	let y = ($ ? round(rect.height) : rect.height) / height;
-	if (!x || !Number.isFinite(x)) x = 1;
-	if (!y || !Number.isFinite(y)) y = 1;
-	return {
-		x,
-		y
-	};
-}
-var noOffsets = /* @__PURE__ */ createCoords(0);
-function getVisualOffsets(element) {
-	const win = getWindow(element);
-	if (!isWebKit() || !win.visualViewport) return noOffsets;
-	return {
-		x: win.visualViewport.offsetLeft,
-		y: win.visualViewport.offsetTop
-	};
-}
-function shouldAddVisualOffsets(element, isFixed, floatingOffsetParent) {
-	if (isFixed === void 0) isFixed = false;
-	if (!floatingOffsetParent || isFixed && floatingOffsetParent !== getWindow(element)) return false;
-	return isFixed;
-}
-function getBoundingClientRect(element, includeScale, isFixedStrategy, offsetParent) {
-	if (includeScale === void 0) includeScale = false;
-	if (isFixedStrategy === void 0) isFixedStrategy = false;
-	const clientRect = element.getBoundingClientRect();
-	const domElement = unwrapElement(element);
-	let scale = createCoords(1);
-	if (includeScale) if (offsetParent) {
-		if (isElement(offsetParent)) scale = getScale(offsetParent);
-	} else scale = getScale(element);
-	const visualOffsets = shouldAddVisualOffsets(domElement, isFixedStrategy, offsetParent) ? getVisualOffsets(domElement) : createCoords(0);
-	let x = (clientRect.left + visualOffsets.x) / scale.x;
-	let y = (clientRect.top + visualOffsets.y) / scale.y;
-	let width = clientRect.width / scale.x;
-	let height = clientRect.height / scale.y;
-	if (domElement) {
-		const win = getWindow(domElement);
-		const offsetWin = offsetParent && isElement(offsetParent) ? getWindow(offsetParent) : offsetParent;
-		let currentWin = win;
-		let currentIFrame = getFrameElement(currentWin);
-		while (currentIFrame && offsetParent && offsetWin !== currentWin) {
-			const iframeScale = getScale(currentIFrame);
-			const iframeRect = currentIFrame.getBoundingClientRect();
-			const css = getComputedStyle$1(currentIFrame);
-			const left = iframeRect.left + (currentIFrame.clientLeft + parseFloat(css.paddingLeft)) * iframeScale.x;
-			const top = iframeRect.top + (currentIFrame.clientTop + parseFloat(css.paddingTop)) * iframeScale.y;
-			x *= iframeScale.x;
-			y *= iframeScale.y;
-			width *= iframeScale.x;
-			height *= iframeScale.y;
-			x += left;
-			y += top;
-			currentWin = getWindow(currentIFrame);
-			currentIFrame = getFrameElement(currentWin);
-		}
-	}
-	return rectToClientRect({
-		width,
-		height,
-		x,
-		y
-	});
-}
-function getWindowScrollBarX(element, rect) {
-	const leftScroll = getNodeScroll(element).scrollLeft;
-	if (!rect) return getBoundingClientRect(getDocumentElement(element)).left + leftScroll;
-	return rect.left + leftScroll;
-}
-function getHTMLOffset(documentElement, scroll) {
-	const htmlRect = documentElement.getBoundingClientRect();
-	return {
-		x: htmlRect.left + scroll.scrollLeft - getWindowScrollBarX(documentElement, htmlRect),
-		y: htmlRect.top + scroll.scrollTop
-	};
-}
-function convertOffsetParentRelativeRectToViewportRelativeRect(_ref) {
-	let { elements, rect, offsetParent, strategy } = _ref;
-	const isFixed = strategy === "fixed";
-	const documentElement = getDocumentElement(offsetParent);
-	const topLayer = elements ? isTopLayer(elements.floating) : false;
-	if (offsetParent === documentElement || topLayer && isFixed) return rect;
-	let scroll = {
-		scrollLeft: 0,
-		scrollTop: 0
-	};
-	let scale = createCoords(1);
-	const offsets = createCoords(0);
-	const isOffsetParentAnElement = isHTMLElement(offsetParent);
-	if (isOffsetParentAnElement || !isOffsetParentAnElement && !isFixed) {
-		if (getNodeName(offsetParent) !== "body" || isOverflowElement(documentElement)) scroll = getNodeScroll(offsetParent);
-		if (isOffsetParentAnElement) {
-			const offsetRect = getBoundingClientRect(offsetParent);
-			scale = getScale(offsetParent);
-			offsets.x = offsetRect.x + offsetParent.clientLeft;
-			offsets.y = offsetRect.y + offsetParent.clientTop;
-		}
-	}
-	const htmlOffset = documentElement && !isOffsetParentAnElement && !isFixed ? getHTMLOffset(documentElement, scroll) : createCoords(0);
-	return {
-		width: rect.width * scale.x,
-		height: rect.height * scale.y,
-		x: rect.x * scale.x - scroll.scrollLeft * scale.x + offsets.x + htmlOffset.x,
-		y: rect.y * scale.y - scroll.scrollTop * scale.y + offsets.y + htmlOffset.y
-	};
-}
-function getClientRects(element) {
-	return Array.from(element.getClientRects());
-}
-function getDocumentRect(element) {
-	const html = getDocumentElement(element);
-	const scroll = getNodeScroll(element);
-	const body = element.ownerDocument.body;
-	const width = max(html.scrollWidth, html.clientWidth, body.scrollWidth, body.clientWidth);
-	const height = max(html.scrollHeight, html.clientHeight, body.scrollHeight, body.clientHeight);
-	let x = -scroll.scrollLeft + getWindowScrollBarX(element);
-	const y = -scroll.scrollTop;
-	if (getComputedStyle$1(body).direction === "rtl") x += max(html.clientWidth, body.clientWidth) - width;
-	return {
-		width,
-		height,
-		x,
-		y
-	};
-}
-var SCROLLBAR_MAX = 25;
-function getViewportRect(element, strategy) {
-	const win = getWindow(element);
-	const html = getDocumentElement(element);
-	const visualViewport = win.visualViewport;
-	let width = html.clientWidth;
-	let height = html.clientHeight;
-	let x = 0;
-	let y = 0;
-	if (visualViewport) {
-		width = visualViewport.width;
-		height = visualViewport.height;
-		const visualViewportBased = isWebKit();
-		if (!visualViewportBased || visualViewportBased && strategy === "fixed") {
-			x = visualViewport.offsetLeft;
-			y = visualViewport.offsetTop;
-		}
-	}
-	const windowScrollbarX = getWindowScrollBarX(html);
-	if (windowScrollbarX <= 0) {
-		const doc = html.ownerDocument;
-		const body = doc.body;
-		const bodyStyles = getComputedStyle(body);
-		const bodyMarginInline = doc.compatMode === "CSS1Compat" ? parseFloat(bodyStyles.marginLeft) + parseFloat(bodyStyles.marginRight) || 0 : 0;
-		const clippingStableScrollbarWidth = Math.abs(html.clientWidth - body.clientWidth - bodyMarginInline);
-		if (clippingStableScrollbarWidth <= SCROLLBAR_MAX) width -= clippingStableScrollbarWidth;
-	} else if (windowScrollbarX <= SCROLLBAR_MAX) width += windowScrollbarX;
-	return {
-		width,
-		height,
-		x,
-		y
-	};
-}
-function getInnerBoundingClientRect(element, strategy) {
-	const clientRect = getBoundingClientRect(element, true, strategy === "fixed");
-	const top = clientRect.top + element.clientTop;
-	const left = clientRect.left + element.clientLeft;
-	const scale = isHTMLElement(element) ? getScale(element) : createCoords(1);
-	return {
-		width: element.clientWidth * scale.x,
-		height: element.clientHeight * scale.y,
-		x: left * scale.x,
-		y: top * scale.y
-	};
-}
-function getClientRectFromClippingAncestor(element, clippingAncestor, strategy) {
-	let rect;
-	if (clippingAncestor === "viewport") rect = getViewportRect(element, strategy);
-	else if (clippingAncestor === "document") rect = getDocumentRect(getDocumentElement(element));
-	else if (isElement(clippingAncestor)) rect = getInnerBoundingClientRect(clippingAncestor, strategy);
-	else {
-		const visualOffsets = getVisualOffsets(element);
-		rect = {
-			x: clippingAncestor.x - visualOffsets.x,
-			y: clippingAncestor.y - visualOffsets.y,
-			width: clippingAncestor.width,
-			height: clippingAncestor.height
-		};
-	}
-	return rectToClientRect(rect);
-}
-function hasFixedPositionAncestor(element, stopNode) {
-	const parentNode = getParentNode(element);
-	if (parentNode === stopNode || !isElement(parentNode) || isLastTraversableNode(parentNode)) return false;
-	return getComputedStyle$1(parentNode).position === "fixed" || hasFixedPositionAncestor(parentNode, stopNode);
-}
-function getClippingElementAncestors(element, cache) {
-	const cachedResult = cache.get(element);
-	if (cachedResult) return cachedResult;
-	let result = getOverflowAncestors(element, [], false).filter((el) => isElement(el) && getNodeName(el) !== "body");
-	let currentContainingBlockComputedStyle = null;
-	const elementIsFixed = getComputedStyle$1(element).position === "fixed";
-	let currentNode = elementIsFixed ? getParentNode(element) : element;
-	while (isElement(currentNode) && !isLastTraversableNode(currentNode)) {
-		const computedStyle = getComputedStyle$1(currentNode);
-		const currentNodeIsContaining = isContainingBlock(currentNode);
-		if (!currentNodeIsContaining && computedStyle.position === "fixed") currentContainingBlockComputedStyle = null;
-		if (elementIsFixed ? !currentNodeIsContaining && !currentContainingBlockComputedStyle : !currentNodeIsContaining && computedStyle.position === "static" && !!currentContainingBlockComputedStyle && (currentContainingBlockComputedStyle.position === "absolute" || currentContainingBlockComputedStyle.position === "fixed") || isOverflowElement(currentNode) && !currentNodeIsContaining && hasFixedPositionAncestor(element, currentNode)) result = result.filter((ancestor) => ancestor !== currentNode);
-		else currentContainingBlockComputedStyle = computedStyle;
-		currentNode = getParentNode(currentNode);
-	}
-	cache.set(element, result);
-	return result;
-}
-function getClippingRect(_ref) {
-	let { element, boundary, rootBoundary, strategy } = _ref;
-	const clippingAncestors = [...boundary === "clippingAncestors" ? isTopLayer(element) ? [] : getClippingElementAncestors(element, this._c) : [].concat(boundary), rootBoundary];
-	const firstRect = getClientRectFromClippingAncestor(element, clippingAncestors[0], strategy);
-	let top = firstRect.top;
-	let right = firstRect.right;
-	let bottom = firstRect.bottom;
-	let left = firstRect.left;
-	for (let i = 1; i < clippingAncestors.length; i++) {
-		const rect = getClientRectFromClippingAncestor(element, clippingAncestors[i], strategy);
-		top = max(rect.top, top);
-		right = min(rect.right, right);
-		bottom = min(rect.bottom, bottom);
-		left = max(rect.left, left);
-	}
-	return {
-		width: right - left,
-		height: bottom - top,
-		x: left,
-		y: top
-	};
-}
-function getDimensions(element) {
-	const { width, height } = getCssDimensions(element);
-	return {
-		width,
-		height
-	};
-}
-function getRectRelativeToOffsetParent(element, offsetParent, strategy) {
-	const isOffsetParentAnElement = isHTMLElement(offsetParent);
-	const documentElement = getDocumentElement(offsetParent);
-	const isFixed = strategy === "fixed";
-	const rect = getBoundingClientRect(element, true, isFixed, offsetParent);
-	let scroll = {
-		scrollLeft: 0,
-		scrollTop: 0
-	};
-	const offsets = createCoords(0);
-	function setLeftRTLScrollbarOffset() {
-		offsets.x = getWindowScrollBarX(documentElement);
-	}
-	if (isOffsetParentAnElement || !isOffsetParentAnElement && !isFixed) {
-		if (getNodeName(offsetParent) !== "body" || isOverflowElement(documentElement)) scroll = getNodeScroll(offsetParent);
-		if (isOffsetParentAnElement) {
-			const offsetRect = getBoundingClientRect(offsetParent, true, isFixed, offsetParent);
-			offsets.x = offsetRect.x + offsetParent.clientLeft;
-			offsets.y = offsetRect.y + offsetParent.clientTop;
-		} else if (documentElement) setLeftRTLScrollbarOffset();
-	}
-	if (isFixed && !isOffsetParentAnElement && documentElement) setLeftRTLScrollbarOffset();
-	const htmlOffset = documentElement && !isOffsetParentAnElement && !isFixed ? getHTMLOffset(documentElement, scroll) : createCoords(0);
-	return {
-		x: rect.left + scroll.scrollLeft - offsets.x - htmlOffset.x,
-		y: rect.top + scroll.scrollTop - offsets.y - htmlOffset.y,
-		width: rect.width,
-		height: rect.height
-	};
-}
-function isStaticPositioned(element) {
-	return getComputedStyle$1(element).position === "static";
-}
-function getTrueOffsetParent(element, polyfill) {
-	if (!isHTMLElement(element) || getComputedStyle$1(element).position === "fixed") return null;
-	if (polyfill) return polyfill(element);
-	let rawOffsetParent = element.offsetParent;
-	if (getDocumentElement(element) === rawOffsetParent) rawOffsetParent = rawOffsetParent.ownerDocument.body;
-	return rawOffsetParent;
-}
-function getOffsetParent(element, polyfill) {
-	const win = getWindow(element);
-	if (isTopLayer(element)) return win;
-	if (!isHTMLElement(element)) {
-		let svgOffsetParent = getParentNode(element);
-		while (svgOffsetParent && !isLastTraversableNode(svgOffsetParent)) {
-			if (isElement(svgOffsetParent) && !isStaticPositioned(svgOffsetParent)) return svgOffsetParent;
-			svgOffsetParent = getParentNode(svgOffsetParent);
-		}
-		return win;
-	}
-	let offsetParent = getTrueOffsetParent(element, polyfill);
-	while (offsetParent && isTableElement(offsetParent) && isStaticPositioned(offsetParent)) offsetParent = getTrueOffsetParent(offsetParent, polyfill);
-	if (offsetParent && isLastTraversableNode(offsetParent) && isStaticPositioned(offsetParent) && !isContainingBlock(offsetParent)) return win;
-	return offsetParent || getContainingBlock(element) || win;
-}
-var getElementRects = async function(data) {
-	const getOffsetParentFn = this.getOffsetParent || getOffsetParent;
-	const getDimensionsFn = this.getDimensions;
-	const floatingDimensions = await getDimensionsFn(data.floating);
-	return {
-		reference: getRectRelativeToOffsetParent(data.reference, await getOffsetParentFn(data.floating), data.strategy),
-		floating: {
-			x: 0,
-			y: 0,
-			width: floatingDimensions.width,
-			height: floatingDimensions.height
-		}
-	};
-};
-function isRTL(element) {
-	return getComputedStyle$1(element).direction === "rtl";
-}
-var platform = {
-	convertOffsetParentRelativeRectToViewportRelativeRect,
-	getDocumentElement,
-	getClippingRect,
-	getOffsetParent,
-	getElementRects,
-	getClientRects,
-	getDimensions,
-	getScale,
-	isElement,
-	isRTL
-};
-function rectsAreEqual(a, b) {
-	return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
-}
-function observeMove(element, onMove) {
-	let io = null;
-	let timeoutId;
-	const root = getDocumentElement(element);
-	function cleanup() {
-		var _io;
-		clearTimeout(timeoutId);
-		(_io = io) == null || _io.disconnect();
-		io = null;
-	}
-	function refresh(skip, threshold) {
-		if (skip === void 0) skip = false;
-		if (threshold === void 0) threshold = 1;
-		cleanup();
-		const elementRectForRootMargin = element.getBoundingClientRect();
-		const { left, top, width, height } = elementRectForRootMargin;
-		if (!skip) onMove();
-		if (!width || !height) return;
-		const insetTop = floor(top);
-		const insetRight = floor(root.clientWidth - (left + width));
-		const insetBottom = floor(root.clientHeight - (top + height));
-		const insetLeft = floor(left);
-		const options = {
-			rootMargin: -insetTop + "px " + -insetRight + "px " + -insetBottom + "px " + -insetLeft + "px",
-			threshold: max(0, min(1, threshold)) || 1
-		};
-		let isFirstUpdate = true;
-		function handleObserve(entries) {
-			const ratio = entries[0].intersectionRatio;
-			if (ratio !== threshold) {
-				if (!isFirstUpdate) return refresh();
-				if (!ratio) timeoutId = setTimeout(() => {
-					refresh(false, 1e-7);
-				}, 1e3);
-				else refresh(false, ratio);
-			}
-			if (ratio === 1 && !rectsAreEqual(elementRectForRootMargin, element.getBoundingClientRect())) refresh();
-			isFirstUpdate = false;
-		}
-		try {
-			io = new IntersectionObserver(handleObserve, {
-				...options,
-				root: root.ownerDocument
-			});
-		} catch (_e) {
-			io = new IntersectionObserver(handleObserve, options);
-		}
-		io.observe(element);
-	}
-	refresh(true);
-	return cleanup;
-}
-/**
-* Automatically updates the position of the floating element when necessary.
-* Should only be called when the floating element is mounted on the DOM or
-* visible on the screen.
-* @returns cleanup function that should be invoked when the floating element is
-* removed from the DOM or hidden from the screen.
-* @see https://floating-ui.com/docs/autoUpdate
-*/
-function autoUpdate(reference, floating, update, options) {
-	if (options === void 0) options = {};
-	const { ancestorScroll = true, ancestorResize = true, elementResize = typeof ResizeObserver === "function", layoutShift = typeof IntersectionObserver === "function", animationFrame = false } = options;
-	const referenceEl = unwrapElement(reference);
-	const ancestors = ancestorScroll || ancestorResize ? [...referenceEl ? getOverflowAncestors(referenceEl) : [], ...floating ? getOverflowAncestors(floating) : []] : [];
-	ancestors.forEach((ancestor) => {
-		ancestorScroll && ancestor.addEventListener("scroll", update, { passive: true });
-		ancestorResize && ancestor.addEventListener("resize", update);
-	});
-	const cleanupIo = referenceEl && layoutShift ? observeMove(referenceEl, update) : null;
-	let reobserveFrame = -1;
-	let resizeObserver = null;
-	if (elementResize) {
-		resizeObserver = new ResizeObserver((_ref) => {
-			let [firstEntry] = _ref;
-			if (firstEntry && firstEntry.target === referenceEl && resizeObserver && floating) {
-				resizeObserver.unobserve(floating);
-				cancelAnimationFrame(reobserveFrame);
-				reobserveFrame = requestAnimationFrame(() => {
-					var _resizeObserver;
-					(_resizeObserver = resizeObserver) == null || _resizeObserver.observe(floating);
-				});
-			}
-			update();
-		});
-		if (referenceEl && !animationFrame) resizeObserver.observe(referenceEl);
-		if (floating) resizeObserver.observe(floating);
-	}
-	let frameId;
-	let prevRefRect = animationFrame ? getBoundingClientRect(reference) : null;
-	if (animationFrame) frameLoop();
-	function frameLoop() {
-		const nextRefRect = getBoundingClientRect(reference);
-		if (prevRefRect && !rectsAreEqual(prevRefRect, nextRefRect)) update();
-		prevRefRect = nextRefRect;
-		frameId = requestAnimationFrame(frameLoop);
-	}
-	update();
-	return () => {
-		var _resizeObserver2;
-		ancestors.forEach((ancestor) => {
-			ancestorScroll && ancestor.removeEventListener("scroll", update);
-			ancestorResize && ancestor.removeEventListener("resize", update);
-		});
-		cleanupIo?.();
-		(_resizeObserver2 = resizeObserver) == null || _resizeObserver2.disconnect();
-		resizeObserver = null;
-		if (animationFrame) cancelAnimationFrame(frameId);
-	};
-}
-/**
-* Modifies the placement by translating the floating element along the
-* specified axes.
-* A number (shorthand for `mainAxis` or distance), or an axes configuration
-* object may be passed.
-* @see https://floating-ui.com/docs/offset
-*/
-var offset$1 = offset$2;
-/**
-* Optimizes the visibility of the floating element by shifting it in order to
-* keep it in view when it will overflow the clipping boundary.
-* @see https://floating-ui.com/docs/shift
-*/
-var shift$1 = shift$2;
-/**
-* Optimizes the visibility of the floating element by flipping the `placement`
-* in order to keep it in view when the preferred placement(s) will overflow the
-* clipping boundary. Alternative to `autoPlacement`.
-* @see https://floating-ui.com/docs/flip
-*/
-var flip$1 = flip$2;
-/**
-* Provides data that allows you to change the size of the floating element —
-* for instance, prevent it from overflowing the clipping boundary or match the
-* width of the reference element.
-* @see https://floating-ui.com/docs/size
-*/
-var size$1 = size$2;
-/**
-* Provides data to hide the floating element in applicable situations, such as
-* when it is not in the same clipping context as the reference element.
-* @see https://floating-ui.com/docs/hide
-*/
-var hide$1 = hide$2;
-/**
-* Provides data to position an inner element of the floating element so that it
-* appears centered to the reference element.
-* @see https://floating-ui.com/docs/arrow
-*/
-var arrow$2 = arrow$3;
-/**
-* Built-in `limiter` that will stop `shift()` at a certain point.
-*/
-var limitShift$1 = limitShift$2;
-/**
-* Computes the `x` and `y` coordinates that will place the floating element
-* next to a given reference element.
-*/
-var computePosition = (reference, floating, options) => {
-	const cache = /* @__PURE__ */ new Map();
-	const mergedOptions = {
-		platform,
-		...options
-	};
-	const platformWithCache = {
-		...mergedOptions.platform,
-		_c: cache
-	};
-	return computePosition$1(reference, floating, {
-		...mergedOptions,
-		platform: platformWithCache
-	});
-};
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@floating-ui+react-dom@2.1.8_react-dom@19.2.4_react@19.2.4__react@19.2.4/node_modules/@floating-ui/react-dom/dist/floating-ui.react-dom.mjs
-var index = typeof document !== "undefined" ? import_react.useLayoutEffect : function noop() {};
-function deepEqual(a, b) {
-	if (a === b) return true;
-	if (typeof a !== typeof b) return false;
-	if (typeof a === "function" && a.toString() === b.toString()) return true;
-	let length;
-	let i;
-	let keys;
-	if (a && b && typeof a === "object") {
-		if (Array.isArray(a)) {
-			length = a.length;
-			if (length !== b.length) return false;
-			for (i = length; i-- !== 0;) if (!deepEqual(a[i], b[i])) return false;
-			return true;
-		}
-		keys = Object.keys(a);
-		length = keys.length;
-		if (length !== Object.keys(b).length) return false;
-		for (i = length; i-- !== 0;) if (!{}.hasOwnProperty.call(b, keys[i])) return false;
-		for (i = length; i-- !== 0;) {
-			const key = keys[i];
-			if (key === "_owner" && a.$$typeof) continue;
-			if (!deepEqual(a[key], b[key])) return false;
-		}
-		return true;
-	}
-	return a !== a && b !== b;
-}
-function getDPR(element) {
-	if (typeof window === "undefined") return 1;
-	return (element.ownerDocument.defaultView || window).devicePixelRatio || 1;
-}
-function roundByDPR(element, value) {
-	const dpr = getDPR(element);
-	return Math.round(value * dpr) / dpr;
-}
-function useLatestRef(value) {
-	const ref = import_react.useRef(value);
-	index(() => {
-		ref.current = value;
-	});
-	return ref;
-}
-/**
-* Provides data to position a floating element.
-* @see https://floating-ui.com/docs/useFloating
-*/
-function useFloating(options) {
-	if (options === void 0) options = {};
-	const { placement = "bottom", strategy = "absolute", middleware = [], platform, elements: { reference: externalReference, floating: externalFloating } = {}, transform = true, whileElementsMounted, open } = options;
-	const [data, setData] = import_react.useState({
-		x: 0,
-		y: 0,
-		strategy,
-		placement,
-		middlewareData: {},
-		isPositioned: false
-	});
-	const [latestMiddleware, setLatestMiddleware] = import_react.useState(middleware);
-	if (!deepEqual(latestMiddleware, middleware)) setLatestMiddleware(middleware);
-	const [_reference, _setReference] = import_react.useState(null);
-	const [_floating, _setFloating] = import_react.useState(null);
-	const setReference = import_react.useCallback((node) => {
-		if (node !== referenceRef.current) {
-			referenceRef.current = node;
-			_setReference(node);
-		}
-	}, []);
-	const setFloating = import_react.useCallback((node) => {
-		if (node !== floatingRef.current) {
-			floatingRef.current = node;
-			_setFloating(node);
-		}
-	}, []);
-	const referenceEl = externalReference || _reference;
-	const floatingEl = externalFloating || _floating;
-	const referenceRef = import_react.useRef(null);
-	const floatingRef = import_react.useRef(null);
-	const dataRef = import_react.useRef(data);
-	const hasWhileElementsMounted = whileElementsMounted != null;
-	const whileElementsMountedRef = useLatestRef(whileElementsMounted);
-	const platformRef = useLatestRef(platform);
-	const openRef = useLatestRef(open);
-	const update = import_react.useCallback(() => {
-		if (!referenceRef.current || !floatingRef.current) return;
-		const config = {
-			placement,
-			strategy,
-			middleware: latestMiddleware
-		};
-		if (platformRef.current) config.platform = platformRef.current;
-		computePosition(referenceRef.current, floatingRef.current, config).then((data) => {
-			const fullData = {
-				...data,
-				isPositioned: openRef.current !== false
-			};
-			if (isMountedRef.current && !deepEqual(dataRef.current, fullData)) {
-				dataRef.current = fullData;
-				import_react_dom.flushSync(() => {
-					setData(fullData);
-				});
-			}
-		});
-	}, [
-		latestMiddleware,
-		placement,
-		strategy,
-		platformRef,
-		openRef
-	]);
-	index(() => {
-		if (open === false && dataRef.current.isPositioned) {
-			dataRef.current.isPositioned = false;
-			setData((data) => ({
-				...data,
-				isPositioned: false
-			}));
-		}
-	}, [open]);
-	const isMountedRef = import_react.useRef(false);
-	index(() => {
-		isMountedRef.current = true;
-		return () => {
-			isMountedRef.current = false;
-		};
-	}, []);
-	index(() => {
-		if (referenceEl) referenceRef.current = referenceEl;
-		if (floatingEl) floatingRef.current = floatingEl;
-		if (referenceEl && floatingEl) {
-			if (whileElementsMountedRef.current) return whileElementsMountedRef.current(referenceEl, floatingEl, update);
-			update();
-		}
-	}, [
-		referenceEl,
-		floatingEl,
-		update,
-		whileElementsMountedRef,
-		hasWhileElementsMounted
-	]);
-	const refs = import_react.useMemo(() => ({
-		reference: referenceRef,
-		floating: floatingRef,
-		setReference,
-		setFloating
-	}), [setReference, setFloating]);
-	const elements = import_react.useMemo(() => ({
-		reference: referenceEl,
-		floating: floatingEl
-	}), [referenceEl, floatingEl]);
-	const floatingStyles = import_react.useMemo(() => {
-		const initialStyles = {
-			position: strategy,
-			left: 0,
-			top: 0
-		};
-		if (!elements.floating) return initialStyles;
-		const x = roundByDPR(elements.floating, data.x);
-		const y = roundByDPR(elements.floating, data.y);
-		if (transform) return {
-			...initialStyles,
-			transform: "translate(" + x + "px, " + y + "px)",
-			...getDPR(elements.floating) >= 1.5 && { willChange: "transform" }
-		};
-		return {
-			position: strategy,
-			left: x,
-			top: y
-		};
-	}, [
-		strategy,
-		transform,
-		elements.floating,
-		data.x,
-		data.y
-	]);
-	return import_react.useMemo(() => ({
-		...data,
-		update,
-		refs,
-		elements,
-		floatingStyles
-	}), [
-		data,
-		update,
-		refs,
-		elements,
-		floatingStyles
-	]);
-}
-/**
-* Provides data to position an inner element of the floating element so that it
-* appears centered to the reference element.
-* This wraps the core `arrow` middleware to allow React refs as the element.
-* @see https://floating-ui.com/docs/arrow
-*/
-var arrow$1 = (options) => {
-	function isRef(value) {
-		return {}.hasOwnProperty.call(value, "current");
-	}
-	return {
-		name: "arrow",
-		options,
-		fn(state) {
-			const { element, padding } = typeof options === "function" ? options(state) : options;
-			if (element && isRef(element)) {
-				if (element.current != null) return arrow$2({
-					element: element.current,
-					padding
-				}).fn(state);
-				return {};
-			}
-			if (element) return arrow$2({
-				element,
-				padding
-			}).fn(state);
-			return {};
-		}
-	};
-};
-/**
-* Modifies the placement by translating the floating element along the
-* specified axes.
-* A number (shorthand for `mainAxis` or distance), or an axes configuration
-* object may be passed.
-* @see https://floating-ui.com/docs/offset
-*/
-var offset = (options, deps) => {
-	const result = offset$1(options);
-	return {
-		name: result.name,
-		fn: result.fn,
-		options: [options, deps]
-	};
-};
-/**
-* Optimizes the visibility of the floating element by shifting it in order to
-* keep it in view when it will overflow the clipping boundary.
-* @see https://floating-ui.com/docs/shift
-*/
-var shift = (options, deps) => {
-	const result = shift$1(options);
-	return {
-		name: result.name,
-		fn: result.fn,
-		options: [options, deps]
-	};
-};
-/**
-* Built-in `limiter` that will stop `shift()` at a certain point.
-*/
-var limitShift = (options, deps) => {
-	return {
-		fn: limitShift$1(options).fn,
-		options: [options, deps]
-	};
-};
-/**
-* Optimizes the visibility of the floating element by flipping the `placement`
-* in order to keep it in view when the preferred placement(s) will overflow the
-* clipping boundary. Alternative to `autoPlacement`.
-* @see https://floating-ui.com/docs/flip
-*/
-var flip = (options, deps) => {
-	const result = flip$1(options);
-	return {
-		name: result.name,
-		fn: result.fn,
-		options: [options, deps]
-	};
-};
-/**
-* Provides data that allows you to change the size of the floating element —
-* for instance, prevent it from overflowing the clipping boundary or match the
-* width of the reference element.
-* @see https://floating-ui.com/docs/size
-*/
-var size = (options, deps) => {
-	const result = size$1(options);
-	return {
-		name: result.name,
-		fn: result.fn,
-		options: [options, deps]
-	};
-};
-/**
-* Provides data to hide the floating element in applicable situations, such as
-* when it is not in the same clipping context as the reference element.
-* @see https://floating-ui.com/docs/hide
-*/
-var hide = (options, deps) => {
-	const result = hide$1(options);
-	return {
-		name: result.name,
-		fn: result.fn,
-		options: [options, deps]
-	};
-};
-/**
-* Provides data to position an inner element of the floating element so that it
-* appears centered to the reference element.
-* This wraps the core `arrow` middleware to allow React refs as the element.
-* @see https://floating-ui.com/docs/arrow
-*/
-var arrow = (options, deps) => {
-	const result = arrow$1(options);
-	return {
-		name: result.name,
-		fn: result.fn,
-		options: [options, deps]
-	};
-};
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-arrow@1.1.7_@types+react-dom@19.2.3_@types+react@19.2.14__@types+react@_e05f2c19a58a99fddf374207b5e3778c/node_modules/@radix-ui/react-arrow/dist/index.mjs
-var NAME$1 = "Arrow";
-var Arrow$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { children, width = 10, height = 5, ...arrowProps } = props;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.svg, {
-		...arrowProps,
-		ref: forwardedRef,
-		width,
-		height,
-		viewBox: "0 0 30 10",
-		preserveAspectRatio: "none",
-		children: props.asChild ? children : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("polygon", { points: "0,0 30,0 15,10" })
-	});
-});
-Arrow$1.displayName = NAME$1;
-var Root$1 = Arrow$1;
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-use-size@1.1.1_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-use-size/dist/index.mjs
-function useSize(element) {
-	const [size, setSize] = import_react.useState(void 0);
-	useLayoutEffect2(() => {
-		if (element) {
-			setSize({
-				width: element.offsetWidth,
-				height: element.offsetHeight
-			});
-			const resizeObserver = new ResizeObserver((entries) => {
-				if (!Array.isArray(entries)) return;
-				if (!entries.length) return;
-				const entry = entries[0];
-				let width;
-				let height;
-				if ("borderBoxSize" in entry) {
-					const borderSizeEntry = entry["borderBoxSize"];
-					const borderSize = Array.isArray(borderSizeEntry) ? borderSizeEntry[0] : borderSizeEntry;
-					width = borderSize["inlineSize"];
-					height = borderSize["blockSize"];
-				} else {
-					width = element.offsetWidth;
-					height = element.offsetHeight;
-				}
-				setSize({
-					width,
-					height
-				});
-			});
-			resizeObserver.observe(element, { box: "border-box" });
-			return () => resizeObserver.unobserve(element);
-		} else setSize(void 0);
-	}, [element]);
-	return size;
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-popper@1.2.8_@types+react-dom@19.2.3_@types+react@19.2.14__@types+react_13e0521d8aea7ebfbfb8bee1fb615c05/node_modules/@radix-ui/react-popper/dist/index.mjs
-var POPPER_NAME = "Popper";
-var [createPopperContext, createPopperScope] = createContextScope(POPPER_NAME);
-var [PopperProvider, usePopperContext] = createPopperContext(POPPER_NAME);
-var Popper = (props) => {
-	const { __scopePopper, children } = props;
-	const [anchor, setAnchor] = import_react.useState(null);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PopperProvider, {
-		scope: __scopePopper,
-		anchor,
-		onAnchorChange: setAnchor,
-		children
-	});
-};
-Popper.displayName = POPPER_NAME;
-var ANCHOR_NAME = "PopperAnchor";
-var PopperAnchor = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopePopper, virtualRef, ...anchorProps } = props;
-	const context = usePopperContext(ANCHOR_NAME, __scopePopper);
-	const ref = import_react.useRef(null);
-	const composedRefs = useComposedRefs(forwardedRef, ref);
-	const anchorRef = import_react.useRef(null);
-	import_react.useEffect(() => {
-		const previousAnchor = anchorRef.current;
-		anchorRef.current = virtualRef?.current || ref.current;
-		if (previousAnchor !== anchorRef.current) context.onAnchorChange(anchorRef.current);
-	});
-	return virtualRef ? null : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.div, {
-		...anchorProps,
-		ref: composedRefs
-	});
-});
-PopperAnchor.displayName = ANCHOR_NAME;
-var CONTENT_NAME$1 = "PopperContent";
-var [PopperContentProvider, useContentContext] = createPopperContext(CONTENT_NAME$1);
-var PopperContent = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopePopper, side = "bottom", sideOffset = 0, align = "center", alignOffset = 0, arrowPadding = 0, avoidCollisions = true, collisionBoundary = [], collisionPadding: collisionPaddingProp = 0, sticky = "partial", hideWhenDetached = false, updatePositionStrategy = "optimized", onPlaced, ...contentProps } = props;
-	const context = usePopperContext(CONTENT_NAME$1, __scopePopper);
-	const [content, setContent] = import_react.useState(null);
-	const composedRefs = useComposedRefs(forwardedRef, (node) => setContent(node));
-	const [arrow$4, setArrow] = import_react.useState(null);
-	const arrowSize = useSize(arrow$4);
-	const arrowWidth = arrowSize?.width ?? 0;
-	const arrowHeight = arrowSize?.height ?? 0;
-	const desiredPlacement = side + (align !== "center" ? "-" + align : "");
-	const collisionPadding = typeof collisionPaddingProp === "number" ? collisionPaddingProp : {
-		top: 0,
-		right: 0,
-		bottom: 0,
-		left: 0,
-		...collisionPaddingProp
-	};
-	const boundary = Array.isArray(collisionBoundary) ? collisionBoundary : [collisionBoundary];
-	const hasExplicitBoundaries = boundary.length > 0;
-	const detectOverflowOptions = {
-		padding: collisionPadding,
-		boundary: boundary.filter(isNotNull),
-		altBoundary: hasExplicitBoundaries
-	};
-	const { refs, floatingStyles, placement, isPositioned, middlewareData } = useFloating({
-		strategy: "fixed",
-		placement: desiredPlacement,
-		whileElementsMounted: (...args) => {
-			return autoUpdate(...args, { animationFrame: updatePositionStrategy === "always" });
-		},
-		elements: { reference: context.anchor },
-		middleware: [
-			offset({
-				mainAxis: sideOffset + arrowHeight,
-				alignmentAxis: alignOffset
-			}),
-			avoidCollisions && shift({
-				mainAxis: true,
-				crossAxis: false,
-				limiter: sticky === "partial" ? limitShift() : void 0,
-				...detectOverflowOptions
-			}),
-			avoidCollisions && flip({ ...detectOverflowOptions }),
-			size({
-				...detectOverflowOptions,
-				apply: ({ elements, rects, availableWidth, availableHeight }) => {
-					const { width: anchorWidth, height: anchorHeight } = rects.reference;
-					const contentStyle = elements.floating.style;
-					contentStyle.setProperty("--radix-popper-available-width", `${availableWidth}px`);
-					contentStyle.setProperty("--radix-popper-available-height", `${availableHeight}px`);
-					contentStyle.setProperty("--radix-popper-anchor-width", `${anchorWidth}px`);
-					contentStyle.setProperty("--radix-popper-anchor-height", `${anchorHeight}px`);
-				}
-			}),
-			arrow$4 && arrow({
-				element: arrow$4,
-				padding: arrowPadding
-			}),
-			transformOrigin({
-				arrowWidth,
-				arrowHeight
-			}),
-			hideWhenDetached && hide({
-				strategy: "referenceHidden",
-				...detectOverflowOptions
-			})
-		]
-	});
-	const [placedSide, placedAlign] = getSideAndAlignFromPlacement(placement);
-	const handlePlaced = useCallbackRef(onPlaced);
-	useLayoutEffect2(() => {
-		if (isPositioned) handlePlaced?.();
-	}, [isPositioned, handlePlaced]);
-	const arrowX = middlewareData.arrow?.x;
-	const arrowY = middlewareData.arrow?.y;
-	const cannotCenterArrow = middlewareData.arrow?.centerOffset !== 0;
-	const [contentZIndex, setContentZIndex] = import_react.useState();
-	useLayoutEffect2(() => {
-		if (content) setContentZIndex(window.getComputedStyle(content).zIndex);
-	}, [content]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		ref: refs.setFloating,
-		"data-radix-popper-content-wrapper": "",
-		style: {
-			...floatingStyles,
-			transform: isPositioned ? floatingStyles.transform : "translate(0, -200%)",
-			minWidth: "max-content",
-			zIndex: contentZIndex,
-			["--radix-popper-transform-origin"]: [middlewareData.transformOrigin?.x, middlewareData.transformOrigin?.y].join(" "),
-			...middlewareData.hide?.referenceHidden && {
-				visibility: "hidden",
-				pointerEvents: "none"
-			}
-		},
-		dir: props.dir,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PopperContentProvider, {
-			scope: __scopePopper,
-			placedSide,
-			onArrowChange: setArrow,
-			arrowX,
-			arrowY,
-			shouldHideArrow: cannotCenterArrow,
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.div, {
-				"data-side": placedSide,
-				"data-align": placedAlign,
-				...contentProps,
-				ref: composedRefs,
-				style: {
-					...contentProps.style,
-					animation: !isPositioned ? "none" : void 0
-				}
-			})
-		})
-	});
-});
-PopperContent.displayName = CONTENT_NAME$1;
-var ARROW_NAME$1 = "PopperArrow";
-var OPPOSITE_SIDE = {
-	top: "bottom",
-	right: "left",
-	bottom: "top",
-	left: "right"
-};
-var PopperArrow = import_react.forwardRef(function PopperArrow2(props, forwardedRef) {
-	const { __scopePopper, ...arrowProps } = props;
-	const contentContext = useContentContext(ARROW_NAME$1, __scopePopper);
-	const baseSide = OPPOSITE_SIDE[contentContext.placedSide];
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-		ref: contentContext.onArrowChange,
-		style: {
-			position: "absolute",
-			left: contentContext.arrowX,
-			top: contentContext.arrowY,
-			[baseSide]: 0,
-			transformOrigin: {
-				top: "",
-				right: "0 0",
-				bottom: "center 0",
-				left: "100% 0"
-			}[contentContext.placedSide],
-			transform: {
-				top: "translateY(100%)",
-				right: "translateY(50%) rotate(90deg) translateX(-50%)",
-				bottom: `rotate(180deg)`,
-				left: "translateY(50%) rotate(-90deg) translateX(50%)"
-			}[contentContext.placedSide],
-			visibility: contentContext.shouldHideArrow ? "hidden" : void 0
-		},
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$1, {
-			...arrowProps,
-			ref: forwardedRef,
-			style: {
-				...arrowProps.style,
-				display: "block"
-			}
-		})
-	});
-});
-PopperArrow.displayName = ARROW_NAME$1;
-function isNotNull(value) {
-	return value !== null;
-}
-var transformOrigin = (options) => ({
-	name: "transformOrigin",
-	options,
-	fn(data) {
-		const { placement, rects, middlewareData } = data;
-		const isArrowHidden = middlewareData.arrow?.centerOffset !== 0;
-		const arrowWidth = isArrowHidden ? 0 : options.arrowWidth;
-		const arrowHeight = isArrowHidden ? 0 : options.arrowHeight;
-		const [placedSide, placedAlign] = getSideAndAlignFromPlacement(placement);
-		const noArrowAlign = {
-			start: "0%",
-			center: "50%",
-			end: "100%"
-		}[placedAlign];
-		const arrowXCenter = (middlewareData.arrow?.x ?? 0) + arrowWidth / 2;
-		const arrowYCenter = (middlewareData.arrow?.y ?? 0) + arrowHeight / 2;
-		let x = "";
-		let y = "";
-		if (placedSide === "bottom") {
-			x = isArrowHidden ? noArrowAlign : `${arrowXCenter}px`;
-			y = `${-arrowHeight}px`;
-		} else if (placedSide === "top") {
-			x = isArrowHidden ? noArrowAlign : `${arrowXCenter}px`;
-			y = `${rects.floating.height + arrowHeight}px`;
-		} else if (placedSide === "right") {
-			x = `${-arrowHeight}px`;
-			y = isArrowHidden ? noArrowAlign : `${arrowYCenter}px`;
-		} else if (placedSide === "left") {
-			x = `${rects.floating.width + arrowHeight}px`;
-			y = isArrowHidden ? noArrowAlign : `${arrowYCenter}px`;
-		}
-		return { data: {
-			x,
-			y
-		} };
-	}
-});
-function getSideAndAlignFromPlacement(placement) {
-	const [side, align = "center"] = placement.split("-");
-	return [side, align];
-}
-var Root2 = Popper;
-var Anchor = PopperAnchor;
-var Content = PopperContent;
-var Arrow = PopperArrow;
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-tooltip@1.2.8_@types+react-dom@19.2.3_@types+react@19.2.14__@types+reac_9074d9fb06315b089b2bee17c4c65951/node_modules/@radix-ui/react-tooltip/dist/index.mjs
-var [createTooltipContext, createTooltipScope] = createContextScope("Tooltip", [createPopperScope]);
-var usePopperScope = createPopperScope();
-var PROVIDER_NAME = "TooltipProvider";
-var DEFAULT_DELAY_DURATION = 700;
-var TOOLTIP_OPEN = "tooltip.open";
-var [TooltipProviderContextProvider, useTooltipProviderContext] = createTooltipContext(PROVIDER_NAME);
-var TooltipProvider$1 = (props) => {
-	const { __scopeTooltip, delayDuration = DEFAULT_DELAY_DURATION, skipDelayDuration = 300, disableHoverableContent = false, children } = props;
-	const isOpenDelayedRef = import_react.useRef(true);
-	const isPointerInTransitRef = import_react.useRef(false);
-	const skipDelayTimerRef = import_react.useRef(0);
-	import_react.useEffect(() => {
-		const skipDelayTimer = skipDelayTimerRef.current;
-		return () => window.clearTimeout(skipDelayTimer);
-	}, []);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipProviderContextProvider, {
-		scope: __scopeTooltip,
-		isOpenDelayedRef,
-		delayDuration,
-		onOpen: import_react.useCallback(() => {
-			window.clearTimeout(skipDelayTimerRef.current);
-			isOpenDelayedRef.current = false;
-		}, []),
-		onClose: import_react.useCallback(() => {
-			window.clearTimeout(skipDelayTimerRef.current);
-			skipDelayTimerRef.current = window.setTimeout(() => isOpenDelayedRef.current = true, skipDelayDuration);
-		}, [skipDelayDuration]),
-		isPointerInTransitRef,
-		onPointerInTransitChange: import_react.useCallback((inTransit) => {
-			isPointerInTransitRef.current = inTransit;
-		}, []),
-		disableHoverableContent,
-		children
-	});
-};
-TooltipProvider$1.displayName = PROVIDER_NAME;
-var TOOLTIP_NAME = "Tooltip";
-var [TooltipContextProvider, useTooltipContext] = createTooltipContext(TOOLTIP_NAME);
-var Tooltip$1 = (props) => {
-	const { __scopeTooltip, children, open: openProp, defaultOpen, onOpenChange, disableHoverableContent: disableHoverableContentProp, delayDuration: delayDurationProp } = props;
-	const providerContext = useTooltipProviderContext(TOOLTIP_NAME, props.__scopeTooltip);
-	const popperScope = usePopperScope(__scopeTooltip);
-	const [trigger, setTrigger] = import_react.useState(null);
-	const contentId = useId();
-	const openTimerRef = import_react.useRef(0);
-	const disableHoverableContent = disableHoverableContentProp ?? providerContext.disableHoverableContent;
-	const delayDuration = delayDurationProp ?? providerContext.delayDuration;
-	const wasOpenDelayedRef = import_react.useRef(false);
-	const [open, setOpen] = useControllableState({
-		prop: openProp,
-		defaultProp: defaultOpen ?? false,
-		onChange: (open2) => {
-			if (open2) {
-				providerContext.onOpen();
-				document.dispatchEvent(new CustomEvent(TOOLTIP_OPEN));
-			} else providerContext.onClose();
-			onOpenChange?.(open2);
-		},
-		caller: TOOLTIP_NAME
-	});
-	const stateAttribute = import_react.useMemo(() => {
-		return open ? wasOpenDelayedRef.current ? "delayed-open" : "instant-open" : "closed";
-	}, [open]);
-	const handleOpen = import_react.useCallback(() => {
-		window.clearTimeout(openTimerRef.current);
-		openTimerRef.current = 0;
-		wasOpenDelayedRef.current = false;
-		setOpen(true);
-	}, [setOpen]);
-	const handleClose = import_react.useCallback(() => {
-		window.clearTimeout(openTimerRef.current);
-		openTimerRef.current = 0;
-		setOpen(false);
-	}, [setOpen]);
-	const handleDelayedOpen = import_react.useCallback(() => {
-		window.clearTimeout(openTimerRef.current);
-		openTimerRef.current = window.setTimeout(() => {
-			wasOpenDelayedRef.current = true;
-			setOpen(true);
-			openTimerRef.current = 0;
-		}, delayDuration);
-	}, [delayDuration, setOpen]);
-	import_react.useEffect(() => {
-		return () => {
-			if (openTimerRef.current) {
-				window.clearTimeout(openTimerRef.current);
-				openTimerRef.current = 0;
-			}
-		};
-	}, []);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root2, {
-		...popperScope,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContextProvider, {
-			scope: __scopeTooltip,
-			contentId,
-			open,
-			stateAttribute,
-			trigger,
-			onTriggerChange: setTrigger,
-			onTriggerEnter: import_react.useCallback(() => {
-				if (providerContext.isOpenDelayedRef.current) handleDelayedOpen();
-				else handleOpen();
-			}, [
-				providerContext.isOpenDelayedRef,
-				handleDelayedOpen,
-				handleOpen
-			]),
-			onTriggerLeave: import_react.useCallback(() => {
-				if (disableHoverableContent) handleClose();
-				else {
-					window.clearTimeout(openTimerRef.current);
-					openTimerRef.current = 0;
-				}
-			}, [handleClose, disableHoverableContent]),
-			onOpen: handleOpen,
-			onClose: handleClose,
-			disableHoverableContent,
-			children
-		})
-	});
-};
-Tooltip$1.displayName = TOOLTIP_NAME;
-var TRIGGER_NAME = "TooltipTrigger";
-var TooltipTrigger$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeTooltip, ...triggerProps } = props;
-	const context = useTooltipContext(TRIGGER_NAME, __scopeTooltip);
-	const providerContext = useTooltipProviderContext(TRIGGER_NAME, __scopeTooltip);
-	const popperScope = usePopperScope(__scopeTooltip);
-	const composedRefs = useComposedRefs(forwardedRef, import_react.useRef(null), context.onTriggerChange);
-	const isPointerDownRef = import_react.useRef(false);
-	const hasPointerMoveOpenedRef = import_react.useRef(false);
-	const handlePointerUp = import_react.useCallback(() => isPointerDownRef.current = false, []);
-	import_react.useEffect(() => {
-		return () => document.removeEventListener("pointerup", handlePointerUp);
-	}, [handlePointerUp]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Anchor, {
-		asChild: true,
-		...popperScope,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive$1.button, {
-			"aria-describedby": context.open ? context.contentId : void 0,
-			"data-state": context.stateAttribute,
-			...triggerProps,
-			ref: composedRefs,
-			onPointerMove: composeEventHandlers(props.onPointerMove, (event) => {
-				if (event.pointerType === "touch") return;
-				if (!hasPointerMoveOpenedRef.current && !providerContext.isPointerInTransitRef.current) {
-					context.onTriggerEnter();
-					hasPointerMoveOpenedRef.current = true;
-				}
-			}),
-			onPointerLeave: composeEventHandlers(props.onPointerLeave, () => {
-				context.onTriggerLeave();
-				hasPointerMoveOpenedRef.current = false;
-			}),
-			onPointerDown: composeEventHandlers(props.onPointerDown, () => {
-				if (context.open) context.onClose();
-				isPointerDownRef.current = true;
-				document.addEventListener("pointerup", handlePointerUp, { once: true });
-			}),
-			onFocus: composeEventHandlers(props.onFocus, () => {
-				if (!isPointerDownRef.current) context.onOpen();
-			}),
-			onBlur: composeEventHandlers(props.onBlur, context.onClose),
-			onClick: composeEventHandlers(props.onClick, context.onClose)
-		})
-	});
-});
-TooltipTrigger$1.displayName = TRIGGER_NAME;
-var PORTAL_NAME = "TooltipPortal";
-var [PortalProvider, usePortalContext] = createTooltipContext(PORTAL_NAME, { forceMount: void 0 });
-var TooltipPortal = (props) => {
-	const { __scopeTooltip, forceMount, children, container } = props;
-	const context = useTooltipContext(PORTAL_NAME, __scopeTooltip);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PortalProvider, {
-		scope: __scopeTooltip,
-		forceMount,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Presence, {
-			present: forceMount || context.open,
-			children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Portal, {
-				asChild: true,
-				container,
-				children
-			})
-		})
-	});
-};
-TooltipPortal.displayName = PORTAL_NAME;
-var CONTENT_NAME = "TooltipContent";
-var TooltipContent$1 = import_react.forwardRef((props, forwardedRef) => {
-	const portalContext = usePortalContext(CONTENT_NAME, props.__scopeTooltip);
-	const { forceMount = portalContext.forceMount, side = "top", ...contentProps } = props;
-	const context = useTooltipContext(CONTENT_NAME, props.__scopeTooltip);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Presence, {
-		present: forceMount || context.open,
-		children: context.disableHoverableContent ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContentImpl, {
-			side,
-			...contentProps,
-			ref: forwardedRef
-		}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContentHoverable, {
-			side,
-			...contentProps,
-			ref: forwardedRef
-		})
-	});
-});
-var TooltipContentHoverable = import_react.forwardRef((props, forwardedRef) => {
-	const context = useTooltipContext(CONTENT_NAME, props.__scopeTooltip);
-	const providerContext = useTooltipProviderContext(CONTENT_NAME, props.__scopeTooltip);
-	const ref = import_react.useRef(null);
-	const composedRefs = useComposedRefs(forwardedRef, ref);
-	const [pointerGraceArea, setPointerGraceArea] = import_react.useState(null);
-	const { trigger, onClose } = context;
-	const content = ref.current;
-	const { onPointerInTransitChange } = providerContext;
-	const handleRemoveGraceArea = import_react.useCallback(() => {
-		setPointerGraceArea(null);
-		onPointerInTransitChange(false);
-	}, [onPointerInTransitChange]);
-	const handleCreateGraceArea = import_react.useCallback((event, hoverTarget) => {
-		const currentTarget = event.currentTarget;
-		const exitPoint = {
-			x: event.clientX,
-			y: event.clientY
-		};
-		const paddedExitPoints = getPaddedExitPoints(exitPoint, getExitSideFromRect(exitPoint, currentTarget.getBoundingClientRect()));
-		const hoverTargetPoints = getPointsFromRect(hoverTarget.getBoundingClientRect());
-		setPointerGraceArea(getHull([...paddedExitPoints, ...hoverTargetPoints]));
-		onPointerInTransitChange(true);
-	}, [onPointerInTransitChange]);
-	import_react.useEffect(() => {
-		return () => handleRemoveGraceArea();
-	}, [handleRemoveGraceArea]);
-	import_react.useEffect(() => {
-		if (trigger && content) {
-			const handleTriggerLeave = (event) => handleCreateGraceArea(event, content);
-			const handleContentLeave = (event) => handleCreateGraceArea(event, trigger);
-			trigger.addEventListener("pointerleave", handleTriggerLeave);
-			content.addEventListener("pointerleave", handleContentLeave);
-			return () => {
-				trigger.removeEventListener("pointerleave", handleTriggerLeave);
-				content.removeEventListener("pointerleave", handleContentLeave);
-			};
-		}
-	}, [
-		trigger,
-		content,
-		handleCreateGraceArea,
-		handleRemoveGraceArea
-	]);
-	import_react.useEffect(() => {
-		if (pointerGraceArea) {
-			const handleTrackPointerGrace = (event) => {
-				const target = event.target;
-				const pointerPosition = {
-					x: event.clientX,
-					y: event.clientY
-				};
-				const hasEnteredTarget = trigger?.contains(target) || content?.contains(target);
-				const isPointerOutsideGraceArea = !isPointInPolygon(pointerPosition, pointerGraceArea);
-				if (hasEnteredTarget) handleRemoveGraceArea();
-				else if (isPointerOutsideGraceArea) {
-					handleRemoveGraceArea();
-					onClose();
-				}
-			};
-			document.addEventListener("pointermove", handleTrackPointerGrace);
-			return () => document.removeEventListener("pointermove", handleTrackPointerGrace);
-		}
-	}, [
-		trigger,
-		content,
-		pointerGraceArea,
-		onClose,
-		handleRemoveGraceArea
-	]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TooltipContentImpl, {
-		...props,
-		ref: composedRefs
-	});
-});
-var [VisuallyHiddenContentContextProvider, useVisuallyHiddenContentContext] = createTooltipContext(TOOLTIP_NAME, { isInside: false });
-var Slottable = /* @__PURE__ */ createSlottable("TooltipContent");
-var TooltipContentImpl = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeTooltip, children, "aria-label": ariaLabel, onEscapeKeyDown, onPointerDownOutside, ...contentProps } = props;
-	const context = useTooltipContext(CONTENT_NAME, __scopeTooltip);
-	const popperScope = usePopperScope(__scopeTooltip);
-	const { onClose } = context;
-	import_react.useEffect(() => {
-		document.addEventListener(TOOLTIP_OPEN, onClose);
-		return () => document.removeEventListener(TOOLTIP_OPEN, onClose);
-	}, [onClose]);
-	import_react.useEffect(() => {
-		if (context.trigger) {
-			const handleScroll = (event) => {
-				if (event.target?.contains(context.trigger)) onClose();
-			};
-			window.addEventListener("scroll", handleScroll, { capture: true });
-			return () => window.removeEventListener("scroll", handleScroll, { capture: true });
-		}
-	}, [context.trigger, onClose]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DismissableLayer, {
-		asChild: true,
-		disableOutsidePointerEvents: false,
-		onEscapeKeyDown,
-		onPointerDownOutside,
-		onFocusOutside: (event) => event.preventDefault(),
-		onDismiss: onClose,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Content, {
-			"data-state": context.stateAttribute,
-			...popperScope,
-			...contentProps,
-			ref: forwardedRef,
-			style: {
-				...contentProps.style,
-				"--radix-tooltip-content-transform-origin": "var(--radix-popper-transform-origin)",
-				"--radix-tooltip-content-available-width": "var(--radix-popper-available-width)",
-				"--radix-tooltip-content-available-height": "var(--radix-popper-available-height)",
-				"--radix-tooltip-trigger-width": "var(--radix-popper-anchor-width)",
-				"--radix-tooltip-trigger-height": "var(--radix-popper-anchor-height)"
-			},
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Slottable, { children }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(VisuallyHiddenContentContextProvider, {
-				scope: __scopeTooltip,
-				isInside: true,
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Root$2, {
-					id: context.contentId,
-					role: "tooltip",
-					children: ariaLabel || children
-				})
-			})]
-		})
-	});
-});
-TooltipContent$1.displayName = CONTENT_NAME;
-var ARROW_NAME = "TooltipArrow";
-var TooltipArrow = import_react.forwardRef((props, forwardedRef) => {
-	const { __scopeTooltip, ...arrowProps } = props;
-	const popperScope = usePopperScope(__scopeTooltip);
-	return useVisuallyHiddenContentContext(ARROW_NAME, __scopeTooltip).isInside ? null : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Arrow, {
-		...popperScope,
-		...arrowProps,
-		ref: forwardedRef
-	});
-});
-TooltipArrow.displayName = ARROW_NAME;
-function getExitSideFromRect(point, rect) {
-	const top = Math.abs(rect.top - point.y);
-	const bottom = Math.abs(rect.bottom - point.y);
-	const right = Math.abs(rect.right - point.x);
-	const left = Math.abs(rect.left - point.x);
-	switch (Math.min(top, bottom, right, left)) {
-		case left: return "left";
-		case right: return "right";
-		case top: return "top";
-		case bottom: return "bottom";
-		default: throw new Error("unreachable");
-	}
-}
-function getPaddedExitPoints(exitPoint, exitSide, padding = 5) {
-	const paddedExitPoints = [];
-	switch (exitSide) {
-		case "top":
-			paddedExitPoints.push({
-				x: exitPoint.x - padding,
-				y: exitPoint.y + padding
-			}, {
-				x: exitPoint.x + padding,
-				y: exitPoint.y + padding
-			});
-			break;
-		case "bottom":
-			paddedExitPoints.push({
-				x: exitPoint.x - padding,
-				y: exitPoint.y - padding
-			}, {
-				x: exitPoint.x + padding,
-				y: exitPoint.y - padding
-			});
-			break;
-		case "left":
-			paddedExitPoints.push({
-				x: exitPoint.x + padding,
-				y: exitPoint.y - padding
-			}, {
-				x: exitPoint.x + padding,
-				y: exitPoint.y + padding
-			});
-			break;
-		case "right":
-			paddedExitPoints.push({
-				x: exitPoint.x - padding,
-				y: exitPoint.y - padding
-			}, {
-				x: exitPoint.x - padding,
-				y: exitPoint.y + padding
-			});
-			break;
-	}
-	return paddedExitPoints;
-}
-function getPointsFromRect(rect) {
-	const { top, right, bottom, left } = rect;
-	return [
-		{
-			x: left,
-			y: top
-		},
-		{
-			x: right,
-			y: top
-		},
-		{
-			x: right,
-			y: bottom
-		},
-		{
-			x: left,
-			y: bottom
-		}
-	];
-}
-function isPointInPolygon(point, polygon) {
-	const { x, y } = point;
-	let inside = false;
-	for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-		const ii = polygon[i];
-		const jj = polygon[j];
-		const xi = ii.x;
-		const yi = ii.y;
-		const xj = jj.x;
-		const yj = jj.y;
-		if (yi > y !== yj > y && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
-	}
-	return inside;
-}
-function getHull(points) {
-	const newPoints = points.slice();
-	newPoints.sort((a, b) => {
-		if (a.x < b.x) return -1;
-		else if (a.x > b.x) return 1;
-		else if (a.y < b.y) return -1;
-		else if (a.y > b.y) return 1;
-		else return 0;
-	});
-	return getHullPresorted(newPoints);
-}
-function getHullPresorted(points) {
-	if (points.length <= 1) return points.slice();
-	const upperHull = [];
-	for (let i = 0; i < points.length; i++) {
-		const p = points[i];
-		while (upperHull.length >= 2) {
-			const q = upperHull[upperHull.length - 1];
-			const r = upperHull[upperHull.length - 2];
-			if ((q.x - r.x) * (p.y - r.y) >= (q.y - r.y) * (p.x - r.x)) upperHull.pop();
-			else break;
-		}
-		upperHull.push(p);
-	}
-	upperHull.pop();
-	const lowerHull = [];
-	for (let i = points.length - 1; i >= 0; i--) {
-		const p = points[i];
-		while (lowerHull.length >= 2) {
-			const q = lowerHull[lowerHull.length - 1];
-			const r = lowerHull[lowerHull.length - 2];
-			if ((q.x - r.x) * (p.y - r.y) >= (q.y - r.y) * (p.x - r.x)) lowerHull.pop();
-			else break;
-		}
-		lowerHull.push(p);
-	}
-	lowerHull.pop();
-	if (upperHull.length === 1 && lowerHull.length === 1 && upperHull[0].x === lowerHull[0].x && upperHull[0].y === lowerHull[0].y) return upperHull;
-	else return upperHull.concat(lowerHull);
-}
-var Provider = TooltipProvider$1;
-var Content2 = TooltipContent$1;
-//#endregion
-//#region src/components/ui/tooltip.tsx
-var TooltipProvider = Provider;
-var TooltipContent = import_react.forwardRef(({ className, sideOffset = 4, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Content2, {
-	"data-uid": "src/components/ui/tooltip.tsx:17:3",
-	"data-prohibitions": "[editContent]",
-	ref,
-	sideOffset,
-	className: cn$1("z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-[--radix-tooltip-content-transform-origin]", className),
-	...props
-}));
-TooltipContent.displayName = Content2.displayName;
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-slot@1.2.4_@types+react@19.2.14_react@19.2.4/node_modules/@radix-ui/react-slot/dist/index.mjs
-var REACT_LAZY_TYPE = Symbol.for("react.lazy");
-var use = import_react[" use ".trim().toString()];
-function isPromiseLike(value) {
-	return typeof value === "object" && value !== null && "then" in value;
-}
-function isLazyComponent(element) {
-	return element != null && typeof element === "object" && "$$typeof" in element && element.$$typeof === REACT_LAZY_TYPE && "_payload" in element && isPromiseLike(element._payload);
-}
-/* @__NO_SIDE_EFFECTS__ */
-function createSlot(ownerName) {
-	const SlotClone = /* @__PURE__ */ createSlotClone(ownerName);
-	const Slot2 = import_react.forwardRef((props, forwardedRef) => {
-		let { children, ...slotProps } = props;
-		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
-		const childrenArray = import_react.Children.toArray(children);
-		const slottable = childrenArray.find(isSlottable);
-		if (slottable) {
-			const newElement = slottable.props.children;
-			const newChildren = childrenArray.map((child) => {
-				if (child === slottable) {
-					if (import_react.Children.count(newElement) > 1) return import_react.Children.only(null);
-					return import_react.isValidElement(newElement) ? newElement.props.children : null;
-				} else return child;
-			});
-			return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
-				...slotProps,
-				ref: forwardedRef,
-				children: import_react.isValidElement(newElement) ? import_react.cloneElement(newElement, void 0, newChildren) : null
-			});
-		}
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SlotClone, {
-			...slotProps,
-			ref: forwardedRef,
-			children
-		});
-	});
-	Slot2.displayName = `${ownerName}.Slot`;
-	return Slot2;
-}
-var Slot = /* @__PURE__ */ createSlot("Slot");
-/* @__NO_SIDE_EFFECTS__ */
-function createSlotClone(ownerName) {
-	const SlotClone = import_react.forwardRef((props, forwardedRef) => {
-		let { children, ...slotProps } = props;
-		if (isLazyComponent(children) && typeof use === "function") children = use(children._payload);
-		if (import_react.isValidElement(children)) {
-			const childrenRef = getElementRef(children);
-			const props2 = mergeProps(slotProps, children.props);
-			if (children.type !== import_react.Fragment) props2.ref = forwardedRef ? composeRefs(forwardedRef, childrenRef) : childrenRef;
-			return import_react.cloneElement(children, props2);
-		}
-		return import_react.Children.count(children) > 1 ? import_react.Children.only(null) : null;
-	});
-	SlotClone.displayName = `${ownerName}.SlotClone`;
-	return SlotClone;
-}
-var SLOTTABLE_IDENTIFIER = Symbol("radix.slottable");
-function isSlottable(child) {
-	return import_react.isValidElement(child) && typeof child.type === "function" && "__radixId" in child.type && child.type.__radixId === SLOTTABLE_IDENTIFIER;
-}
-function mergeProps(slotProps, childProps) {
-	const overrideProps = { ...childProps };
-	for (const propName in childProps) {
-		const slotPropValue = slotProps[propName];
-		const childPropValue = childProps[propName];
-		if (/^on[A-Z]/.test(propName)) {
-			if (slotPropValue && childPropValue) overrideProps[propName] = (...args) => {
-				const result = childPropValue(...args);
-				slotPropValue(...args);
-				return result;
-			};
-			else if (slotPropValue) overrideProps[propName] = slotPropValue;
-		} else if (propName === "style") overrideProps[propName] = {
-			...slotPropValue,
-			...childPropValue
-		};
-		else if (propName === "className") overrideProps[propName] = [slotPropValue, childPropValue].filter(Boolean).join(" ");
-	}
-	return {
-		...slotProps,
-		...overrideProps
-	};
-}
-function getElementRef(element) {
-	let getter = Object.getOwnPropertyDescriptor(element.props, "ref")?.get;
-	let mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
-	if (mayWarn) return element.ref;
-	getter = Object.getOwnPropertyDescriptor(element, "ref")?.get;
-	mayWarn = getter && "isReactWarning" in getter && getter.isReactWarning;
-	if (mayWarn) return element.props.ref;
-	return element.props.ref || element.ref;
-}
-//#endregion
-//#region src/components/ui/button.tsx
-var buttonVariants = cva("inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0", {
-	variants: {
-		variant: {
-			default: "bg-primary text-primary-foreground hover:bg-primary/90",
-			destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-			outline: "border border-input bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground",
-			secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-			ghost: "text-foreground hover:bg-accent hover:text-accent-foreground",
-			link: "text-foreground underline-offset-4 hover:underline"
-		},
-		size: {
-			default: "h-10 px-4 py-2",
-			sm: "h-9 rounded-md px-3",
-			lg: "h-11 rounded-md px-8",
-			icon: "h-10 w-10"
-		}
-	},
-	defaultVariants: {
-		variant: "default",
-		size: "default"
-	}
-});
-var Button = import_react.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(asChild ? Slot : "button", {
-		"data-uid": "src/components/ui/button.tsx:44:7",
-		"data-prohibitions": "[editContent]",
-		className: cn$1(buttonVariants({
-			variant,
-			size,
-			className
-		})),
-		ref,
-		...props
-	});
-});
-Button.displayName = "Button";
-//#endregion
-//#region src/lib/tracking.ts
-function openWhatsApp() {
-	if (typeof window !== "undefined") {
-		if (window.gtag) window.gtag("event", "conversion", { send_to: "AW-123456789/WhatsAppContact" });
-		console.log("Tracked conversion to Google Ads");
-		window.open("https://wa.me/5511999999999?text=Ol%C3%A1%21%20Gostaria%20de%20solicitar%20informa%C3%A7%C3%B5es%20sobre%20a%20Casa%20Vita%20Repouso.", "_blank", "noopener,noreferrer");
-	}
-}
-//#endregion
-//#region src/components/sections/Hero.tsx
-function Hero() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/Hero.tsx:7:5",
-		"data-prohibitions": "[]",
-		id: "home",
-		className: "relative overflow-hidden bg-secondary/40 pt-16 md:pt-24 pb-32",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/Hero.tsx:8:7",
-			"data-prohibitions": "[]",
-			className: "container mx-auto px-4 flex flex-col lg:flex-row items-center gap-12 lg:gap-20",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/Hero.tsx:9:9",
-				"data-prohibitions": "[]",
-				className: "flex-1 space-y-8 text-center lg:text-left z-10 animate-fade-in-up",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/sections/Hero.tsx:10:11",
-						"data-prohibitions": "[]",
-						className: "inline-flex items-center gap-2 bg-primary/10 text-primary px-5 py-2.5 rounded-full font-semibold text-sm mb-2 shadow-sm",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(HeartPulse, {
-							"data-uid": "src/components/sections/Hero.tsx:11:13",
-							"data-prohibitions": "[editContent]",
-							className: "h-4 w-4"
-						}), "Cuidado humanizado e especializado"]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h1", {
-						"data-uid": "src/components/sections/Hero.tsx:14:11",
-						"data-prohibitions": "[]",
-						className: "text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.15]",
-						children: [
-							"O conforto do lar com a",
-							" ",
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
-								"data-uid": "src/components/sections/Hero.tsx:16:13",
-								"data-prohibitions": "[]",
-								className: "text-primary relative inline-block",
-								children: ["segurança", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", {
-									"data-uid": "src/components/sections/Hero.tsx:18:15",
-									"data-prohibitions": "[]",
-									className: "absolute w-full h-3 -bottom-1 left-0 text-primary/30",
-									viewBox: "0 0 100 10",
-									preserveAspectRatio: "none",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", {
-										"data-uid": "src/components/sections/Hero.tsx:23:17",
-										"data-prohibitions": "[editContent]",
-										d: "M0 5 Q 50 10 100 5",
-										stroke: "currentColor",
-										strokeWidth: "4",
-										fill: "transparent"
-									})
-								})]
-							}),
-							" ",
-							"que eles merecem."
-						]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-						"data-uid": "src/components/sections/Hero.tsx:33:11",
-						"data-prohibitions": "[]",
-						className: "text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto lg:mx-0 leading-relaxed",
-						children: "A Casa Vita oferece um ambiente alegre, acolhedor e com profissionais dedicados 24 horas por dia para garantir a qualidade de vida e o bem-estar do seu familiar."
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/sections/Hero.tsx:37:11",
-						"data-prohibitions": "[]",
-						className: "flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start pt-4",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-							"data-uid": "src/components/sections/Hero.tsx:38:13",
-							"data-prohibitions": "[]",
-							size: "lg",
-							className: "rounded-full w-full sm:w-auto text-base h-14 px-8 bg-[#25D366] hover:bg-[#20bd5a] text-white shadow-lg",
-							onClick: openWhatsApp,
-							children: ["Solicitar Informações ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, {
-								"data-uid": "src/components/sections/Hero.tsx:43:37",
-								"data-prohibitions": "[editContent]",
-								className: "ml-2 h-5 w-5"
-							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-							"data-uid": "src/components/sections/Hero.tsx:45:13",
-							"data-prohibitions": "[]",
-							size: "lg",
-							variant: "outline",
-							className: "rounded-full w-full sm:w-auto text-base h-14 px-8 bg-white border-2 hover:bg-muted",
-							asChild: true,
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-								"data-uid": "src/components/sections/Hero.tsx:51:15",
-								"data-prohibitions": "[]",
-								href: "#about",
-								children: "Conheça nossa estrutura"
-							})
-						})]
-					})
-				]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/Hero.tsx:56:9",
-				"data-prohibitions": "[]",
-				className: "flex-1 w-full max-w-xl lg:max-w-none relative animate-fade-in",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-						"data-uid": "src/components/sections/Hero.tsx:57:11",
-						"data-prohibitions": "[editContent]",
-						className: "absolute inset-0 bg-gradient-to-tr from-primary/30 to-transparent rounded-[2.5rem] transform rotate-3 scale-105"
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-						"data-uid": "src/components/sections/Hero.tsx:58:11",
-						"data-prohibitions": "[editContent]",
-						src: "https://img.usecurling.com/p/800/800?q=happy%20elderly%20caregiver&dpr=2",
-						alt: "Profissional cuidando de idosa feliz",
-						className: "rounded-[2.5rem] shadow-elevation relative z-10 object-cover w-full aspect-square md:aspect-[4/3] lg:aspect-square"
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/sections/Hero.tsx:64:11",
-						"data-prohibitions": "[]",
-						className: "absolute -bottom-6 -left-6 z-20 bg-white p-6 rounded-3xl shadow-elevation flex items-center gap-5 animate-float",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-							"data-uid": "src/components/sections/Hero.tsx:65:13",
-							"data-prohibitions": "[]",
-							className: "bg-primary/10 p-4 rounded-2xl",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("svg", {
-								"data-uid": "src/components/sections/Hero.tsx:66:15",
-								"data-prohibitions": "[]",
-								className: "w-8 h-8 text-primary",
-								fill: "none",
-								viewBox: "0 0 24 24",
-								stroke: "currentColor",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("path", {
-									"data-uid": "src/components/sections/Hero.tsx:72:17",
-									"data-prohibitions": "[editContent]",
-									strokeLinecap: "round",
-									strokeLinejoin: "round",
-									strokeWidth: 2.5,
-									d: "M5 13l4 4L19 7"
-								})
-							})
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							"data-uid": "src/components/sections/Hero.tsx:80:13",
-							"data-prohibitions": "[]",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-								"data-uid": "src/components/sections/Hero.tsx:81:15",
-								"data-prohibitions": "[]",
-								className: "font-bold text-foreground text-lg",
-								children: "Assistência 24h"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-								"data-uid": "src/components/sections/Hero.tsx:82:15",
-								"data-prohibitions": "[]",
-								className: "text-muted-foreground",
-								children: "Equipe multiprofissional"
-							})]
-						})]
-					})
-				]
-			})]
-		})
-	});
-}
-//#endregion
-//#region src/components/sections/About.tsx
-function About() {
-	const benefits = [
-		"Ambiente totalmente adaptado e seguro",
-		"Alimentação balanceada por nutricionistas",
-		"Atividades cognitivas e recreativas diárias",
-		"Acompanhamento médico contínuo"
-	];
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/About.tsx:12:5",
-		"data-prohibitions": "[editContent]",
-		id: "about",
-		className: "container mx-auto px-4 scroll-mt-32",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/About.tsx:13:7",
-			"data-prohibitions": "[editContent]",
-			className: "grid lg:grid-cols-2 gap-16 items-center",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/About.tsx:14:9",
-				"data-prohibitions": "[]",
-				className: "order-2 lg:order-1 relative",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					"data-uid": "src/components/sections/About.tsx:15:11",
-					"data-prohibitions": "[editContent]",
-					className: "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-secondary/50 rounded-full -z-10 blur-3xl"
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/sections/About.tsx:16:11",
-					"data-prohibitions": "[]",
-					className: "grid grid-cols-2 gap-4 md:gap-6",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-						"data-uid": "src/components/sections/About.tsx:17:13",
-						"data-prohibitions": "[editContent]",
-						src: "https://img.usecurling.com/p/400/500?q=beautiful%20nursing%20home%20garden&dpr=2",
-						alt: "Jardim da casa de repouso",
-						className: "rounded-[2rem] w-full h-full object-cover shadow-lg translate-y-8 md:translate-y-12"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-						"data-uid": "src/components/sections/About.tsx:22:13",
-						"data-prohibitions": "[editContent]",
-						src: "https://img.usecurling.com/p/400/500?q=elderly%20having%20tea&dpr=2",
-						alt: "Idosos socializando",
-						className: "rounded-[2rem] w-full h-full object-cover shadow-lg"
-					})]
-				})]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/About.tsx:30:9",
-				"data-prohibitions": "[editContent]",
-				className: "order-1 lg:order-2 space-y-8",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-						"data-uid": "src/components/sections/About.tsx:31:11",
-						"data-prohibitions": "[]",
-						className: "space-y-4",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h2", {
-							"data-uid": "src/components/sections/About.tsx:32:13",
-							"data-prohibitions": "[]",
-							className: "text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight",
-							children: [
-								"Muito mais que uma casa de repouso,",
-								" ",
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									"data-uid": "src/components/sections/About.tsx:34:15",
-									"data-prohibitions": "[]",
-									className: "text-primary",
-									children: "uma verdadeira família."
-								})
-							]
-						})
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						"data-uid": "src/components/sections/About.tsx:37:11",
-						"data-prohibitions": "[]",
-						className: "space-y-4 text-lg text-muted-foreground leading-relaxed",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							"data-uid": "src/components/sections/About.tsx:38:13",
-							"data-prohibitions": "[]",
-							children: "A Casa Vita nasceu com a missão de transformar o conceito de hospedagem para idosos. Acreditamos que esta fase da vida deve ser vivida com alegria, dignidade e muito carinho."
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							"data-uid": "src/components/sections/About.tsx:43:13",
-							"data-prohibitions": "[]",
-							children: "Nossa estrutura foi cuidadosamente planejada para oferecer segurança total sem perder o aconchego de um lar, estimulando a convivência e a qualidade de vida dos nossos residentes diariamente."
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("ul", {
-						"data-uid": "src/components/sections/About.tsx:50:11",
-						"data-prohibitions": "[editContent]",
-						className: "space-y-5 pt-2",
-						children: benefits.map((benefit, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
-							"data-uid": "src/components/sections/About.tsx:52:15",
-							"data-prohibitions": "[editContent]",
-							className: "flex items-center gap-4 bg-secondary/30 p-4 rounded-2xl",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheckBig, {
-								"data-uid": "src/components/sections/About.tsx:53:17",
-								"data-prohibitions": "[editContent]",
-								className: "h-7 w-7 text-primary shrink-0"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								"data-uid": "src/components/sections/About.tsx:54:17",
-								"data-prohibitions": "[editContent]",
-								className: "text-foreground font-medium text-lg",
-								children: benefit
-							})]
-						}, i))
-					})
-				]
-			})]
-		})
-	});
-}
-//#endregion
-//#region src/components/ui/card.tsx
-var Card = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	"data-uid": "src/components/ui/card.tsx:8:5",
-	"data-prohibitions": "[editContent]",
-	ref,
-	className: cn$1("rounded-lg border bg-card text-card-foreground shadow-sm", className),
-	...props
-}));
-Card.displayName = "Card";
-var CardHeader = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	"data-uid": "src/components/ui/card.tsx:19:5",
-	"data-prohibitions": "[editContent]",
-	ref,
-	className: cn$1("flex flex-col space-y-1.5 p-6", className),
-	...props
-}));
-CardHeader.displayName = "CardHeader";
-var CardTitle = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	"data-uid": "src/components/ui/card.tsx:26:5",
-	"data-prohibitions": "[editContent]",
-	ref,
-	className: cn$1("text-2xl font-semibold leading-none tracking-tight", className),
-	...props
-}));
-CardTitle.displayName = "CardTitle";
-var CardDescription = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	"data-uid": "src/components/ui/card.tsx:37:5",
-	"data-prohibitions": "[editContent]",
-	ref,
-	className: cn$1("text-sm text-muted-foreground", className),
-	...props
-}));
-CardDescription.displayName = "CardDescription";
-var CardContent = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	"data-uid": "src/components/ui/card.tsx:44:5",
-	"data-prohibitions": "[editContent]",
-	ref,
-	className: cn$1("p-6 pt-0", className),
-	...props
-}));
-CardContent.displayName = "CardContent";
-var CardFooter = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-	"data-uid": "src/components/ui/card.tsx:51:5",
-	"data-prohibitions": "[editContent]",
-	ref,
-	className: cn$1("flex items-center p-6 pt-0", className),
-	...props
-}));
-CardFooter.displayName = "CardFooter";
-//#endregion
-//#region src/components/sections/Services.tsx
-function Services() {
-	const services = [
-		{
-			title: "Enfermagem 24h",
-			description: "Equipe de enfermagem presente 24 horas por dia para garantir cuidados contínuos e administração correta de medicamentos.",
-			icon: Heart
-		},
-		{
-			title: "Acompanhamento Médico",
-			description: "Visitas médicas regulares para avaliação da saúde e atualização dos planos de cuidado de cada residente.",
-			icon: Stethoscope
-		},
-		{
-			title: "Nutrição Especializada",
-			description: "Cardápios desenvolvidos por nutricionistas, respeitando as restrições e necessidades individuais de alimentação.",
-			icon: Coffee
-		},
-		{
-			title: "Fisioterapia",
-			description: "Sessões de fisioterapia preventiva e de reabilitação para manter a mobilidade, equilíbrio e autonomia.",
-			icon: Activity
-		},
-		{
-			title: "Terapia Ocupacional",
-			description: "Atividades que estimulam a cognição, coordenação motora fina e o bem-estar psicológico contínuo.",
-			icon: Sparkles
-		},
-		{
-			title: "Lazer e Socialização",
-			description: "Eventos diários, comemorações e espaços de convivência que promovem a interação social e a alegria coletiva.",
-			icon: Users
-		}
-	];
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/Services.tsx:45:5",
-		"data-prohibitions": "[editContent]",
-		id: "services",
-		className: "bg-secondary/30 py-24 scroll-mt-20",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/Services.tsx:46:7",
-			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/Services.tsx:47:9",
-				"data-prohibitions": "[]",
-				className: "text-center max-w-3xl mx-auto mb-16 space-y-6",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-					"data-uid": "src/components/sections/Services.tsx:48:11",
-					"data-prohibitions": "[]",
-					className: "text-3xl md:text-4xl lg:text-5xl font-bold",
-					children: "Cuidado integral e multidisciplinar"
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					"data-uid": "src/components/sections/Services.tsx:51:11",
-					"data-prohibitions": "[]",
-					className: "text-lg text-muted-foreground",
-					children: "Oferecemos uma gama completa de serviços de saúde e bem-estar para garantir que cada residente tenha a atenção exata que precisa."
-				})]
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				"data-uid": "src/components/sections/Services.tsx:57:9",
-				"data-prohibitions": "[editContent]",
-				className: "grid md:grid-cols-2 lg:grid-cols-3 gap-8",
-				children: services.map((service, index) => {
-					const Icon = service.icon;
-					return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Card, {
-						"data-uid": "src/components/sections/Services.tsx:61:15",
-						"data-prohibitions": "[editContent]",
-						className: "border-none shadow-sm hover:shadow-elevation transition-all duration-300 group bg-white rounded-3xl overflow-hidden",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(CardHeader, {
-							"data-uid": "src/components/sections/Services.tsx:65:17",
-							"data-prohibitions": "[editContent]",
-							className: "p-8 pb-4",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								"data-uid": "src/components/sections/Services.tsx:66:19",
-								"data-prohibitions": "[]",
-								className: "h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:bg-primary group-hover:scale-110 transition-all duration-300",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Icon, {
-									"data-uid": "src/components/sections/Services.tsx:67:21",
-									"data-prohibitions": "[editContent]",
-									className: "h-8 w-8 text-primary group-hover:text-white transition-colors"
-								})
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardTitle, {
-								"data-uid": "src/components/sections/Services.tsx:69:19",
-								"data-prohibitions": "[editContent]",
-								className: "text-2xl",
-								children: service.title
-							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardContent, {
-							"data-uid": "src/components/sections/Services.tsx:71:17",
-							"data-prohibitions": "[editContent]",
-							className: "p-8 pt-0",
-							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CardDescription, {
-								"data-uid": "src/components/sections/Services.tsx:72:19",
-								"data-prohibitions": "[editContent]",
-								className: "text-base text-muted-foreground/90 leading-relaxed",
-								children: service.description
-							})
-						})]
-					}, index);
-				})
-			})]
-		})
-	});
-}
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-primitive@2.1.4_@types+react-dom@19.2.3_@types+react@19.2.14__@types+re_0243fb2db8a1fb85ca77b8d9e5c2d650/node_modules/@radix-ui/react-primitive/dist/index.mjs
-var Primitive = [
-	"a",
-	"button",
-	"div",
-	"form",
-	"h2",
-	"h3",
-	"img",
-	"input",
-	"label",
-	"li",
-	"nav",
-	"ol",
-	"p",
-	"select",
-	"span",
-	"svg",
-	"ul"
-].reduce((primitive, node) => {
-	const Slot = /* @__PURE__ */ createSlot(`Primitive.${node}`);
-	const Node = import_react.forwardRef((props, forwardedRef) => {
-		const { asChild, ...primitiveProps } = props;
-		const Comp = asChild ? Slot : node;
-		if (typeof window !== "undefined") window[Symbol.for("radix-ui")] = true;
-		return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Comp, {
-			...primitiveProps,
-			ref: forwardedRef
-		});
-	});
-	Node.displayName = `Primitive.${node}`;
-	return {
-		...primitive,
-		[node]: Node
-	};
-}, {});
-//#endregion
-//#region ../../cache/modules/casa-vita-repouso-5c06b/node_modules/.pnpm/@radix-ui+react-aspect-ratio@1.1.8_@types+react-dom@19.2.3_@types+react@19.2.14__@types_93c53edbfaac53d9d2b10dc74f6122b5/node_modules/@radix-ui/react-aspect-ratio/dist/index.mjs
-var NAME = "AspectRatio";
-var AspectRatio$1 = import_react.forwardRef((props, forwardedRef) => {
-	const { ratio = 1 / 1, style, ...aspectRatioProps } = props;
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		style: {
-			position: "relative",
-			width: "100%",
-			paddingBottom: `${100 / ratio}%`
-		},
-		"data-radix-aspect-ratio-wrapper": "",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Primitive.div, {
-			...aspectRatioProps,
-			ref: forwardedRef,
-			style: {
-				...style,
-				position: "absolute",
-				top: 0,
-				right: 0,
-				bottom: 0,
-				left: 0
-			}
-		})
-	});
-});
-AspectRatio$1.displayName = NAME;
-//#endregion
-//#region src/components/ui/aspect-ratio.tsx
-var AspectRatio = AspectRatio$1;
-//#endregion
-//#region src/components/sections/Gallery.tsx
-function Gallery() {
-	const images = [
-		{
-			src: "https://img.usecurling.com/p/800/600?q=nursing%20home%20bedroom%20clean",
-			alt: "Suítes Aconchegantes"
-		},
-		{
-			src: "https://img.usecurling.com/p/800/600?q=elderly%20care%20living%20room",
-			alt: "Sala de Convivência"
-		},
-		{
-			src: "https://img.usecurling.com/p/800/600?q=beautiful%20garden%20patio",
-			alt: "Jardins e Área Externa"
-		},
-		{
-			src: "https://img.usecurling.com/p/800/600?q=healthy%20food%20dining%20room",
-			alt: "Refeitório Amplo"
-		},
-		{
-			src: "https://img.usecurling.com/p/800/600?q=physiotherapy%20room",
-			alt: "Sala de Fisioterapia"
-		},
-		{
-			src: "https://img.usecurling.com/p/800/600?q=elderly%20group%20activity",
-			alt: "Espaço de Atividades"
-		}
-	];
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
-		"data-uid": "src/components/sections/Gallery.tsx:32:5",
-		"data-prohibitions": "[editContent]",
-		id: "gallery",
-		className: "container mx-auto px-4 scroll-mt-32",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/Gallery.tsx:33:7",
-			"data-prohibitions": "[]",
-			className: "text-center max-w-3xl mx-auto mb-16 space-y-6",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-				"data-uid": "src/components/sections/Gallery.tsx:34:9",
-				"data-prohibitions": "[]",
-				className: "text-3xl md:text-4xl lg:text-5xl font-bold",
-				children: "Nossa Estrutura"
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-				"data-uid": "src/components/sections/Gallery.tsx:35:9",
-				"data-prohibitions": "[]",
-				className: "text-lg text-muted-foreground",
-				children: "Ambientes amplos, iluminados e totalmente adaptados, projetados para oferecer segurança e o máximo de conforto para nossos residentes."
-			})]
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			"data-uid": "src/components/sections/Gallery.tsx:41:7",
-			"data-prohibitions": "[editContent]",
-			className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8",
-			children: images.map((image, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				"data-uid": "src/components/sections/Gallery.tsx:43:11",
-				"data-prohibitions": "[editContent]",
-				className: "overflow-hidden rounded-3xl group relative shadow-subtle",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AspectRatio, {
-					"data-uid": "src/components/sections/Gallery.tsx:44:13",
-					"data-prohibitions": "[editContent]",
-					ratio: 4 / 3,
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-						"data-uid": "src/components/sections/Gallery.tsx:45:15",
-						"data-prohibitions": "[editContent]",
-						src: image.src,
-						alt: image.alt,
-						className: "object-cover w-full h-full transition-transform duration-700 group-hover:scale-110"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-						"data-uid": "src/components/sections/Gallery.tsx:50:15",
-						"data-prohibitions": "[editContent]",
-						className: "absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-8",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							"data-uid": "src/components/sections/Gallery.tsx:51:17",
-							"data-prohibitions": "[editContent]",
-							className: "text-white font-semibold text-xl tracking-wide",
-							children: image.alt
-						})
-					})]
-				})
-			}, i))
-		})]
-	});
-}
-//#endregion
-//#region src/components/sections/CTA.tsx
-function CTA() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("section", {
-		"data-uid": "src/components/sections/CTA.tsx:7:5",
-		"data-prohibitions": "[]",
-		className: "container mx-auto px-4",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/sections/CTA.tsx:8:7",
-			"data-prohibitions": "[]",
-			className: "bg-primary rounded-[3rem] p-10 md:p-20 text-center text-primary-foreground relative overflow-hidden shadow-elevation",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-				"data-uid": "src/components/sections/CTA.tsx:9:9",
-				"data-prohibitions": "[]",
-				className: "absolute inset-0 bg-[url('https://img.usecurling.com/p/1200/400?q=abstract%20smooth%20shapes&color=cyan')] opacity-10 bg-cover bg-center mix-blend-overlay"
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				"data-uid": "src/components/sections/CTA.tsx:11:9",
-				"data-prohibitions": "[]",
-				className: "relative z-10 max-w-4xl mx-auto space-y-10",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", {
-						"data-uid": "src/components/sections/CTA.tsx:12:11",
-						"data-prohibitions": "[]",
-						className: "text-3xl md:text-4xl lg:text-5xl font-bold leading-tight",
-						children: "Venha conhecer a Casa Vita e descubra o melhor lugar para quem você ama."
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-						"data-uid": "src/components/sections/CTA.tsx:15:11",
-						"data-prohibitions": "[]",
-						className: "text-lg md:text-xl text-primary-foreground/90 max-w-2xl mx-auto",
-						children: "Agende uma visita sem compromisso ou tire suas dúvidas diretamente com nossa equipe de atendimento especializado pelo WhatsApp."
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-						"data-uid": "src/components/sections/CTA.tsx:19:11",
-						"data-prohibitions": "[]",
-						className: "pt-4",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-							"data-uid": "src/components/sections/CTA.tsx:20:13",
-							"data-prohibitions": "[]",
-							size: "lg",
-							className: "rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white text-lg h-16 px-10 shadow-lg hover:scale-105 transition-all duration-300",
-							onClick: openWhatsApp,
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
-								"data-uid": "src/components/sections/CTA.tsx:25:15",
-								"data-prohibitions": "[editContent]",
-								className: "mr-3 h-6 w-6"
-							}), "Agendar Visita via WhatsApp"]
-						})
-					})
-				]
-			})]
-		})
-	});
-}
-//#endregion
-//#region src/pages/Index.tsx
-function Index() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		"data-uid": "src/pages/Index.tsx:9:5",
-		"data-prohibitions": "[]",
-		className: "flex flex-col gap-24 md:gap-32 pb-24",
-		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Hero, {
-				"data-uid": "src/pages/Index.tsx:10:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(About, {
-				"data-uid": "src/pages/Index.tsx:11:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Services, {
-				"data-uid": "src/pages/Index.tsx:12:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Gallery, {
-				"data-uid": "src/pages/Index.tsx:13:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CTA, {
-				"data-uid": "src/pages/Index.tsx:14:7",
-				"data-prohibitions": "[editContent]"
-			})
-		]
-	});
-}
-//#endregion
-//#region src/pages/NotFound.tsx
-var NotFound = () => {
-	const location = useLocation();
-	(0, import_react.useEffect)(() => {
-		console.error("404 Error: User attempted to access non-existent route:", location.pathname);
-	}, [location.pathname]);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		"data-uid": "src/pages/NotFound.tsx:13:5",
-		"data-prohibitions": "[]",
-		className: "min-h-screen flex items-center justify-center bg-gray-100",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/pages/NotFound.tsx:14:7",
-			"data-prohibitions": "[]",
-			className: "text-center",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", {
-					"data-uid": "src/pages/NotFound.tsx:15:9",
-					"data-prohibitions": "[]",
-					className: "text-4xl font-bold mb-4",
-					children: "404"
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					"data-uid": "src/pages/NotFound.tsx:16:9",
-					"data-prohibitions": "[]",
-					className: "text-xl text-gray-600 mb-4",
-					children: "Oops! Page not found"
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-					"data-uid": "src/pages/NotFound.tsx:17:9",
-					"data-prohibitions": "[]",
-					href: "/",
-					className: "text-blue-500 hover:text-blue-700 underline",
-					children: "Return to Home"
-				})
-			]
-		})
-	});
-};
-//#endregion
-//#region src/components/Header.tsx
-function Header() {
-	const [isOpen, setIsOpen] = (0, import_react.useState)(false);
-	const links = [
-		{
-			name: "Início",
-			href: "#home"
-		},
-		{
-			name: "Sobre Nós",
-			href: "#about"
-		},
-		{
-			name: "Serviços",
-			href: "#services"
-		},
-		{
-			name: "Estrutura",
-			href: "#gallery"
-		}
-	];
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", {
-		"data-uid": "src/components/Header.tsx:17:5",
-		"data-prohibitions": "[editContent]",
-		className: "fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b shadow-sm",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/Header.tsx:18:7",
-			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4 h-20 flex items-center justify-between",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
-					"data-uid": "src/components/Header.tsx:19:9",
-					"data-prohibitions": "[]",
-					href: "#home",
-					className: "flex items-center gap-2 text-primary font-bold text-2xl",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Heart, {
-						"data-uid": "src/components/Header.tsx:20:11",
-						"data-prohibitions": "[editContent]",
-						className: "h-8 w-8 text-primary",
-						fill: "currentColor"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-						"data-uid": "src/components/Header.tsx:21:11",
-						"data-prohibitions": "[]",
-						children: "Casa Vita"
-					})]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("nav", {
-					"data-uid": "src/components/Header.tsx:25:9",
-					"data-prohibitions": "[editContent]",
-					className: "hidden md:flex items-center gap-8",
-					children: [links.map((link) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-						"data-uid": "src/components/Header.tsx:27:13",
-						"data-prohibitions": "[editContent]",
-						href: link.href,
-						className: "text-sm font-medium hover:text-primary transition-colors",
-						children: link.name
-					}, link.name)), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-						"data-uid": "src/components/Header.tsx:35:11",
-						"data-prohibitions": "[]",
-						onClick: openWhatsApp,
-						className: "rounded-full px-6 bg-primary text-primary-foreground hover:bg-primary/90",
-						children: "Fale Conosco"
-					})]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-					"data-uid": "src/components/Header.tsx:44:9",
-					"data-prohibitions": "[editContent]",
-					className: "md:hidden p-2 text-foreground",
-					onClick: () => setIsOpen(!isOpen),
-					children: isOpen ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, {
-						"data-uid": "src/components/Header.tsx:45:21",
-						"data-prohibitions": "[editContent]",
-						className: "h-6 w-6"
-					}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Menu, {
-						"data-uid": "src/components/Header.tsx:45:49",
-						"data-prohibitions": "[editContent]",
-						className: "h-6 w-6"
-					})
-				})
-			]
-		}), isOpen && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/Header.tsx:51:9",
-			"data-prohibitions": "[editContent]",
-			className: "md:hidden absolute top-20 left-0 right-0 bg-white border-b p-4 flex flex-col gap-4 shadow-lg animate-in slide-in-from-top-2",
-			children: [links.map((link) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-				"data-uid": "src/components/Header.tsx:53:13",
-				"data-prohibitions": "[editContent]",
-				href: link.href,
-				className: "text-lg font-medium p-3 hover:bg-muted rounded-xl transition-colors",
-				onClick: () => setIsOpen(false),
-				children: link.name
-			}, link.name)), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-				"data-uid": "src/components/Header.tsx:62:11",
-				"data-prohibitions": "[]",
-				onClick: () => {
-					openWhatsApp();
-					setIsOpen(false);
-				},
-				size: "lg",
-				className: "w-full rounded-full mt-2",
-				children: "Fale Conosco"
-			})]
-		})]
-	});
-}
-//#endregion
-//#region src/components/Footer.tsx
-function Footer() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("footer", {
-		"data-uid": "src/components/Footer.tsx:5:5",
-		"data-prohibitions": "[editContent]",
-		className: "bg-primary text-primary-foreground py-16",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/Footer.tsx:6:7",
-			"data-prohibitions": "[]",
-			className: "container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/Footer.tsx:7:9",
-					"data-prohibitions": "[]",
-					className: "col-span-1 md:col-span-2 space-y-6",
-					children: [
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							"data-uid": "src/components/Footer.tsx:8:11",
-							"data-prohibitions": "[]",
-							className: "flex items-center gap-2 font-bold text-3xl",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Heart, {
-								"data-uid": "src/components/Footer.tsx:9:13",
-								"data-prohibitions": "[editContent]",
-								className: "h-10 w-10",
-								fill: "currentColor"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								"data-uid": "src/components/Footer.tsx:10:13",
-								"data-prohibitions": "[]",
-								children: "Casa Vita"
-							})]
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-							"data-uid": "src/components/Footer.tsx:12:11",
-							"data-prohibitions": "[]",
-							className: "text-primary-foreground/80 max-w-sm text-lg leading-relaxed",
-							children: "Proporcionando qualidade de vida, conforto e cuidado humanizado para quem você mais ama."
-						}),
-						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							"data-uid": "src/components/Footer.tsx:15:11",
-							"data-prohibitions": "[]",
-							className: "flex items-center gap-4 pt-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-								"data-uid": "src/components/Footer.tsx:16:13",
-								"data-prohibitions": "[]",
-								href: "#",
-								className: "bg-primary-foreground/10 p-3 rounded-full hover:bg-primary-foreground/20 transition-colors",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Facebook, {
-									"data-uid": "src/components/Footer.tsx:20:15",
-									"data-prohibitions": "[editContent]",
-									className: "h-5 w-5"
-								})
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-								"data-uid": "src/components/Footer.tsx:22:13",
-								"data-prohibitions": "[]",
-								href: "#",
-								className: "bg-primary-foreground/10 p-3 rounded-full hover:bg-primary-foreground/20 transition-colors",
-								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Instagram, {
-									"data-uid": "src/components/Footer.tsx:26:15",
-									"data-prohibitions": "[editContent]",
-									className: "h-5 w-5"
-								})
-							})]
-						})
-					]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/Footer.tsx:31:9",
-					"data-prohibitions": "[]",
-					className: "space-y-6",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", {
-						"data-uid": "src/components/Footer.tsx:32:11",
-						"data-prohibitions": "[]",
-						className: "font-semibold text-xl",
-						children: "Contato"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("ul", {
-						"data-uid": "src/components/Footer.tsx:33:11",
-						"data-prohibitions": "[]",
-						className: "space-y-4 text-primary-foreground/90",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
-							"data-uid": "src/components/Footer.tsx:34:13",
-							"data-prohibitions": "[]",
-							className: "flex items-center gap-3",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Phone, {
-								"data-uid": "src/components/Footer.tsx:35:15",
-								"data-prohibitions": "[editContent]",
-								className: "h-5 w-5 shrink-0"
-							}), " (11) 9999-9999"]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("li", {
-							"data-uid": "src/components/Footer.tsx:37:13",
-							"data-prohibitions": "[]",
-							className: "flex items-center gap-3",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Mail, {
-								"data-uid": "src/components/Footer.tsx:38:15",
-								"data-prohibitions": "[editContent]",
-								className: "h-5 w-5 shrink-0"
-							}), " contato@casavita.com.br"]
-						})]
-					})]
-				}),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					"data-uid": "src/components/Footer.tsx:43:9",
-					"data-prohibitions": "[]",
-					className: "space-y-6",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h4", {
-						"data-uid": "src/components/Footer.tsx:44:11",
-						"data-prohibitions": "[]",
-						className: "font-semibold text-xl",
-						children: "Endereço"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-						"data-uid": "src/components/Footer.tsx:45:11",
-						"data-prohibitions": "[]",
-						className: "flex items-start gap-3 text-primary-foreground/90 leading-relaxed",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MapPin, {
-								"data-uid": "src/components/Footer.tsx:46:13",
-								"data-prohibitions": "[editContent]",
-								className: "h-6 w-6 shrink-0"
-							}),
-							"Rua das Oliveiras, 123",
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
-								"data-uid": "src/components/Footer.tsx:48:13",
-								"data-prohibitions": "[editContent]"
-							}),
-							"Bairro Jardim Primavera",
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("br", {
-								"data-uid": "src/components/Footer.tsx:50:13",
-								"data-prohibitions": "[editContent]"
-							}),
-							"São Paulo - SP"
-						]
-					})]
-				})
-			]
-		}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-			"data-uid": "src/components/Footer.tsx:55:7",
-			"data-prohibitions": "[editContent]",
-			className: "container mx-auto px-4 mt-16 pt-8 border-t border-primary-foreground/20 text-center text-primary-foreground/60",
-			children: [
-				"© ",
-				(/* @__PURE__ */ new Date()).getFullYear(),
-				" Casa Vita Repouso. Todos os direitos reservados."
-			]
-		})]
-	});
-}
-//#endregion
-//#region src/components/FloatingWhatsApp.tsx
-function FloatingWhatsApp() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-		"data-uid": "src/components/FloatingWhatsApp.tsx:6:5",
-		"data-prohibitions": "[editContent]",
-		onClick: openWhatsApp,
-		className: "fixed bottom-6 right-6 z-50 bg-[#25D366] hover:bg-[#20bd5a] text-white p-4 rounded-full shadow-elevation hover:-translate-y-1 transition-all duration-300 group flex items-center justify-center",
-		"aria-label": "Fale conosco no WhatsApp",
-		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(MessageCircle, {
-				"data-uid": "src/components/FloatingWhatsApp.tsx:11:7",
-				"data-prohibitions": "[editContent]",
-				className: "w-8 h-8"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-				"data-uid": "src/components/FloatingWhatsApp.tsx:12:7",
-				"data-prohibitions": "[]",
-				className: "absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-white text-foreground px-4 py-2 rounded-2xl shadow-subtle text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none",
-				children: "Fale com nossa equipe"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-				"data-uid": "src/components/FloatingWhatsApp.tsx:16:7",
-				"data-prohibitions": "[]",
-				className: "absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-20 -z-10"
-			})
-		]
-	});
-}
-//#endregion
-//#region src/components/Layout.tsx
-function Layout() {
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-		"data-uid": "src/components/Layout.tsx:8:5",
-		"data-prohibitions": "[]",
-		className: "flex flex-col min-h-screen relative font-sans antialiased bg-background text-foreground selection:bg-primary/20",
-		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Header, {
-				"data-uid": "src/components/Layout.tsx:9:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("main", {
-				"data-uid": "src/components/Layout.tsx:10:7",
-				"data-prohibitions": "[]",
-				className: "flex-1",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {
-					"data-uid": "src/components/Layout.tsx:11:9",
-					"data-prohibitions": "[editContent]"
-				})
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Footer, {
-				"data-uid": "src/components/Layout.tsx:13:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FloatingWhatsApp, {
-				"data-uid": "src/components/Layout.tsx:14:7",
-				"data-prohibitions": "[editContent]"
-			})
-		]
-	});
-}
-//#endregion
 //#region src/App.tsx
-var App = () => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BrowserRouter, {
-	"data-uid": "src/App.tsx:14:3",
-	"data-prohibitions": "[editContent]",
-	future: {
-		v7_startTransition: false,
-		v7_relativeSplatPath: false
-	},
-	children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TooltipProvider, {
-		"data-uid": "src/App.tsx:15:5",
-		"data-prohibitions": "[editContent]",
+function App() {
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(BrowserRouter, {
+		"data-uid": "src/App.tsx:10:5",
+		"data-prohibitions": "[]",
 		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Toaster$2, {
-				"data-uid": "src/App.tsx:16:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Toaster, {
-				"data-uid": "src/App.tsx:17:7",
-				"data-prohibitions": "[editContent]"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Routes, {
-				"data-uid": "src/App.tsx:18:7",
-				"data-prohibitions": "[editContent]",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
-					"data-uid": "src/App.tsx:19:9",
-					"data-prohibitions": "[editContent]",
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Routes, {
+				"data-uid": "src/App.tsx:11:7",
+				"data-prohibitions": "[]",
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Route, {
+					"data-uid": "src/App.tsx:12:9",
+					"data-prohibitions": "[]",
 					element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Layout, {
-						"data-uid": "src/App.tsx:19:25",
+						"data-uid": "src/App.tsx:12:25",
 						"data-prohibitions": "[editContent]"
 					}),
-					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
-						"data-uid": "src/App.tsx:20:11",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
+						"data-uid": "src/App.tsx:13:11",
 						"data-prohibitions": "[editContent]",
 						path: "/",
 						element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Index, {
-							"data-uid": "src/App.tsx:20:36",
+							"data-uid": "src/App.tsx:13:36",
 							"data-prohibitions": "[editContent]"
 						})
-					})
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
-					"data-uid": "src/App.tsx:23:9",
-					"data-prohibitions": "[editContent]",
-					path: "*",
-					element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(NotFound, {
-						"data-uid": "src/App.tsx:23:34",
-						"data-prohibitions": "[editContent]"
-					})
-				})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Route, {
+						"data-uid": "src/App.tsx:14:11",
+						"data-prohibitions": "[editContent]",
+						path: "*",
+						element: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(NotFound, {
+							"data-uid": "src/App.tsx:14:36",
+							"data-prohibitions": "[editContent]"
+						})
+					})]
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Toaster$2, {
+				"data-uid": "src/App.tsx:17:7",
+				"data-prohibitions": "[editContent]"
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Toaster, {
+				"data-uid": "src/App.tsx:18:7",
+				"data-prohibitions": "[editContent]"
 			})
 		]
-	})
-});
+	});
+}
 //#endregion
 //#region src/main.tsx
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(App, {
@@ -25341,4 +23238,4 @@ var App = () => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(BrowserRouter, {
 }));
 //#endregion
 
-//# sourceMappingURL=index-DSyeGsy7.js.map
+//# sourceMappingURL=index-B-qXst-0.js.map

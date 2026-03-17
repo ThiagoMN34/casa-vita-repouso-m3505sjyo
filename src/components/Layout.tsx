@@ -1,13 +1,13 @@
 import { Outlet } from 'react-router-dom'
-import Header from './Header'
-import Footer from './Footer'
-import FloatingWhatsApp from './FloatingWhatsApp'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
+import { FloatingWhatsApp } from '@/components/FloatingWhatsApp'
 
-export default function Layout() {
+export function Layout() {
   return (
-    <div className="flex flex-col min-h-screen relative font-sans antialiased bg-background text-foreground selection:bg-primary/20">
+    <div className="min-h-screen font-sans antialiased text-slate-900 bg-slate-50 flex flex-col">
       <Header />
-      <main className="flex-1">
+      <main className="flex-grow">
         <Outlet />
       </main>
       <Footer />
