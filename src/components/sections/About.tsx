@@ -1,20 +1,42 @@
 export function About() {
   return (
-    <section id="about" className="py-24 sm:py-32 bg-white overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="about" className="py-24 sm:py-32 bg-white overflow-hidden relative">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:gap-x-16 items-center">
-          <div className="relative order-2 lg:order-1 group">
+          <div
+            className="relative order-2 lg:order-1 group animate-fade-in-up opacity-0"
+            style={{ animationDelay: '0.1s' }}
+          >
             <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] transition-transform duration-500 hover:scale-[1.02]">
               <img
                 src="https://img.usecurling.com/p/800/600?q=nursing%20home%20garden"
                 alt="Jardim da Casa Vita"
+                className="w-full h-full object-cover animate-subtle-zoom"
+              />
+            </div>
+
+            <div
+              className="absolute -bottom-8 -right-8 w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white shadow-xl z-20 hidden md:block animate-zoom-in opacity-0"
+              style={{ animationDelay: '0.4s' }}
+            >
+              <video
+                src="/accent-video-2.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                aria-hidden="true"
                 className="w-full h-full object-cover"
               />
             </div>
+
             <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-[#B4D330]/20 rounded-full -z-10 blur-2xl transition-all duration-500 group-hover:scale-110"></div>
             <div className="absolute -top-6 -left-6 w-48 h-48 bg-gray-200 rounded-full -z-10 blur-2xl transition-all duration-500 group-hover:scale-110"></div>
           </div>
-          <div className="order-1 lg:order-2">
+          <div
+            className="order-1 lg:order-2 animate-fade-in-up opacity-0"
+            style={{ animationDelay: '0.2s' }}
+          >
             <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl mb-6">
               Sobre a Casa Vita
             </h2>
