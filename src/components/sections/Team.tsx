@@ -1,77 +1,60 @@
-import { Card } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
+import thiagoPhoto from '@/assets/foto_thiago-5d841.png'
+import luisPhoto from '@/assets/foto_luis-9deef.png'
 
 const team = [
   {
     name: 'Thiago',
-    role: 'Diretor',
-    image: '/foto_thiago-c3243.png',
-    fallback: 'https://img.usecurling.com/ppl/large?gender=male&seed=thiago',
+    role: 'Diretor Clínico',
+    image: thiagoPhoto,
     description:
-      'Com vasta experiência na gestão de moradias assistidas, Thiago dedica-se a proporcionar o melhor ambiente, conforto e atendimento acolhedor para todos os residentes da Casa Vita.',
+      'Médico especialista dedicado ao acompanhamento contínuo e preventivo dos nossos residentes.',
   },
   {
     name: 'Luis',
-    role: 'Diretor Clínico',
-    image: '/foto_luis.jpg',
-    fallback: 'https://img.usecurling.com/ppl/large?gender=male&seed=luis',
+    role: 'Coordenador de Enfermagem',
+    image: luisPhoto,
     description:
-      'Responsável por garantir que todas as necessidades de saúde e bem-estar sejam atendidas com excelência, coordenando nossos Cuidados 24h com muito carinho e empatia.',
+      'Enfermeiro chefe responsável por garantir excelência, segurança e conforto no dia a dia.',
   },
 ]
 
 export function Team() {
   return (
-    <section id="team" className="py-24 sm:py-32 bg-white relative overflow-hidden">
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-[0.02]">
-        <video
-          src="/bg-team-decor.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          aria-hidden="true"
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="mx-auto max-w-2xl text-center mb-16">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl animate-fade-in-up">
-            Nossa Equipe
-          </h2>
-          <p
-            className="mt-4 text-lg text-gray-600 animate-fade-in-up opacity-0"
-            style={{ animationDelay: '0.1s' }}
-          >
-            Conheça os profissionais dedicados que fazem da Casa Vita um verdadeiro lar para quem
-            você ama.
-          </p>
+    <section className="py-16 md:py-24 bg-muted/30">
+      <div className="container px-4 md:px-6">
+        <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12 md:mb-16">
+          <div className="space-y-2">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+              Nossa Equipe de Especialistas
+            </h2>
+            <p className="max-w-[700px] text-muted-foreground md:text-lg/relaxed mx-auto text-balance">
+              Profissionais dedicados e altamente qualificados, comprometidos com o bem-estar e a
+              saúde integral dos nossos residentes.
+            </p>
+          </div>
         </div>
-        <div className="mx-auto max-w-4xl grid grid-cols-1 gap-10 sm:grid-cols-2">
-          {team.map((member, index) => (
-            <Card
-              key={member.name}
-              className="overflow-hidden border-none shadow-lg rounded-3xl hover:shadow-2xl transition-all duration-300 group animate-zoom-in opacity-0"
-              style={{ animationDelay: `${0.2 + index * 0.1}s` }}
-            >
-              <div className="aspect-[4/5] relative overflow-hidden rounded-3xl bg-gray-100">
-                <img
-                  src={member.image}
-                  onError={(e) => {
-                    e.currentTarget.onerror = null
-                    e.currentTarget.src = member.fallback
-                  }}
-                  alt={`Retrato de ${member.name}, ${member.role} da Casa Vita`}
-                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/30 to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100"></div>
-                <div className="absolute bottom-0 left-0 right-0 p-8 transform transition-transform duration-300 translate-y-4 group-hover:translate-y-0">
-                  <h3 className="text-3xl font-bold text-white mb-1">{member.name}</h3>
-                  <p className="text-[#B4D330] font-semibold mb-4 text-lg">{member.role}</p>
-                  <p className="text-gray-200 text-sm leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+
+        <div className="grid gap-8 md:grid-cols-2 lg:gap-12 max-w-4xl mx-auto">
+          {team.map((member) => (
+            <Card key={member.name} className="border-none shadow-none bg-transparent">
+              <CardContent className="flex flex-col items-center space-y-4 p-0">
+                <div className="relative h-48 w-48 overflow-hidden rounded-full border-4 border-background shadow-xl mb-4 group">
+                  <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none" />
+                  <img
+                    src={member.image}
+                    alt={`Foto de ${member.name}`}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <div className="space-y-2 text-center">
+                  <h3 className="text-2xl font-bold tracking-tight">{member.name}</h3>
+                  <p className="text-primary font-medium">{member.role}</p>
+                  <p className="text-muted-foreground pt-2 max-w-sm mx-auto">
                     {member.description}
                   </p>
                 </div>
-              </div>
+              </CardContent>
             </Card>
           ))}
         </div>

@@ -1,82 +1,50 @@
 import { Button } from '@/components/ui/button'
-import { trackWhatsAppClick } from '@/lib/tracking'
+import { ArrowRight } from 'lucide-react'
+import heroImage from '@/assets/poster-fefe6.jpg'
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-white pt-24 pb-16 md:pt-32 md:pb-24">
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <video
-          src="/bg-hero-decor.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          aria-hidden="true"
-          className="w-full h-full object-cover opacity-[0.03] mix-blend-overlay"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#B4D330]/5 to-transparent" />
-      </div>
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-8 items-center">
-          <div className="max-w-2xl animate-fade-in-up">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl leading-tight">
-              Alegria, carinho e <span className="text-[#B4D330]">qualidade de vida</span>
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-gray-600">
-              Na Casa Vita, oferecemos uma moradia assistida com foco no bem-estar e na segurança de
-              quem você ama. Nossa equipe especializada proporciona cuidados diários em um ambiente
-              acolhedor e cheio de vida.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4 sm:gap-6">
-              <a
-                href="https://wa.me/5511973651777"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={trackWhatsAppClick}
-              >
-                <Button
-                  size="lg"
-                  className="rounded-full bg-[#B4D330] hover:bg-[#a0bc2a] text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
-                >
-                  Fale pelo WhatsApp
-                </Button>
-              </a>
-              <a
-                href="#about"
-                className="text-base font-semibold leading-6 text-gray-900 hover:text-[#B4D330] transition-colors px-4 py-2"
-              >
-                Conheça a Casa Vita <span aria-hidden="true">→</span>
-              </a>
+    <section className="relative overflow-hidden bg-background pt-24 pb-16 md:pt-32 md:pb-24 lg:pt-40 lg:pb-32">
+      {/* Subtle background decoration placed at the top of the DOM structure */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background pointer-events-none" />
+
+      <div className="container relative px-4 md:px-6">
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
+          <div className="flex flex-col justify-center space-y-8 text-center lg:text-left">
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none text-balance">
+                Cuidado, Conforto e <span className="text-primary">Qualidade de Vida</span>
+              </h1>
+              <p className="max-w-[600px] text-muted-foreground md:text-xl mx-auto lg:mx-0 text-balance">
+                A Casa Vita Repouso oferece um ambiente acolhedor e profissional, focado no
+                bem-estar físico e emocional de quem você mais ama.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 min-[400px]:flex-row justify-center lg:justify-start">
+              <Button size="lg" className="px-8 h-12 text-base">
+                Agendar Visita
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button size="lg" variant="outline" className="px-8 h-12 text-base">
+                Conheça a Estrutura
+              </Button>
             </div>
           </div>
-          <div className="relative mx-auto w-full max-w-lg lg:max-w-none group animate-zoom-in">
-            <div
-              className="absolute -left-6 md:-left-12 top-1/4 w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white shadow-xl z-20 animate-fade-in-up opacity-0"
-              style={{ animationDelay: '0.5s' }}
-            >
-              <video
-                src="/accent-video-1.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                aria-hidden="true"
-                className="w-full h-full object-cover"
-              />
-            </div>
 
-            <div className="absolute -top-4 -right-4 w-72 h-72 bg-[#B4D330]/20 rounded-full blur-3xl -z-10 transition-all duration-500 group-hover:bg-[#B4D330]/30" />
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl transition-transform duration-500 hover:scale-[1.02]">
+          <div className="relative mx-auto w-full max-w-[500px] lg:max-w-none">
+            {/* Decorative blobs */}
+            <div className="absolute -top-4 -right-4 h-72 w-72 bg-primary/20 rounded-full blur-3xl opacity-50 pointer-events-none" />
+            <div className="absolute -bottom-4 -left-4 h-72 w-72 bg-blue-500/20 rounded-full blur-3xl opacity-50 pointer-events-none" />
+
+            {/* Hero Image with custom entry animation */}
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border bg-muted/50 shadow-2xl animate-hero-enter">
               <img
-                src="/poster-b2fef.jpg"
-                onError={(e) => {
-                  e.currentTarget.onerror = null
-                  e.currentTarget.src = 'https://img.usecurling.com/p/800/600?q=joyful%20seniors'
-                }}
-                alt="Idosos felizes e sorridentes na Casa Vita"
-                className="w-full h-[500px] object-cover animate-subtle-zoom"
+                src={heroImage}
+                alt="Idosos recebendo carinho e cuidado na Casa Vita Repouso"
+                className="h-full w-full object-cover"
               />
-              <div className="absolute inset-0 rounded-3xl ring-1 ring-inset ring-gray-900/10" />
+              {/* Subtle overlay to make image pop */}
+              <div className="absolute inset-0 ring-1 ring-inset ring-black/10 rounded-2xl pointer-events-none" />
             </div>
           </div>
         </div>
